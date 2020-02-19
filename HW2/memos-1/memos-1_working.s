@@ -8,8 +8,6 @@
 # video driver for the Quest OS, to support Pacman.
 # If it can't play Pacman it's not a proper OS!	
  
-mmap_ent equ 0x8000
-
 	.globl _start
 	
 	.code16
@@ -43,48 +41,10 @@ write_byte:
 	int $0x10
 
 
-# Probe memory by using int 0x15 and eax=0xE820   !!!!!! Not yet complete
-
-do_e820:
-	movw $0x8004, %di
-	xor %ebx, %ebx
-	xor %bp, %bp
-	mov $0x0534D4150, %edx
-	mov $0xe820, %eax
-	mov  $24, %ecx
+# Probe memory:
+	movw $0xE801, %ax
 	int $0x15
-	jc  error
-	cmp $0x0534D4150, %eax
-	jne error
-	test %ebx,%ebx
-	je error
-	jmp start
-
-next_entry:
-	mov $0x0534D4150, %edx
-	mov $24, %ecx
-	mov $0xe820, %eax
-	int $0x15
-
-start:
-	jcxz skip_entry
-notext:
-	mov %es:8(%di), %ecx
-	or %es:12(%di), %ecx
-	jz skip_entry
-good_entry:
-	inc %bp
-	add $24, %di
-skip_entry:
-	test %ebx, %ebx
-	jne next_entry
-e820f:
-	mov %bp, mmap_ent
-	clc
-error:
-	stc
-
-
+	
 	#Account for lower 1MB memory in item
 	addw $0x400, %ax 
 
@@ -138,14 +98,9 @@ print:	pushw %dx
 msg: 	.asciz "MemOS: Welcome **** System Memory is: "
 msg_len:.word . - msg
 
-addr_range: .asciz "Address range "
-addr_range_len:.word . - addr_range
-
-status: .asciz "status"
-sta_len:.word . - status
-
 munits: .asciz "KB"
 u_len:  .word . - munits
+
 
 end:
 	hlt
