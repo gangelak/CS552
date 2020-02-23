@@ -17,121 +17,58 @@ _start:
 	movw %ax, %ss
 	xorw %sp, %sp
 
-# set video mode	
-	movw $0x0003, %ax
+
+	movw $0x7C0, %dx # Load the MBR ar 0x7C00
+	movw %dx, %ds    # BIOS loads the MBR at 0x7C00
+
+	leaw msg, %si
+	movw msg_len, %cx
+
+write_byte:
+	
+	lodsb 		# Load a byte from DS:SI
+	movb $0x0E, %ah # Write character to the screen
+	int $0x10
+	loop write_byte
+
+
+# Write "0x" to screen....
+	movb $'0, %al  # '0 is ASCII(0)
+	movb $0x0E, %ah
+	int $0x10
+	movb $'x, %al  # 'x is ASCII(x)
+	movb $0x0E, %ah
 	int $0x10
 
-#sequencer	
-	movw $0x3c4, %dx
-	xorb %al, %al
-	movw $5, %cx
-1:	
-	outb %al, %dx
-	incw %dx
-	pushw %ax
-	inb %dx, %al
-	decw %dx
 
-	call print
+# Probe memory:
+	movw $0xE801, %ax
+	int $0x15
 	
-	popw %ax
-	incb %al
-	loop 1b
+	#Account for lower 1MB memory in item
+	addw $0x400, %ax 
 
-	movw $0x0e0d, %ax
-	movw $0x07, %bx
-	int $0x10
-	movw $0x0e0a, %ax
-	movw $0x07, %bx
-	int $0x10
+	movw %ax, %cx 
+	movw %dx, %bx
 
-#attribute controller	
-	movw $0x3c0, %dx
-	movb $0x10, %al
-	movw $4, %cx
-1:	
-	outb %al, %dx
-	incw %dx
-	pushw %ax
-	inb %dx, %al
-	decw %dx
-	
-	call print
-	
-	popw %ax
-	incb %al
-	loop 1b
-
-	movb $0x34, %al
-	outb %al, %dx
-	incw %dx
-	inb %dx, %al
-
+	mov %ah, %al
 	call print
 
-	movw $0x0e0d, %ax
-	movw $0x07, %bx
-	int $0x10
-	movw $0x0e0a, %ax
-	movw $0x07, %bx
-	int $0x10
-
-#graphics register
-	movw $0x3ce, %dx
-	xorb %al, %al
-	movw $9, %cx
-1:	
-	outb %al, %dx
-	incw %dx
-	pushw %ax
-	inb %dx, %al
-	decw %dx
-
-	call print
-	
-	popw %ax
-	incb %al
-	loop 1b
-
-	movw $0x0e0d, %ax
-	movw $0x07, %bx
-	int $0x10
-	movw $0x0e0a, %ax
-	movw $0x07, %bx
-	int $0x10
-
-#crt controller	
-	movw $0x3d4, %dx
-	xorb %al, %al
-	movw $25, %cx
-1:	
-	outb %al, %dx
-	incw %dx
-	pushw %ax
-	inb %dx, %al
-	decw %dx
-
-	call print
-	
-	popw %ax
-	incb %al
-	loop 1b
-
-	movw $0x0e0d, %ax
-	movw $0x07, %bx
-	int $0x10
-	movw $0x0e0a, %ax
-	movw $0x07, %bx
-	int $0x10
-
-#misc o/p register
-	movw $0x3cc, %dx
-	inb %dx, %al
-
+	mov %cl, %al
 	call print
 
-1:	jmp 1b
-	
+	leaw munits, %si
+	movw u_len, %cx
+
+write_byte2:
+
+	lodsb 		# Load a byte from DS:SI
+	movb $0x0E, %ah # Write character to the screen
+	int $0x10
+	loop write_byte2
+
+	jmp end
+
 print:	pushw %dx
 	movb %al, %dl
 	shrb $4, %al
@@ -139,7 +76,7 @@ print:	pushw %dx
 	jge 1f
 	addb $0x30, %al
 	jmp 2f
-1:	addb $55, %al		
+1:	addb $55, %al	 #Add ASCII 'A' - 10 offset	
 2:	movb $0x0E, %ah
 	movw $0x07, %bx
 	int $0x10
@@ -157,6 +94,16 @@ print:	pushw %dx
 	popw %dx
 	ret
 
+
+msg: 	.asciz "MemOS: Welcome **** System Memory is: "
+msg_len:.word . - msg
+
+munits: .asciz "KB"
+u_len:  .word . - munits
+
+
+end:
+	hlt
 # This is going to be in our MBR for Bochs, so we need a valid signature
 	.org 0x1FE
 

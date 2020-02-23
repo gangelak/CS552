@@ -8,14 +8,10 @@
 # video driver for the Quest OS, to support Pacman.
 # If it can't play Pacman it's not a proper OS!	
  
-MMAP_ENT: .word 0x8000
 
 	.globl _start
 	
 	.code16
-
-	
-
 
 _start:
 	movw $0x9000, %ax
@@ -44,7 +40,7 @@ write_byte:
 	movb $'x, %al  # 'x is ASCII(x)
 	movb $0x0E, %ah
 	int $0x10
-
+	
 
 # Probe memory by using int 0x15 and eax=0xE820   !!!!!! Not yet complete
 
@@ -91,22 +87,44 @@ skip_entry:
 e820f:
 	mov %bp, MMAP_ENT
 	clc
-	ret
+	jmp calc_mem
 error:
-	 stc 
+	stc
 	ret
+	
+calc_mem:
+	movl MMAP_ENT, %eax
+	movl %eax, %ebx
+	andl $0xffff0000, %eax
+	shrl $4, %eax
 
+	movw %ax, %cx
+
+	
 	#Account for lower 1MB memory in item
 	;addw $0x400, %ax 
 
-	;movw %ax, %cx 
+	movw %ax, %cx 
 	;movw %dx, %bx
 
-	;mov %ah, %al
-	;call print
+	mov %ah, %al
+	call print
 
-	;mov %cl, %al
-	;call print
+	mov %cl, %al
+	call print
+
+	movl %ebx, %eax
+	andl $0x0000ffff, %eax
+
+	movw %ax, %cx 
+	
+	mov %ah, %al
+	call print
+
+	mov %cl, %al
+	call print
+
+	jmp end
 
 	;leaw munits, %si
 	;movw u_len, %cx
@@ -118,7 +136,6 @@ error:
 	;int $0x10
 	;loop write_byte2
 
-	;jmp end
 
 print:	pushw %dx
 	movb %al, %dl
@@ -157,6 +174,8 @@ sta_len:.word . - status
 
 munits: .asciz "KB"
 u_len:  .word . - munits
+
+MMAP_ENT: .word 0x8000
 
 
 end:
