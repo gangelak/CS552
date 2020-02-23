@@ -8,11 +8,14 @@
 # video driver for the Quest OS, to support Pacman.
 # If it can't play Pacman it's not a proper OS!	
  
-mmap_ent equ 0x8000
+MMAP_ENT: .word 0x8000
 
 	.globl _start
 	
 	.code16
+
+	
+
 
 _start:
 	movw $0x9000, %ax
@@ -47,67 +50,75 @@ write_byte:
 
 do_e820:
 	movw $0x8004, %di
-	xor %ebx, %ebx
-	xor %bp, %bp
-	mov $0x0534D4150, %edx
-	mov $0xe820, %eax
-	mov  $24, %ecx
+	xorl %ebx, %ebx
+	xorw %bp, %bp
+	movl $0x0534D4150, %edx
+	movl $0xe820, %eax
+	movl $1, %es:20(%di)
+	movl  $24, %ecx
 	int $0x15
 	jc  error
-	cmp $0x0534D4150, %eax
+	cmpl $0x0534D4150, %eax
 	jne error
-	test %ebx,%ebx
+	testl %ebx,%ebx
 	je error
 	jmp start
 
 next_entry:
-	mov $0x0534D4150, %edx
-	mov $24, %ecx
-	mov $0xe820, %eax
+	movl $0xe820, %eax
+	movl $1, %es:20(%di)
+	movl $24, %ecx
 	int $0x15
+	jc e820f
+	movl $0x0534D4150, %edx
+	movl $0xdde820, %eax
 
 start:
 	jcxz skip_entry
+	cmpb $20,%cl
+	jbe notext
+	testb $1, %es:29(%di)
+	je skip_entry
 notext:
-	mov %es:8(%di), %ecx
-	or %es:12(%di), %ecx
+	mov %ecx, %es:8(%di)
+	or %ecx, %es:12(%di)
 	jz skip_entry
-good_entry:
-	inc %bp
-	add $24, %di
+	incw %bp
+	addw $24, %di
 skip_entry:
-	test %ebx, %ebx
+	testl %ebx, %ebx
 	jne next_entry
 e820f:
-	mov %bp, mmap_ent
+	mov %bp, MMAP_ENT
 	clc
+	ret
 error:
-	stc
-
+	 stc 
+	ret
 
 	#Account for lower 1MB memory in item
-	addw $0x400, %ax 
+	;addw $0x400, %ax 
 
-	movw %ax, %cx 
-	movw %dx, %bx
+	;movw %ax, %cx 
+	;movw %dx, %bx
 
-	mov %ah, %al
-	call print
+	;mov %ah, %al
+	;call print
 
-	mov %cl, %al
-	call print
+	;mov %cl, %al
+	;call print
 
-	leaw munits, %si
-	movw u_len, %cx
+	;leaw munits, %si
+	;movw u_len, %cx
 
-write_byte2:
+;write_byte2:
 
-	lodsb 		# Load a byte from DS:SI
-	movb $0x0E, %ah # Write character to the screen
-	int $0x10
-	loop write_byte2
+	;lodsb 		# Load a byte from DS:SI
+	;movb $0x0E, %ah # Write character to the screen
+	;int $0x10
+	;loop write_byte2
 
-	jmp end
+	;jmp end
 
 print:	pushw %dx
 	movb %al, %dl
@@ -146,6 +157,7 @@ sta_len:.word . - status
 
 munits: .asciz "KB"
 u_len:  .word . - munits
+
 
 end:
 	hlt
