@@ -54,7 +54,8 @@ do_e820:
 	movl  $24, %ecx
 	int $0x15
 	jc  error
-	cmpl $0x0534D4150, %eax
+	movl $0x0534D4150, %edx
+	cmpl %edx, %eax
 	jne error
 	testl %ebx,%ebx
 	je error
@@ -67,13 +68,13 @@ next_entry:
 	int $0x15
 	jc e820f
 	movl $0x0534D4150, %edx
-	movl $0xdde820, %eax
+	movl $0xe820, %eax
 
 start:
 	jcxz skip_entry
 	cmpb $20,%cl
 	jbe notext
-	testb $1, %es:29(%di)
+	testb $1, %es:20(%di)
 	je skip_entry
 notext:
 	mov %ecx, %es:8(%di)
@@ -93,48 +94,44 @@ error:
 	ret
 	
 calc_mem:
-	movl MMAP_ENT, %eax
-	movl %eax, %ebx
-	andl $0xffff0000, %eax
-	shrl $4, %eax
+	xorl %eax,%eax
+	movw $0x8004, %di
+	movw %es:16(%di), %ax
+	#movl %eax, %ebx
+	
+	#andl $0xffff0000, %eax
+	#shr $4, %eax
 
 	movw %ax, %cx
-
-	
-	#Account for lower 1MB memory in item
-	;addw $0x400, %ax 
-
-	movw %ax, %cx 
-	;movw %dx, %bx
-
-	mov %ah, %al
-	call print
-
-	mov %cl, %al
-	call print
-
-	movl %ebx, %eax
-	andl $0x0000ffff, %eax
-
-	movw %ax, %cx 
 	
 	mov %ah, %al
 	call print
 
 	mov %cl, %al
 	call print
+
+	#movl %ebx, %eax
+	#andl $0x0000ffff, %eax
+
+	#movw %ax, %cx 
+	
+	#mov %ah, %al
+	#call print
+
+	#mov %cl, %al
+	#call print
 
 	jmp end
 
-	;leaw munits, %si
-	;movw u_len, %cx
+#	;leaw munits, %si
+#	;movw u_len, %cx
 
-;write_byte2:
+#;write_byte2:
 
-	;lodsb 		# Load a byte from DS:SI
-	;movb $0x0E, %ah # Write character to the screen
-	;int $0x10
-	;loop write_byte2
+#	;lodsb 		# Load a byte from DS:SI
+#	;movb $0x0E, %ah # Write character to the screen
+#	;int $0x10
+#	;loop write_byte2
 
 
 print:	pushw %dx
@@ -163,6 +160,8 @@ print:	pushw %dx
 	ret
 
 
+MMAP_ENT: .word 0x8000
+
 msg: 	.asciz "MemOS: Welcome **** System Memory is: "
 msg_len:.word . - msg
 
@@ -175,7 +174,6 @@ sta_len:.word . - status
 munits: .asciz "KB"
 u_len:  .word . - munits
 
-MMAP_ENT: .word 0x8000
 
 
 end:
