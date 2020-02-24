@@ -22,30 +22,30 @@ _start:
 	movw $0x7C0, %dx # Load the MBR ar 0x7C00
 	movw %dx, %ds    # BIOS loads the MBR at 0x7C00
 
-	leaw msg, %si
-	movw msg_len, %cx
+	#leaw msg, %si
+	#movw msg_len, %cx
 
-write_byte:
+#write_byte:
 	
-	lodsb 		# Load a byte from DS:SI
-	movb $0x0E, %ah # Write character to the screen
-	int $0x10
-	loop write_byte
+#	lodsb 		# Load a byte from DS:SI
+#	movb $0x0E, %ah # Write character to the screen
+#	int $0x10
+#	loop write_byte
 
 
 # Write "0x" to screen....
-	movb $'0, %al  # '0 is ASCII(0)
-	movb $0x0E, %ah
-	int $0x10
-	movb $'x, %al  # 'x is ASCII(x)
-	movb $0x0E, %ah
-	int $0x10
-	
+	#movb $'0, %al  # '0 is ASCII(0)
+#	movb $0x0E, %ah
+#	int $0x10
+	#movb $'x, %ah  # 'x is ASCII(x)
+	#call print_2_bytes
+#	movb $0x0E, %ah
+#	int $0x10
 
 # Probe memory by using int 0x15 and eax=0xE820   !!!!!! Not yet complete
 
 do_e820:
-	movw $0x8004, %di
+	mov $0x5000, %di
 	xorl %ebx, %ebx
 	xorw %bp, %bp
 	movl $0x0534D4150, %edx
@@ -88,40 +88,81 @@ skip_entry:
 e820f:
 	mov %bp, MMAP_ENT
 	clc
-	jmp calc_mem
+	jmp print_map
 error:
 	stc
 	ret
 	
-calc_mem:
-	xorl %eax,%eax
-	movw $0x8004, %di
-	movw %es:16(%di), %ax
-	#movl %eax, %ebx
-	
-	#andl $0xffff0000, %eax
-	#shr $4, %eax
-
-	movw %ax, %cx
-	
-	mov %ah, %al
+print_map:
+	push %di
+	push %bx
+	mov MMAP_ENT, %cx
+	movw $0, %dx
+	#movw $24, %cx           
+	#mul %cx             # Store how many memory regions we have as 24 byte entries
+	mov %cx, %ax 
 	call print
-
-	mov %cl, %al
+	call print_newl
+	movw $0x5007, %di
+	movw $0x4fff, %dx
+	cld
+repeat:
+	cmpw $0, %cx
+	je done
+	mov %es:(%di), %al
+	#lodsb
 	call print
-
-	#movl %ebx, %eax
-	#andl $0x0000ffff, %eax
-
-	#movw %ax, %cx 
-	
-	#mov %ah, %al
-	#call print
-
-	#mov %cl, %al
-	#call print
-
+	#movb $0x20, %al
+	#movb $0x0E, %ah
+	#int $0x10
+	#dec %cx
+	dec %di
+	#mov $0, %dx
+	mov %di, %ax
+	#mov $8, %bx
+	#div %bx
+	cmpw %dx, %ax
+	jne no_newl
+	call print_newl
+	add $32, %di
+	add $24, %dx
+	dec %cx
+no_newl:
+	#incw %di
+	jmp repeat
+done:
+	pop %bx
+	pop %di
 	jmp end
+
+
+print_newl:
+	push %ax
+	push %bx
+	movb $'\n, %al
+	movb $0x0E, %ah
+	int $0x10
+	movb $'\r, %al
+	movb $0x0E, %ah
+	int $0x10
+	
+	pop %bx
+	pop %ax
+	ret
+
+print_2_bytes:
+	push %ax
+	push %dx
+	push %bx
+	movw %ax, %dx
+	call print
+	movw %dx, %ax
+	movb %ah, %al
+	call print
+	pop %bx
+	pop %dx
+	pop %ax
+	ret
 
 #	;leaw munits, %si
 #	;movw u_len, %cx
@@ -160,7 +201,7 @@ print:	pushw %dx
 	ret
 
 
-MMAP_ENT: .word 0x8000
+MMAP_ENT: .word 0x4ffc
 
 msg: 	.asciz "MemOS: Welcome **** System Memory is: "
 msg_len:.word . - msg
