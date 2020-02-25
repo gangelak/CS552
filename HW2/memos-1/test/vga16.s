@@ -105,8 +105,7 @@ u_len:  .word . - munits
 end:
 	hlt
 # This is going to be in our MBR for Bochs, so we need a valid signature
-	.org 0x1FE
-
+	.org  0x1fe
 	.byte 0x55
 	.byte 0xAA
 
