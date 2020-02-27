@@ -1,3 +1,6 @@
 Followed instruction in BOCHS HOWTO
 
-mount c2.img and copy the binary under /boot/grub/memos2
+# mount c2 image
+mount c2.img /mnt/C -text2 -o loop,offset=32256
+# copy memos2 binary to c2.img
+cp memos2 /mnt/C/boot/memos-2
