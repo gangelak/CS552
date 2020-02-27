@@ -1,0 +1,3 @@
+Followed instruction in BOCHS HOWTO
+
+mount c2.img and copy the binary under /boot/grub/memos2
