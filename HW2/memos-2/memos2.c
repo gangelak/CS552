@@ -8,6 +8,14 @@
 
 unsigned short *text_buffer = (unsigned short*)TEXT_BUFFER_LOC;
 
+typedef struct multiboot_memory_map {
+	unsigned int size;
+	unsigned int base_low, base_high;
+	unsigned int len_low, len_high;
+	unsigned int type;
+} multiboot_memmap_t;
+
+typedef multiboot_memmap_t mmap_entry_t;
 struct cursor {
 	int x, y;
 } csr;
@@ -46,7 +54,17 @@ void print(char *text) {
 }
 
 
-void kmain (multiboot_info_t* mbd, unsigned long magic) {
+void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	print("MemOS: Welcome *** System Memory is:\n");
+
+	mmap_entry_t* ent = mbt->mmap_addr;
+	while( ent < mbt->mmap_addr + mbt->mmap_length )
+	{
+		if ( ent->type == 1 )
+			print("1\n");
+		else if ( ent->type == 2 )
+			print("2\n");
+		ent = (mmap_entry_t*) ((unsigned int) ent + ent->size + sizeof(ent->size));
+	}
 	for (;;) {}
 }
