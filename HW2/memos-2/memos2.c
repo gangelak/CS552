@@ -88,17 +88,31 @@ void print(char *text) {
 
 
 void kmain (multiboot_info_t* mbt, unsigned long magic) {
-	print("MemOS: Welcome *** System Memory is:\n");
-
-	mmap_entry_t* ent = mbt->mmap_addr;
-	while( ent < mbt->mmap_addr + mbt->mmap_length )
+	print("\n\n\n\n\n\n\n\nMemOS: Welcome *** System Memory is:\n");
+	
+	// check whether the data is valid or not
+	if (mbt->flags & 0b1000000)
 	{
-		char str[50] = "";
-		my_itoa(ent->type, str, 10);
-		print("here:");
-		print(str);
-		print("\n");
-		ent = (mmap_entry_t*) ((unsigned int) ent + ent->size + sizeof(ent->size));
+		mmap_entry_t* ent = mbt->mmap_addr;
+		while( ent < mbt->mmap_addr + mbt->mmap_length )
+		{
+			char str[50] = "";
+			// Address Range: [ 0x00000000 0x0000000 ] status: 
+			print("Address Range: [");
+			print(" 0x");
+			my_itoa(ent->base_low, str, 16);
+			print(str);
+
+			print(" 0x");
+			my_itoa(ent->base_low + ent->len_low, str, 16);
+			print(str);
+			print(" ]");
+			print(" status: ");
+			my_itoa(ent->type, str, 10);
+			print(str);
+			print("\n");
+			ent = (mmap_entry_t*) ((unsigned int) ent + ent->size + sizeof(ent->size));
+		}
 	}
 	for (;;) {}
 }
