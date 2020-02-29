@@ -136,9 +136,15 @@ void my_memset(char *str){
 
 
 void kmain (multiboot_info_t* mbt, unsigned long magic) {
-	print("\n\n\n\n\n\n\n\nMemOS: Welcome *** System Memory is:\n");
-	char *str;
+	print("\n\n\n\n\n\n\n\nMemOS: Welcome *** System Memory is:");
+	char* str;
+	my_memset(str);
+	str = itoa(mbt->mem_lower+mbt->mem_upper, str, 10);
+	print(str);
+	print("KB");
+	my_memset(str);
 	
+	print("\n");
 	// check whether the data is valid or not
 	if (mbt->flags & 0b1000000)
 	{
