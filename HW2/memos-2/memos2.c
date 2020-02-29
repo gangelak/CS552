@@ -22,36 +22,36 @@ struct cursor {
 } csr;
 
 // refer to geeksforgeeks.org for implementation of itoa()
-void my_itoa ( int num, char* str, int base)
-{
-	int i = 0 ;
+/*void my_itoa ( int num, char* str, int base)*/
+/*{*/
+	/*int i = 0 ;*/
 
-	// handle 0 explicitely
-	if ( num ==0 )
-	{
-		str[i++] = '0';
-		str[i] = '\0';
-	}
-	// process individual digits 
-	while (num != 0) 
-	{ 
-		int rem = num % base;
-		str[i++] = (rem > 9)? (rem-10) + 'a' : rem + '0';
-		num = num/base; 
-	}
+	/*// handle 0 explicitely*/
+	/*if ( num ==0 )*/
+	/*{*/
+		/*str[i++] = '0';*/
+		/*str[i] = '\0';*/
+	/*}*/
+	/*// process individual digits */
+	/*while (num != 0) */
+	/*{ */
+		/*int rem = num % base;*/
+		/*str[i++] = (rem > 9)? (rem-10) + 'a' : rem + '0';*/
+		/*num = num/base; */
+	/*}*/
 
-	str[i] = '\0';
-	// now we have to reverse the char**/
-	i--;
-	char tmp = "\0";
-	for ( int j = 0 ; i > j; j++, i-- )
-	{
-		tmp = str[i];
-		str[i] = str[j];
-		str[j] = tmp;
-	}
+	/*str[i] = '\0';*/
+	/*// now we have to reverse the char**/
+	/*i--;*/
+	/*char tmp = '\0';*/
+	/*for ( int j = 0 ; i > j; j++, i-- )*/
+	/*{*/
+		/*tmp = str[i];*/
+		/*str[i] = str[j];*/
+		/*str[j] = tmp;*/
+	/*}*/
 	
-}
+/*}*/
 
 void put(unsigned char c)
 {
@@ -155,8 +155,6 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	char* str;
 	unsigned long temp;
 	unsigned long total_len = 0;
-	unsigned long lsb_sum;
-	unsigned long msb_sum;
 	
 	// check whether the data is valid or not
 	if (mbt->flags & 0b1000000)
