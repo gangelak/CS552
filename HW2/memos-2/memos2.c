@@ -20,6 +20,39 @@ struct cursor {
 	int x, y;
 } csr;
 
+// refer to geeksforgeeks.org for implementation of iota()
+void my_itoa ( int num, char* str, int base)
+{
+	int i = 0 ;
+
+	// handle 0 explicitely
+	if ( num ==0 )
+	{
+		str[i++] = '0';
+		str[i] = '\0';
+
+	}
+	// process individual digits 
+	while (num != 0) 
+	{ 
+		int rem = num % base; 
+		str[i++] = (rem > 9)? (rem-10) + 'a' : rem + '0'; 
+		num = num/base; 
+	}
+
+	str[i] = '\0';
+	// now we have to reverse the char*
+	i--;
+	char tmp = "\0";
+	for ( int j = 0 ; i > j; j++, i-- )
+	{
+		tmp = str[i];
+		str[i] = str[j];
+		str[j] = tmp;
+	}
+	
+}
+
 void put(unsigned char c)
 {
 	unsigned short *pos;
@@ -60,10 +93,11 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	mmap_entry_t* ent = mbt->mmap_addr;
 	while( ent < mbt->mmap_addr + mbt->mmap_length )
 	{
-		if ( ent->type == 1 )
-			print("1\n");
-		else if ( ent->type == 2 )
-			print("2\n");
+		char str[50] = "";
+		my_itoa(ent->type, str, 10);
+		print("here:");
+		print(str);
+		print("\n");
 		ent = (mmap_entry_t*) ((unsigned int) ent + ent->size + sizeof(ent->size));
 	}
 	for (;;) {}
