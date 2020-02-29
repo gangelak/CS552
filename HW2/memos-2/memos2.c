@@ -3,7 +3,7 @@
 #define TEXT_BUFFER_LOC 0xB8000
 #define COLS 80
 #define ROWS 24
-#define MAX_INT 4294967295
+#define MAX_INT 0xFFFFFFFF
 
 #define COLOR 0x0F << 8
 
@@ -21,37 +21,6 @@ struct cursor {
 	int x, y;
 } csr;
 
-// refer to geeksforgeeks.org for implementation of itoa()
-/*void my_itoa ( int num, char* str, int base)*/
-/*{*/
-	/*int i = 0 ;*/
-
-	/*// handle 0 explicitely*/
-	/*if ( num ==0 )*/
-	/*{*/
-		/*str[i++] = '0';*/
-		/*str[i] = '\0';*/
-	/*}*/
-	/*// process individual digits */
-	/*while (num != 0) */
-	/*{ */
-		/*int rem = num % base;*/
-		/*str[i++] = (rem > 9)? (rem-10) + 'a' : rem + '0';*/
-		/*num = num/base; */
-	/*}*/
-
-	/*str[i] = '\0';*/
-	/*// now we have to reverse the char**/
-	/*i--;*/
-	/*char tmp = '\0';*/
-	/*for ( int j = 0 ; i > j; j++, i-- )*/
-	/*{*/
-		/*tmp = str[i];*/
-		/*str[i] = str[j];*/
-		/*str[j] = tmp;*/
-	/*}*/
-	
-/*}*/
 
 void put(unsigned char c)
 {
@@ -160,7 +129,8 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	if (mbt->flags & 0b1000000)
 	{
 		mmap_entry_t* ent = mbt->mmap_addr;
-		while( ent < mbt->mmap_addr + mbt->mmap_length && (ent->base_low + ent->len_low != 0))
+		int flag = 0;
+		while( ent < mbt->mmap_addr + mbt->mmap_length && flag == 0)
 		{
 			// Address Range: [ 0x00000000 0x0000000 ] status: 
 			my_memset(str);
@@ -179,13 +149,15 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 
 			// printing base_addr + len
 
-			print(" : ");
+			print(":");
 
-			if (ent->base_low + ent->len_low > MAX_INT)
+			if ((unsigned int)(ent->base_low + ent->len_low) == 0 )
 			{
-				str = itoa(ent->len_high+ent->base_high + 1, str ,16);
+				str = itoa( (ent->len_high+ent->base_high +1) , str ,16);
 				pad(str);
 				my_memset(str);
+				flag = 1;
+
 			}
 			else
 			{
