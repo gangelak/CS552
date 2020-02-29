@@ -187,5 +187,5 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 			my_memset(str);
 			print("\n");
 	}
-	for (;;) {}
+	while(1){;}
 }
