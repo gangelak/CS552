@@ -20,10 +20,10 @@ _start:
 	movw $0x7C0, %dx # Load the MBR ar 0x7C00
 	movw %dx, %ds    # BIOS loads the MBR at 0x7C00
 	
-	# Print welcome message
-	leaw welcome, %si
-	movw welcome_len, %cx
-	call print_string
+	
+	# Zero out the total memory accumulator
+	mov $0x6000, %si
+	movl $0x0, %es:(%di)
 
 # Probe memory by using int 0x15 and eax=0xE820 -- Get Memory regions starting from mmap_ent
 
@@ -31,6 +31,7 @@ do_e820:
 	mov $0x5000, %di
 	xorl %ebx, %ebx
 	xorw %bp, %bp
+next_entry:
 	movl $0x0534D4150, %edx
 	movl $0xe820, %eax
 	movl $1, %es:20(%di)
@@ -39,94 +40,23 @@ do_e820:
 	jc  error
 	cmpl $0x0534D4150, %eax
 	jne error
-	testl %ebx,%ebx
-	je error
-	jmp start
-
-next_entry:
-	movl $0xe820, %eax
-	movl $1, %es:20(%di)
-	movl $24, %ecx
-	int $0x15
-	jc e820f
-	movl $0x0534D4150, %edx
-start:
-	jcxz skip_entry
-	cmpb $20,%cl
-	jbe notext
-	testb $1, %es:20(%di)
-	je skip_entry
-notext:
-	mov %ecx, %es:8(%di)
-	or %ecx, %es:12(%di)
-	jz skip_entry
-	incw %bp
-	addw $24, %di
-skip_entry:
 	testl %ebx, %ebx
-	jne next_entry
-e820f:
-	dec %bp
-	mov %bp, mmap_ent
-	clc
-	jmp calc_total_mem
-error:
-	stc
-	ret
+	je e820f
 	
-calc_total_mem:
-	pusha
-	mov mmap_ent, %ax
-	movw $24, %cx           
-	mul %cx               # Store how many memory regions we have as 24 byte entries
-	add $0x4FE8, %ax      # Go to the beginning of our last entry (We just need the sum = base_addr + length)
-	movw %ax, %di 	      # Start of base address for the last entry is in di
-	
-	# MSBs
-	movl %es:4(%di), %ebx # Get MSBs to %ebx
-	# LSBs
-	movl %es:(%di), %eax  # Get LSBs to %eax 
-	
-	# We need to convert the result into 
-	# MB so we shift right by 20 -> division by 1MB
-	shrd $20,%eax,%eax 
-	and  $0xfff, %eax
-
-	# Temp store upper bits to edx
-	shld $12,%ebx, %ebx
-	and $0xfffff000, %ebx
-	or %ebx,%eax           # Lower 4 bytes ready -- RAM < 4 billion MBs
-	
-	incl %eax              # We are off by 1 byte -> correct that
-	
-	call print_4_bytes
-	popa
-
-# Print the MB string
-print_MB:
-	leaw munits, %si
-	movw u_len, %cx
-	call print_string
-	call print_newl
-	
-print_map:
-	pusha
-	mov mmap_ent, %cx       # Move the memory region counter from memory in cx
-	movw $0x5000, %di       # Start of the memory region information is in 0x7c005000
-repeat:
-	cmpw $0, %cx
-	je done
+	# Save %cx because we are going to modify it
 	push %cx
-	clc
+
 	# Print Address range ...
+
 	leaw addr_range, %si
 	movw addr_range_len, %cx
 	call print_string
 	
-	movl %es:8(%di), %edx   # Base address 4 MSBs
+	clc
+	movl %es:4(%di), %edx   # Base address 4 MSBs
 	mov %edx, %eax
 	call print_4_bytes
-	movl %es:12(%di), %eax    # Base address 4 LSBs
+	movl %es:(%di), %eax    # Base address 4 LSBs
 	call print_4_bytes
 	
 	# Don't ruin %eax
@@ -150,11 +80,6 @@ repeat:
 	# Print the 4 LSBs
 	pop %eax 
 	call print_4_bytes
-	
-	#movl %es:28(%di), %eax
-	#call print_4_bytes
-	#movl %es:24(%di), %eax
-	#call print_4_bytes
 
 	# Print status message
 	leaw status, %si
@@ -165,16 +90,82 @@ repeat:
 	mov %es:16(%di), %al
 	call print_byte
 	call print_newl
-	# Restore counter to %cx
+
+
+	# Sum the length 
+	# We assume that RAM < 4GB
+	# so we need only the 4 LSBs
+	mov %es:8(%di), %eax
+	
+	# Save %di
+	push %di
+	mov $0x6000, %di
+	addl %eax, %es:(%di)
+	# Restore %di
+	pop %di
+	
+	# Restore %cx
 	pop %cx
-	dec %cx
-	add $24, %di
-	jmp repeat
-done:
+	
+	jne next_entry
+e820f:
+	# The final length is not added
+	# So add it now that we finished
+	mov %es:8(%di), %eax
+	
+	# Save %di
+	push %di
+	mov $0x6000, %di
+	addl %eax, %es:(%di)
+	# Restore %di
+	pop %di
+	
+	jmp print_total_mem
+error:
+	leaw welcome, %si
+	movw welcome_len, %cx
+	call print_string
+	ret
+	
+print_total_mem:
+	pusha
+	
+	# Print welcome message
+	leaw welcome, %si
+	movw welcome_len, %cx
+	call print_string
+	
+	movw $0x6000, %di    # Address where the length is stored at
+	
+	# Get length from memory to %eax
+	movl %es:(%di), %eax  
+	
+	# We need to convert the result into 
+	# MB so we shift right by 20 -> division by 1MB
+	shrd $20,%eax,%eax 
+	and  $0xfff, %eax
+	
+	incl %eax              # We are off by 1 byte -> correct that
+	
+	# Save %eax
+	push %eax
+	shr $8, %eax           # Print MSB first
+	call print_byte        
+	
+	pop %eax
+	call print_byte        # Print LSB
+
 	popa
+
+# Print the MB string
+print_MB:
+	leaw munits, %si
+	movw u_len, %cx
+	call print_string
+	call print_newl
+
 	jmp end
-
-
+	
 # Print 1 ascii character
 print_ascii_char:
 	movb $0x0E, %ah 	# Write character to the screen
@@ -242,17 +233,22 @@ print_byte:
 # counter and the regions
 mmap_ent: .word 0x4ffc
 
+total_mem: .word 0x6000
+
 welcome: .asciz "MemOS: Welcome *** System Memory is: 0x"
-welcome_len:.word . - welcome
+welcome_len: .word . - welcome -1
 
-addr_range: .asciz "Address range ["
-addr_range_len:.word . - addr_range
+addr_range:.asciz "Address range ["
+addr_range_len:.word . - addr_range -1
 
-status: .asciz "] status: "
-status_len:.word . - status
+status:.asciz "] status: "
+status_len:.word . - status -1
 
-munits: .asciz "MB"
-u_len:  .word . - munits
+error_msg:.asciz "******Error******"
+error_msg_len:.word . - error_msg -1
+
+munits:.asciz "MB"
+u_len:.word . - munits -1
 
 end:
 	hlt
