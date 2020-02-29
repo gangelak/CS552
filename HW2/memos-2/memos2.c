@@ -3,6 +3,7 @@
 #define TEXT_BUFFER_LOC 0xB8000
 #define COLS 80
 #define ROWS 24
+#define MAX_INT  2147483647
 
 #define COLOR 0x0F << 8
 
@@ -136,15 +137,13 @@ void my_memset(char *str){
 
 
 void kmain (multiboot_info_t* mbt, unsigned long magic) {
-	print("\n\n\n\n\n\n\n\nMemOS: Welcome *** System Memory is:");
+	print("\n\n\n\n\n\n\n\n");
 	char* str;
-	my_memset(str);
-	str = itoa(mbt->mem_lower+mbt->mem_upper, str, 10);
-	print(str);
-	print("KB");
-	my_memset(str);
+	unsigned long temp;
+	unsigned long total_len = 0;
+	unsigned long lsb_sum;
+	unsigned long msb_sum;
 	
-	print("\n");
 	// check whether the data is valid or not
 	if (mbt->flags & 0b1000000)
 	{
@@ -155,12 +154,16 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 			my_memset(str);
 			print("Address Range: [");
 			print(" 0x");
-			str = itoa(ent->base_low, str, 16);
+			lsb_sum = ent->base_low;
+			str = itoa(lsb_sum, str, 16);
 			print(str);
 
 			my_memset(str);
 			print(" 0x");
-			str = itoa(ent->base_low + ent->len_low, str, 16);
+			lsb_sum = ent->base_low + ent->len_low;
+			//if (lsb_sum)
+
+			str = itoa(lsb_sum, str, 16);
 			print(str);
 			print(" ]");
 			print(" status: ");
@@ -168,7 +171,18 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 			print(str);
 			print("\n");
 			ent = (mmap_entry_t*) ((unsigned int) ent + ent->size + sizeof(ent->size));
+
+			total_len += ent->len_low;
+
 		}
+			print("MemOS: Welcome *** System Memory is: ");
+			my_memset(str);
+			temp = ((((total_len) >> 20) &0xfff) + 1);
+			str = itoa(temp, str, 10);
+			print(str);
+			print("MB");
+			my_memset(str);
+			print("\n");
 	}
 	for (;;) {}
 }
