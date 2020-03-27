@@ -15,7 +15,7 @@
                          case __LINE__:; } while (0)
 #define crFinish }
 
-#define MAX_THREADS 1
+#define MAX_THREADS 2
 
 typedef enum {
   FALSE,
@@ -39,7 +39,7 @@ int thread1 (void) {
   int i; 
   static int j;
 
- // crBegin;
+  crBegin;
   while (1) {
     for (i = 0; i < 10; i++) {
       print ("<1>");
@@ -74,7 +74,7 @@ int thread2 (void) {
       //msleep (100);
       //fflush (stdout);
     }
-    print ("\n\n\n\n\n\n\n\n");
+    print ("\n");
     crReturn (2); // Time to yield
 
     if (++j == 10)

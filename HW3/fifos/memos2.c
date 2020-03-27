@@ -70,7 +70,7 @@ int thread_create(void) {
 
   /* Build a "runqueue" */
   f[0] = thread1;
-  f[1] = thread2;
+ // f[1] = thread2;
 
   // Setup runqueue head
   head.task = f[0];
