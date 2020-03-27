@@ -42,19 +42,19 @@ int thread1 (void) {
  // crBegin;
   while (1) {
     for (i = 0; i < 10; i++) {
-      print ("<1>");
-//      msleep (100);
+      print ("1");
+      msleep (1000);
   //    fflush (stdout);
     }
     print ("\n");
-    crReturn (1); // Let's cooperate and yield
+//    crReturn (1); // Let's cooperate and yield
 
     if (++j == 6)
       break;
   }
   done[0] = TRUE;
 
-  print ("Done <1>!\n");
+  print ("Done 1\n");
 
   crFinish;
 
@@ -70,19 +70,19 @@ int thread2 (void) {
   crBegin;
   while (1) {
     for (i = 0; i < 5; i++) {
-      print ("<2>");
-      //msleep (100);
+      print ("2");
+      msleep (1000);
       //fflush (stdout);
     }
-    print ("\n\n\n\n\n\n\n\n");
-    crReturn (2); // Time to yield
+    print("\n");
+//    crReturn (2); // Time to yield
 
     if (++j == 10)
       break;
   }
   done[1] = TRUE;
 
-  print ("Done <2>!\n");
+  print ("Done 2\n");
 
   crFinish;
 
