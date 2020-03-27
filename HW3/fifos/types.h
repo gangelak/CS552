@@ -1,7 +1,6 @@
 #define FALSE 0
 #define TRUE 1
 
-
 typedef unsigned char uint8;
 typedef unsigned short int uint16;
 typedef unsigned long int uint32;
@@ -11,7 +10,6 @@ typedef signed char sint8, s8;
 typedef signed short int sint16, s16;
 typedef signed long int sint32, s32;
 typedef signed long long int sint64, s64;
-
 
 #ifndef _SIZE_T
 typedef int size_t;
