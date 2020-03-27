@@ -18,35 +18,35 @@ gdt:
 	/* Checkout Wikipedia */
 
 	# Null descriptor -> First entry
-	.word $0x0
-	.word $0x0
+	.word 0x0
+	.word 0x0
 	
 	# Code Segment -->  Base 0x04000000
-	.short $0xffff     	# Max limit 
-	.short $0x0             # Base 1st 16 bits          
-	.byte  $0x0
-	.byte  $0x9a
-	.byte  $0x4f            # Granularity in MBs 
-	.byte  $0x04
+	.short 0xffff     	# Max limit 
+	.short 0x0             # Base 1st 16 bits          
+	.byte  0x0
+	.byte  0x9a
+	.byte  0x4f            # Granularity in MBs 
+	.byte  0x04
 
 	# Data segment -->  Base 0x08000000
-	.short $0xffff
-	.short $0x0
-	.byte  $0x0
-	.byte  $0x92
-	.byte  $0x4f
-	.byte  $0x08
+	.short 0xffff
+	.short 0x0
+	.byte  0x0
+	.byte  0x92
+	.byte  0x4f
+	.byte  0x08
 
 gdt_ptr:
-	.short $0x7ff    	# Length in bytes - 3 descriptors but space for 256 linear address
+	.short 0x7ff    	# Length in bytes - 3 descriptors but space for 256 linear address
 	.long gdt
 
 #idt_prt:
 #	.short $0x7ff 		# Length - 256 descriptors
 #	.long idt
 
-#	.text
-#	.global _start
+	.text
+	.global _start
 
 
 _start:

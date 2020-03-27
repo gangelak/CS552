@@ -39,7 +39,7 @@ int thread1 (void) {
   int i; 
   static int j;
 
- // crBegin;
+  crBegin;
   while (1) {
     for (i = 0; i < 10; i++) {
       print ("1");
@@ -47,7 +47,7 @@ int thread1 (void) {
   //    fflush (stdout);
     }
     print ("\n");
-//    crReturn (1); // Let's cooperate and yield
+    crReturn (1); // Let's cooperate and yield
 
     if (++j == 6)
       break;
@@ -56,7 +56,7 @@ int thread1 (void) {
 
   print ("Done 1\n");
 
-  //crFinish;
+  crFinish;
 
   return 1;
 }
@@ -75,7 +75,7 @@ int thread2 (void) {
       //fflush (stdout);
     }
     print("\n");
-//    crReturn (2); // Time to yield
+    crReturn (2); // Time to yield
 
     if (++j == 10)
       break;
@@ -84,7 +84,7 @@ int thread2 (void) {
 
   print ("Done 2\n");
 
-  //crFinish;
+  crFinish;
 
   return 2;
 }
