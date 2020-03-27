@@ -4,6 +4,7 @@
 #define MAX_INT 0xFFFFFFFF
 
 #define COLOR 0x0F << 8
+#define nop() asm("nop")
 
 unsigned short *text_buffer = (unsigned short*)TEXT_BUFFER_LOC;
 
@@ -40,10 +41,21 @@ void put(unsigned char c)
 	{
 		pos = text_buffer + (csr.y*COLS) + csr.x ;
 		*pos = COLOR | c;
+		if (csr.x > COLS)
+		{
+			csr.x = 0;
+			csr.y++;
+		} else {
 		csr.x++;
+		}
 	}
 }
 
+void msleep(int time){
+	for( int i = 0 ; i < time ; i++) {
+		nop();
+	}
+}
 void print(char *text) {
 
 	int i;
