@@ -15,12 +15,8 @@
                          case __LINE__:; } while (0)
 #define crFinish }
 
-#define MAX_THREADS 1
+#define MAX_THREADS 2
 
-typedef enum {
-  FALSE,
-  TRUE
-} bool;
 
 typedef struct runqueue {
   int (*task)();
@@ -42,11 +38,11 @@ int thread1 (void) {
   crBegin;
   while (1) {
     for (i = 0; i < 10; i++) {
-      print ("1");
+      terminal_writestring("1");
       msleep (1000);
   //    fflush (stdout);
     }
-    print ("\n");
+    terminal_writestring("\n");
     crReturn (1); // Let's cooperate and yield
 
     if (++j == 6)
@@ -54,7 +50,7 @@ int thread1 (void) {
   }
   done[0] = TRUE;
 
-  print ("Done 1\n");
+  terminal_writestring("Done 1\n");
 
   crFinish;
 
@@ -70,11 +66,11 @@ int thread2 (void) {
   crBegin;
   while (1) {
     for (i = 0; i < 5; i++) {
-      print ("2");
+      terminal_writestring("2");
       msleep (1000);
       //fflush (stdout);
     }
-    print("\n");
+    terminal_writestring("\n");
     crReturn (2); // Time to yield
 
     if (++j == 10)
@@ -82,7 +78,7 @@ int thread2 (void) {
   }
   done[1] = TRUE;
 
-  print ("Done 2\n");
+  terminal_writestring("Done 2\n");
 
   crFinish;
 
