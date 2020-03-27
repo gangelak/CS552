@@ -29,3 +29,19 @@ typedef uint32 uint32_t;
 typedef uint64 uint64_t;
 #endif
 
+#define MAX_THREADS 2
+
+
+/* PCB for a process/thread */
+
+struct proc_crtl_block{
+	int tid;
+	int *bp;
+	int (*task)();
+	int flag;
+	struct proc_crtl_block *next;
+	int *sp;
+};
+
+
+typedef struct proc_crtl_block pcb;
