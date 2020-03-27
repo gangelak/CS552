@@ -4,7 +4,6 @@
  */
 
 #include "helper.h"
-#include "vga.h"
 
 #define crBegin static int state=0; switch(state) { case 0:
 

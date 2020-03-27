@@ -68,16 +68,16 @@ void *my_malloc(int size){
 
 
 void kmain (multiboot_info_t* mbt, unsigned long magic) {
-	terminal_writestring("\n\n\n\n\n\n\n\n");
+	print_s("\n\n\n\n\n\n\n\n");
 	int avail_regs;          // # of available memory regions
 	
 
-//	print("Getting memory regions!!!!\n");
+	print_s("Getting memory regions!!!!\n");
 
-//	if (mbt->flags & 0b1000000){
-//		mmap_entry_t* ent = (mmap_entry_t*) mbt->mmap_addr;
-//		avail_regs = get_mem_regs(mbt,ent);
-//	}
+	if (mbt->flags & 0b1000000){
+		mmap_entry_t* ent = (mmap_entry_t*) mbt->mmap_addr;
+		avail_regs = get_mem_regs(mbt,ent);
+	}
 	
 	/* Initialize the PCB pool*/
 //	pcb_init();
@@ -94,8 +94,8 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 //	thread_create();
 //	threads_init();
 
-	terminal_writestring("Creating Threads!!!\n");
-	thread_create();
+	print_s("Creating Threads!!!\n");
+	init_threads();
 
 
 	return ;
