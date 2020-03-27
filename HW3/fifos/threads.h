@@ -91,9 +91,14 @@ int thread2 (void) {
 
 void schedule (void) {
 	int i;
-
+	print_s("scheduling\n");
 	for (i =0; i< MAX_THREADS; i++){
-		fifos_threads[i]->task();
+		if (in_use[i] & !done[i])
+		{
+			fifos_threads[i]->task();
+			in_use[i] = 0;
+			done[i] = 1;
+		}
 	}
 
 	return;
@@ -123,8 +128,11 @@ int thread_create(void *func){
 
 
 void init_threads(void){
+	print_s("creating the threads\n");
 	thread_create(thread1);
 	thread_create(thread2);
+
+	schedule();
 }
 
 

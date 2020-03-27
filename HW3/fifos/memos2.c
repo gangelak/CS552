@@ -57,16 +57,6 @@ void *my_malloc(int size){
 	return 0;
 }
 
-
-/*
-	The function that is going to create the threads!!!!!
-*/
-
-
-
-
-
-
 void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	print("\n\n\n\n\n\n\n\n");
 	int avail_regs;          // # of available memory regions
@@ -92,10 +82,10 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	/* Creating autostarting threads */
 
 //	thread_create();
-//	threads_init();
+	terminal_initialize();
 
-	/*print_s("Creating Threads!!!\n");*/
-	/*init_threads();*/
+	print_s("Creating Threads!!!\n");
+	init_threads();
 
 
 	return ;
