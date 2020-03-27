@@ -115,7 +115,8 @@ int thread_create(void *func){
 	fifos_threads[new_pcb]->flag = 0;
 	fifos_threads[new_pcb]->next = 0;
 	fifos_threads[new_pcb]->prev = 0;
-
+	
+	return 0;
 }
 
 

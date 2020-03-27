@@ -1,7 +1,23 @@
 #include "vga.h"
 
 
+#define TEXT_BUFFER_LOC 0xB8000
+#define COLS 80
+#define ROWS 24
+#define MAX_INT 0xFFFFFFFF
+
+#define COLOR 0x0F << 8
+
+
 #define nop() asm("nop")
+
+
+struct cursor {
+	int x, y;
+} csr;
+
+
+unsigned short *text_buffer = (unsigned short*)TEXT_BUFFER_LOC;
 
 typedef struct multiboot_memory_map {
 	unsigned int size;
@@ -80,6 +96,43 @@ void pad(char* str)
  print_s(padded);
  str = padded;
 }
+
+
+
+void put(unsigned char c)
+{
+	unsigned short *pos;
+	if(c == 0x09)
+	{
+		csr.x = (csr.x + 8 ) & ~( 8 - 1);
+	}
+	else if ( c == '\r' )
+	{
+		csr.x = 0;
+	}
+	else if (c == '\n')
+	{
+		csr.x = 0;
+		csr.y++;
+	}
+	else if (c >= ' ')
+	{
+		pos = text_buffer + (csr.y*COLS) + csr.x ;
+		*pos = COLOR | c;
+		csr.x++;
+	}
+}
+
+
+void print(char *text) {
+
+	int i;
+	for (i =0; text[i] != '\0'; i ++)
+	{
+		put(text[i]);
+	}
+}
+
 
 void my_memset(char *str){
 	int i;
