@@ -42,6 +42,7 @@ struct proc_crtl_block{
 	int (*task)();
 	int flag;
 	struct proc_crtl_block *next;
+	struct proc_crtl_block *prev;
 	int *sp;
 };
 

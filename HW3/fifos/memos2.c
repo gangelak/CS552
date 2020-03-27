@@ -1,5 +1,5 @@
 #include "multiboot.h"
-#include "crtn_sample.h"
+#include "threads.h"
 
 /*
 	Store the usable memory regions in an array for
@@ -63,48 +63,6 @@ void *my_malloc(int size){
 */
 
 
-int thread_create(void) {
-
-  int i;
-  rq *ptr, *pptr;
-
-  /* Build a "runqueue" */
-  f[0] = thread1;
- // f[1] = thread2;
-
-  // Setup runqueue head
-  head.task = f[0];
-  head.tid = 0;
-  head.next = 0;
-  head.prev = 0;
-
-  // Add any additional threads after the first
-  for (i = 1; i < MAX_THREADS; i++) {
-    ptr = (rq *) my_malloc((int)sizeof(rq));
-
-    if (i == 1) {
-      head.next = ptr;
-      pptr = &head;
-    }
-    else { 
-      pptr = pptr->next;
-      pptr->next = ptr;
-    }
-
-    ptr->prev = pptr;
-
-    ptr->task = f[i];
-    ptr->tid = i;
-    ptr->next = &head; // Wraparound
-    head.prev = ptr;
-  }
-  
-  // Let's get going...
-  schedule ();
-
-  return 0;
-}
-
 
 
 
@@ -132,10 +90,10 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 // 	pit_init();
 
 	/* Creating autostarting threads */
-//	threads_init();
-
 	print("Creating Threads!!!\n");
-	thread_create();
+	init_threads();
+
+//	thread_create();
 
 
 	return ;
