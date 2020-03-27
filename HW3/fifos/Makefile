@@ -13,5 +13,5 @@ stub.o: stub.s
 #	gcc -m32 -fno-stack-protector -fno-builtin -nostdinc -O -g -Wall -c -o thread.o crtn_sample.c
 
 clean:
-	rm -rf stub.o memos2.o memos-2
+	rm -rf stub.o memos2.o memos-2 *.o
 

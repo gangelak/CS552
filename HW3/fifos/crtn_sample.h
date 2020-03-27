@@ -56,7 +56,7 @@ int thread1 (void) {
 
   print ("Done 1\n");
 
-  crFinish;
+  //crFinish;
 
   return 1;
 }
@@ -84,7 +84,7 @@ int thread2 (void) {
 
   print ("Done 2\n");
 
-  crFinish;
+  //crFinish;
 
   return 2;
 }

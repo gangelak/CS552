@@ -5,8 +5,8 @@
 
 	.bss
 	.align 0x1000
-	.comm stack, 0x1000  // Setup stack are in bss
-	.comm idt, 0x100     //  2KB for IDT
+	.comm stack, 0x1000  # Setup stack are in bss
+#	.comm idt, 0x100     //  2KB for IDT
 
 
 	.data
@@ -17,18 +17,19 @@
 gdt:
 	/* Checkout Wikipedia */
 
-	// Null descriptor -> First entry
-	.quad $0x0
+	# Null descriptor -> First entry
+	.word $0x0
+	.word $0x0
 	
-	// Code Segment -->  Base 0x04000000
-	.short $0xffff     	//Max limit 
-	.short $0x0             //Base 1st 16 bits          
+	# Code Segment -->  Base 0x04000000
+	.short $0xffff     	# Max limit 
+	.short $0x0             # Base 1st 16 bits          
 	.byte  $0x0
 	.byte  $0x9a
-	.byte  $0x4f            // Granularity in MBs 
+	.byte  $0x4f            # Granularity in MBs 
 	.byte  $0x04
 
-	// Data segment -->  Base 0x08000000
+	# Data segment -->  Base 0x08000000
 	.short $0xffff
 	.short $0x0
 	.byte  $0x0
@@ -37,15 +38,15 @@ gdt:
 	.byte  $0x08
 
 gdt_ptr:
-	.short $0x7ff    	//Length in bytes - 3 descriptors but space for 256 linear address
+	.short $0x7ff    	# Length in bytes - 3 descriptors but space for 256 linear address
 	.long gdt
 
-idt_prt:
-	.short $0x7ff 		//Length - 256 descriptors
-	.long idt
+#idt_prt:
+#	.short $0x7ff 		# Length - 256 descriptors
+#	.long idt
 
-	.text
-	.global _start
+#	.text
+#	.global _start
 
 
 _start:
@@ -68,7 +69,7 @@ real_start:
 	ljmp $0x08, $1f
 	
 1:
-	movw $0x10, %ax 	//Setup 2nd descr selector from GDT
+	movw $0x10, %ax 	# Setup 2nd descr selector from GDT
 	movw %ax,%ss
 	movw %ax,%ds
 	movw %ax,%es
@@ -76,22 +77,22 @@ real_start:
 	movw %ax,%gs
 	
 	/*Setup the stack*/
-	movl $stack_top+0x1000, %esp     //setup 4KB stack
+	movl $stack+0x1000, %esp     # setup 4KB stack
 	
 	pushl %ebx
 
-
-	/*Set up IDT by constructing 64-bit interrupt descriptors*/
+/*
+	Set up IDT by constructing 64-bit interrupt descriptors
 	movl $idt, %edi
 	movl $0x30, %ecx 	//Set counter for 48 IDT entries used
 	movl $0x080000, %edx 	//Used to index kernel CS
 	movl $int_table,%esi
-
+*/
 	/* 
 	For now populate int_table with interrupt gate descriptors
 	These clear the IF flag when invoked
 	*/
-
+/*
 1:
 	lodsl 			//Value at address DS:ESI --> EAX
 	movw %ax,%dx 		//Lower 16-bits of int_table address 
@@ -107,7 +108,8 @@ real_start:
 	loop 1b
 
 	lidt idt_ptr
-	call kmain 		//Start of C code
+*/
+	call kmain 		# Start of C code
 	cli
 	hlt
 loop:

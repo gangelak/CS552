@@ -3,7 +3,7 @@
 
 /*
 	Store the usable memory regions in an array for
-	foture use. Used the same methodology as memos-2
+	future use. Used the same methodology as memos-2
 */
 unsigned long base_addr[10];
 unsigned long end_addr[10];
@@ -120,6 +120,19 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 		mmap_entry_t* ent = (mmap_entry_t*) mbt->mmap_addr;
 		avail_regs = get_mem_regs(mbt,ent);
 	}
+	
+	/* Initialize the PCB pool*/
+//	pcb_init();
+	
+
+	/* Initialize 8259 PIC */
+//	pic_init();
+
+	/* Initialize 8254 PIT */
+// 	pit_init();
+
+	/* Creating autostarting threads */
+//	threads_init();
 
 	print("Creating Threads!!!\n");
 	thread_create();
