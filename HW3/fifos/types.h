@@ -37,14 +37,14 @@ typedef uint64 uint64_t;
 struct proc_crtl_block{
 	int tid;
 	int *bp;
-<<<<<<< HEAD
+
 	int (*entry)();
 	int status;
-=======
+
 	int (*task)();
 	int flag;
 	bool idle;
->>>>>>> 3d02579e2b7d8a911c122e222a86dcbf112ead14
+
 	struct proc_crtl_block *next;
 	struct proc_crtl_block *prev;
 	int *sp;

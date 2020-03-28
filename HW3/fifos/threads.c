@@ -171,9 +171,8 @@ int thread_create(void *stack, void *func){
 
 
 
-void init_threads(void){
-<<<<<<< HEAD
-	
+void init_threads(void)
+{	
 	int i;
 	print_s("creating the threads\n");
 	
