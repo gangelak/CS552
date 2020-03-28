@@ -102,6 +102,17 @@ void schedule (void) {
 }
 */
 
+void thread_yield() {
+	// save state and call scheduler
+	// our scheduler is wrong for now
+	// we should make a runqueue like west
+	// and add the threads to the end of it
+	// and in the scheduler do round robin
+}
+void exit_thread() {
+
+
+}
 /*TODO add a stack*/
 
 int thread_create(void *stack, void *func){
@@ -158,8 +169,6 @@ int thread_create(void *stack, void *func){
 
 	
 }
-
-
 
 
 void init_threads(void){
