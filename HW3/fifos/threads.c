@@ -8,7 +8,7 @@
 
 static bool done[MAX_THREADS];
 static bool in_use[MAX_THREADS] = {0,0};
-static uint32_t stacks[MAX_THREADS];
+static uint32_t stacks[MAX_THREADS][1024];
 
 /* 
  * Create an array of stacks to be used by the 
@@ -16,25 +16,16 @@ static uint32_t stacks[MAX_THREADS];
 */
 extern pcb fifos_threads[MAX_THREADS];
 
-void create_stack(void){
-	int i;
-
-	for (i = 0; i< MAX_THREADS; i++ ){
-		uint32_t stack[1024];
-		stacks[i] = stack;
-	}
-}
-
 /* Get an available pcb spot from the array */
 
 int get_pcb(){
 	
 	int i;
 	for (i =0; i< MAX_THREADS; i++){
-		if (fifos_threads[i].idle == 1){
+		if (in_use[i] == 0){
 //			fifos_threads[i].in_use = 1;
 			pcb temp;
-			temp.idle = 0;
+			in_use[i] = 1;
 			fifos_threads[i] = temp;
 			return i;
 		}
@@ -149,7 +140,7 @@ int thread_create(void *stack, void *func){
 	
 	/* Fake initial context */
 
-	/* EIP */ *(((uint32_t *)stack) - 0) = fifos_threads[new_pcb].entry; 
+	/* EIP */ *(((uint32_t *)stack) - 0) = (uint32_t) fifos_threads[new_pcb].entry; 
 	/* FLG */ *(((uint32_t *)stack) - 1) = 0 ;   //Set IF for preemption  (Not now)
 	/* EAX */ *(((uint32_t *)stack) - 2) = 0; 
 	/* ECX */ *(((uint32_t *)stack) - 3) = 0; 
@@ -165,22 +156,19 @@ int thread_create(void *stack, void *func){
 	/* FS */ *(((uint16_t *)stack) - 23) = 0; 
 	/* GS */ *(((uint16_t *)stack) - 24) = 0; 
 
-	return 0;
+	
 }
 
 
 
 
 void init_threads(void){
-<<<<<<< HEAD
 	
 	int i;
 	print_s("creating the threads\n");
 	
-	create_stack();
-	
 	for (i = 0; i < MAX_THREADS; i++){
-		thread_create(&stacks[i].stack[1023], thread);
+		thread_create(&stacks[i], thread);
 	}
 }
 
