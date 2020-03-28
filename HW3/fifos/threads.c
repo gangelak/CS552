@@ -6,8 +6,6 @@
 #include "threads.h"
 #include "types.h"
 
-pcb fifos_threads[MAX_THREADS];
-
 static bool done[MAX_THREADS];
 static bool in_use[MAX_THREADS] = {0,0};
 static uint32_t stacks[MAX_THREADS];
@@ -16,6 +14,7 @@ static uint32_t stacks[MAX_THREADS];
  * Create an array of stacks to be used by the 
  * different hreads
 */
+extern pcb fifos_threads[MAX_THREADS];
 
 void create_stack(void){
 	int i;
@@ -32,9 +31,10 @@ int get_pcb(){
 	
 	int i;
 	for (i =0; i< MAX_THREADS; i++){
-		if (in_use[i] == 0){
-			in_use[i] = 1;
+		if (fifos_threads[i].idle == 1){
+//			fifos_threads[i].in_use = 1;
 			pcb temp;
+			temp.idle = 0;
 			fifos_threads[i] = temp;
 			return i;
 		}
@@ -61,7 +61,7 @@ static int thread1 () {
     if (++j == 6)
       break;
   }
-  done[0] = TRUE;
+//  done[0] = TRUE;
 
   print_s ("Done 1\n");
 
@@ -87,14 +87,14 @@ int thread2 () {
     if (++j == 10)
       break;
   }
-  done[1] = TRUE;
+// done[1] = TRUE;
 
   print_s ("Done 2\n");
 
   return 2;
 }
 
-
+/*
 void schedule (void) {
 	int i;
 	for (i =0; i< MAX_THREADS; i++){
@@ -109,6 +109,7 @@ void schedule (void) {
 
 	return;
 }
+*/
 
 /*TODO add a stack*/
 
@@ -164,7 +165,6 @@ int thread_create(void *stack, void *func){
 	/* FS */ *(((uint16_t *)stack) - 23) = 0; 
 	/* GS */ *(((uint16_t *)stack) - 24) = 0; 
 
-
 	return 0;
 }
 
@@ -172,6 +172,7 @@ int thread_create(void *stack, void *func){
 
 
 void init_threads(void){
+<<<<<<< HEAD
 	
 	int i;
 	print_s("creating the threads\n");
