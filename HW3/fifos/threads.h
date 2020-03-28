@@ -13,6 +13,6 @@
 #define crFinish }
 pcb * runqueue;
 void init_threads(void);
-void runqueue_remove();
+void runqueue_remove(int);
 #endif
 

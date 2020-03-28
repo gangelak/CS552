@@ -89,9 +89,9 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 //	thread_create();
 	terminal_initialize();
 
-	print_s("Getting memory regions!!!!\n");
+//	print_s("Getting memory regions!!!!\n");
 
-	print_s("Creating Threads!!!\n");
+//	print_s("Creating Threads!!!\n");
 	init_threads();
 
 	
