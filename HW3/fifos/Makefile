@@ -1,15 +1,17 @@
 CC := gcc
-CFLAGS := -m32 -fno-stack-protector -fno-builtin -nostdinc -O -g -Wall -c
+CFLAGS := -m32 -fno-stack-protector -fno-builtin -nostdinc -O -g -Wall -I. -c
 AS := as
-
+SRCS := threads.c vga.c helper.c 
+OBJS = $(SRCS:.c=.o)
 all: fifos
 
 fifos: stub.o fifos.o fifos.ld
-	ld -m elf_i386 -T fifos.ld -o fifos fifos.o stub.o
+	ld -m elf_i386 -T fifos.ld -o fifos fifos.o stub.o $(OBJS)
+fifos.o:fifos.c $(OBJS)
+	$(CC) $(CFLAGS) -o fifos.o fifos.c $(OBJS)
 
-fifos.o: fifos.c
-	$(CC) $(CFLAGS) -o fifos.o fifos.c
-
+.c.o:
+	$(CC) $(CFLAGS) $< -o $@
 #helper.o: helper.c
 #	gcc -m32 -fno-stack-protector -fno-builtin -nostdinc -O -g -Wall -c -o helper.o helper.c
 

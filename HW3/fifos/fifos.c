@@ -1,10 +1,13 @@
-#include "multiboot.h"
 #include "threads.h"
-
+#include "helper.h"
+#include "multiboot.h"
+#include "vga.h"
 /*
 	Store the usable memory regions in an array for
 	future use. Used the same methodology as memos-2
 */
+
+
 unsigned long base_addr[10];
 unsigned long end_addr[10];
 int mem_pointer[10];
@@ -58,11 +61,9 @@ void *my_malloc(int size){
 }
 
 void kmain (multiboot_info_t* mbt, unsigned long magic) {
-	print("\n\n\n\n\n\n\n\n");
 	int avail_regs;          // # of available memory regions
 	
 
-	print("Getting memory regions!!!!\n");
 
 	/*if (mbt->flags & 0b1000000){*/
 		/*mmap_entry_t* ent = (mmap_entry_t*) mbt->mmap_addr;*/
@@ -83,6 +84,10 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 
 //	thread_create();
 	terminal_initialize();
+
+	print_s("\n\n\n\n\n\n\n\n");
+
+	print_s("Getting memory regions!!!!\n");
 
 	print_s("Creating Threads!!!\n");
 	init_threads();
