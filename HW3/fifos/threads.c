@@ -119,13 +119,14 @@ void exit_thread() {
 // remove the current head of runqueue bc it finished
 void runqueue_remove()
 {
-	if (runqueue->next != 0 )
+	if (runqueue->next == runqueue )
 	{
 		// this was the last one in the runqueue
 		print_s("remove from runqueue: this was the last one to remove\n");
 		runqueue = 0;
 		return;
 	}
+	else {
 	// maybe I didn't need head variable
 	print_s("remove from runqueue: not the last one\n");
 	pcb* head = runqueue->next;
@@ -137,6 +138,7 @@ void runqueue_remove()
 	runqueue = runqueue->next;
 
 	return;
+	}
 }
 
 // add a thread to the runqueue
@@ -151,15 +153,14 @@ void runqueue_add(pcb* t)
 		// and change next and prev in tail
 		// we wanna add t between tail and [what is running now] kinda:
 		// [what is running now] is what runqueue point to
-		//  tail [what is running now] next to run
+		// linked list look like below:
+		//  tail : [what is running now] : next to run
 		
 		pcb * tail = runqueue->prev;
-		t->next = tail->next;
+		t->next = runqueue;
 		t->prev = tail;
 		tail->next = t;
-
-		// now update runqueue to also point to the new tail
-		t->next->prev = t;
+		runqueue->prev = t;
 
 	}
 	else{
@@ -236,7 +237,7 @@ void init_threads(void){
 	print_s("creating the threads\n");
 	
 	for (i = 0; i < MAX_THREADS; i++){
-		thread_create(&stacks[i], thread);
+		thread_create(&stacks[i], thread1);
 	}
 }
 

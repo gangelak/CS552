@@ -15,6 +15,7 @@ void schedule () {
 		}
 		else {
 			(void*)(runqueue->entry)();
+//			print_s("run the thread\n");
 			runqueue_remove();
 			// do context switch here for now bc the thread is done
 			// remove this from runqueue
