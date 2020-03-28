@@ -1,17 +1,24 @@
-all: memos-2
+CC := gcc
+CFLAGS := -m32 -fno-stack-protector -fno-builtin -nostdinc -O -g -Wall -c
+AS := as
 
-memos-2: stub.o memos2.o memos2.ld
-	ld -m elf_i386 -T memos2.ld -o memos-2 memos2.o stub.o
+all: fifos
+
+fifos: stub.o fifos.o fifos.ld
+	ld -m elf_i386 -T fifos.ld -o fifos fifos.o stub.o
+
+fifos.o: fifos.c
+	$(CC) $(CFLAGS) -o fifos.o fifos.c
 
 #helper.o: helper.c
 #	gcc -m32 -fno-stack-protector -fno-builtin -nostdinc -O -g -Wall -c -o helper.o helper.c
-memos2.o: memos2.c
-	gcc -m32 -fno-stack-protector -fno-builtin -nostdinc -O -g -Wall -c -o memos2.o memos2.c
-stub.o: stub.s
-	as --32 stub.s -o stub.o
+
 #thread.o: crtn_sample.c
 #	gcc -m32 -fno-stack-protector -fno-builtin -nostdinc -O -g -Wall -c -o thread.o crtn_sample.c
 
+stub.o: stub.s
+	$(AS) --32 stub.s -o stub.o
+
 clean:
-	rm -rf stub.o memos2.o memos-2 *.o
+	rm -rf fifos *.o
 
