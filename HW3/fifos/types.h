@@ -37,8 +37,8 @@ typedef uint64 uint64_t;
 struct proc_crtl_block{
 	int tid;
 	int *bp;
-	int (*task)();
-	int flag;
+	int (*entry)();
+	int status;
 	struct proc_crtl_block *next;
 	struct proc_crtl_block *prev;
 	int *sp;
