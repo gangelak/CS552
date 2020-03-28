@@ -16,7 +16,7 @@
 #define crFinish }
 
 /* Create an array of PCBs with size as the MAX_THREADS*/
-pcb *fifos_threads[MAX_THREADS];
+pcb fifos_threads[MAX_THREADS];
 
 static bool done[MAX_THREADS];
 static bool in_use[MAX_THREADS] = {0,0};
@@ -32,19 +32,20 @@ int get_pcb(){
 		if (in_use[i] == 0){
 			in_use[i] = 1;
 			pcb temp;
-			fifos_threads[i] = &temp;
+			fifos_threads[i] = temp;
 			return i;
 		}
 	}
 	return -1;
 }
 
-
-int thread1 (void) {
+static
+int thread1 () {
 
   int i; 
   static int j;
-
+	
+  print_s("Executing Thread1!\n");
   while (1) {
     for (i = 0; i < 10; i++) {
       print_s ("1");
@@ -64,12 +65,13 @@ int thread1 (void) {
   return 1;
 }
 
-
-int thread2 (void) {
+static
+int thread2 () {
 
   int i;
   static int j;
 
+  print_s("Executing Thread2!\n");
   while (1) {
     for (i = 0; i < 5; i++) {
       print_s ("2");
@@ -91,11 +93,11 @@ int thread2 (void) {
 
 void schedule (void) {
 	int i;
-	print_s("scheduling\n");
 	for (i =0; i< MAX_THREADS; i++){
 		if (in_use[i] & !done[i])
 		{
-			fifos_threads[i]->task();
+			print_s("scheduling thread\n");
+			fifos_threads[i].task();
 			in_use[i] = 0;
 			done[i] = 1;
 		}
@@ -115,11 +117,11 @@ int thread_create(void *func){
 		return -1;
 	}
 	
-	fifos_threads[new_pcb]->tid = new_pcb;
-	fifos_threads[new_pcb]->task = (int) func;
-	fifos_threads[new_pcb]->flag = 0;
-	fifos_threads[new_pcb]->next = 0;
-	fifos_threads[new_pcb]->prev = 0;
+	fifos_threads[new_pcb].tid = new_pcb;
+	fifos_threads[new_pcb].task = (int) func;
+	fifos_threads[new_pcb].flag = 0;
+	fifos_threads[new_pcb].next = 0;
+	fifos_threads[new_pcb].prev = 0;
 	
 	return 0;
 }
@@ -129,10 +131,9 @@ int thread_create(void *func){
 
 void init_threads(void){
 	print_s("creating the threads\n");
-	thread_create(thread1);
+   	thread_create(thread1);
 	thread_create(thread2);
 
-	schedule();
 }
 
 

@@ -87,7 +87,8 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	print_s("Creating Threads!!!\n");
 	init_threads();
 
-
+	
+	schedule();
 	return ;
 
 
