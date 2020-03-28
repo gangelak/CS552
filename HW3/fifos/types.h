@@ -33,7 +33,8 @@ typedef uint64 uint64_t;
 
 
 /* PCB for a process/thread */
-
+#ifndef _PCB
+#define _PCB
 struct proc_crtl_block{
 	int tid;
 	int *bp;
@@ -46,3 +47,5 @@ struct proc_crtl_block{
 
 
 typedef struct proc_crtl_block pcb;
+
+#endif

@@ -10,6 +10,8 @@ static bool done[MAX_THREADS];
 static bool in_use[MAX_THREADS] = {0,0};
 static uint32_t stacks[MAX_THREADS][1024];
 
+// our runqueue works on this
+
 /* 
  * Create an array of stacks to be used by the 
  * different hreads
@@ -42,14 +44,14 @@ static int thread1 () {
 	
   print_s("Executing Thread1!\n");
   while (1) {
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < 5; i++) {
       print_s ("1");
    //   msleep (1000);
   //    fflush (stdout);
     }
     print_s ("\n");
 
-    if (++j == 6)
+    if (++j == 3)
       break;
   }
 //  done[0] = TRUE;
@@ -110,8 +112,63 @@ void thread_yield() {
 	// and in the scheduler do round robin
 }
 void exit_thread() {
+	
 
+}
 
+// remove the current head of runqueue bc it finished
+void runqueue_remove()
+{
+	if (runqueue->next != 0 )
+	{
+		// this was the last one in the runqueue
+		print_s("remove from runqueue: this was the last one to remove\n");
+		runqueue = 0;
+		return;
+	}
+	// maybe I didn't need head variable
+	print_s("remove from runqueue: not the last one\n");
+	pcb* head = runqueue->next;
+	
+	runqueue->prev->next = head;
+	head->prev = runqueue->prev;
+	
+	//  the new runqueue is the next one in the linked list
+	runqueue = runqueue->next;
+
+	return;
+}
+
+// add a thread to the runqueue
+void runqueue_add(pcb* t)
+{
+	if(runqueue)
+	{
+		print_s("add to runqueue: not first time\n");
+
+		// we don't wanna change where runqueue points to
+		// we get tail
+		// and change next and prev in tail
+		// we wanna add t between tail and [what is running now] kinda:
+		// [what is running now] is what runqueue point to
+		//  tail [what is running now] next to run
+		
+		pcb * tail = runqueue->prev;
+		t->next = tail->next;
+		t->prev = tail;
+		tail->next = t;
+
+		// now update runqueue to also point to the new tail
+		t->next->prev = t;
+
+	}
+	else{
+		print_s("add to runqueue: first time\n");
+		runqueue = t;
+		runqueue->next = runqueue;
+		runqueue->prev = runqueue;
+
+	}
 }
 /*TODO add a stack*/
 
@@ -167,7 +224,9 @@ int thread_create(void *stack, void *func){
 	/* FS */ *(((uint16_t *)stack) - 23) = 0; 
 	/* GS */ *(((uint16_t *)stack) - 24) = 0; 
 
-	
+	// add to the run queue
+	runqueue_add(&fifos_threads[new_pcb]);
+
 }
 
 
