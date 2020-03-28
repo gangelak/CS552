@@ -11,7 +11,7 @@ void schedule () {
 		if (!fifos_threads[i].idle)
 		{
 			print_s("scheduling threads\n");
-			fifos_threads[i].task();
+			(void*)(fifos_threads[i].entry)();
 			fifos_threads[i].idle = 1;
 		}
 	}

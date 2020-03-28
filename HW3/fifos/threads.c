@@ -111,6 +111,17 @@ void schedule (void) {
 }
 */
 
+void thread_yield() {
+	// save state and call scheduler
+	// our scheduler is wrong for now
+	// we should make a runqueue like west
+	// and add the threads to the end of it
+	// and in the scheduler do round robin
+}
+void exit_thread() {
+
+
+}
 /*TODO add a stack*/
 
 int thread_create(void *stack, void *func){
@@ -175,11 +186,15 @@ void init_threads(void)
 {	
 	int i;
 	print_s("creating the threads\n");
-	
+//
+	for (i = 0; i < MAX_THREADS; i++)
+	{
+		fifos_threads[i].idle =1;
+	}
 	create_stack();
-	
+	void* threads[2] = {thread1, thread2};	
 	for (i = 0; i < MAX_THREADS; i++){
-		thread_create(&stacks[i].stack[1023], thread);
+		thread_create(&stacks[i], threads[i]);
 	}
 }
 
