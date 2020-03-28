@@ -6,30 +6,27 @@ extern pcb fifos_threads[MAX_THREADS];
 extern pcb * runqueue;
 
 void schedule () {
-	for (;;)
+	if (runqueue->next == 0)
 	{
-		if (!runqueue)
-		{
-			print_s("schedule: nothing to run\n");
-			break;
-		}
-		else {
-			runqueue.entry();
-			print_s("run the thread\n");
-			runqueue_remove();
-			// do context switch here for now bc the thread is done
-			// remove this from runqueue
-		}
+		print_s("schedule: nothing to run\n");
+		return;
 	}
-/*	for (i =0; i < MAX_THREADS; i++)
+	pcb* tmp = runqueue->next;
+	for (;runqueue->next != 0;)
 	{
-		if (runqueue)
+		(tmp->entry)();
+//		print_s("running the thread\n");
+		runqueue_remove(tmp->tid);
+		if( tmp->next == 0 )
 		{
-			print_s("scheduling threads\n");
-			(void*)(eads[i].entry)();
-			fifos_threads[i].status = 1;
+			// we reached end of list
+			// so we are gonna go to the head again
+			tmp = runqueue->next;
 		}
+		else{
+			tmp = tmp->next;
+		}	
 	}
-	*/
+	print_s("schedule: nothing to run\n");
 	return;
 }

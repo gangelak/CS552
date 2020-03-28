@@ -5,7 +5,7 @@
 #include "helper.h"
 #include "threads.h"
 #include "types.h"
-
+#include "vga.h"
 static bool done[MAX_THREADS];
 static bool in_use[MAX_THREADS] = {0,0};
 static uint32_t stacks[MAX_THREADS][1024];
@@ -37,54 +37,52 @@ int get_pcb(){
 /* Thread functions */
 
 
-static int thread1 () {
-
-  int i; 
-  static int j;
+static int thread1 () 
+{
+	int i; 
+  	int j = 0;
 	
-  print_s("Executing Thread1!\n");
-  while (1) {
-    for (i = 0; i < 5; i++) {
-      print_s ("1");
-   //   msleep (1000);
-  //    fflush (stdout);
-    }
-    print_s ("\n");
+	print_s("Executing Thread1!\n");
+  	while (1) 
+  	{
+		for (i = 0; i < 10; i++) 
+    		{
+	      	print_s ("<1>"); 
+    		}
+		print_s("\n");
+		if (++j> 6)
+		{
+			break;
+		}
+	}
 
-    if (++j == 3)
-      break;
-  }
-//  done[0] = TRUE;
-
-  print_s ("Done 1\n");
-
-
-  return 1;
+	//  done[0] = TRUE;
+	print_s ("Done 1\n");
+	return 1;
 }
 
 static
-int thread2 () {
+int thread2 () 
+{
+	int i;
+	int j = 0;
 
-  int i;
-  static int j;
+	print_s("Executing Thread2!\n");
+	while (1) 
+	{
+		for (i = 0; i < 5; i++) 
+		{
+			print_s ("<2>");
+		}
+		print_s("\n");
 
-  print_s("Executing Thread2!\n");
-  while (1) {
-    for (i = 0; i < 5; i++) {
-      print_s ("2");
-   //   msleep (1000);
-      //fflush (stdout);
-    }
-    print_s("\n");
+		if (++j == 10)
+			break;
+  	}
+	// done[1] = TRUE;
+	print_s ("Done 2\n");
 
-    if (++j == 10)
-      break;
-  }
-// done[1] = TRUE;
-
-  print_s ("Done 2\n");
-
-  return 2;
+	return 2;
 }
 
 /*
@@ -116,59 +114,56 @@ void exit_thread() {
 
 }
 
-// remove the current head of runqueue bc it finished
-void runqueue_remove()
+// remove the pcb with the passed tid from runqueue
+
+void runqueue_remove(int tid)
 {
-	if (runqueue->next == runqueue )
+	if (runqueue->next == 0 )
 	{
-		// this was the last one in the runqueue
-		print_s("remove from runqueue: this was the last one to remove\n");
-		runqueue = 0;
+		print_s("there is no running thread here!\n");
 		return;
 	}
-	else {
-	// maybe I didn't need head variable
-	print_s("remove from runqueue: not the last one\n");
-	pcb* head = runqueue->next;
-	
-	runqueue->prev->next = head;
-	head->prev = runqueue->prev;
-	
-	//  the new runqueue is the next one in the linked list
-	runqueue = runqueue->next;
 
-	return;
+
+	// tmp points to the thread that its next thread has tid equal to passed argument
+	pcb* tmp = runqueue->next;
+	pcb* btmp = runqueue;
+	while (tmp->tid != tid)
+	{
+		if ( tmp->next == 0 )
+		{
+			print_s("the tid not found!!\n");
+			return;
+		}
+		tmp = tmp->next;
+		btmp = btmp->next;
 	}
+	// btmp points to the thread before tmp
+	// so we want the thread before temp to point to the thread after tmp
+	// technically remove tmp from the linked list
+	btmp->next = tmp->next;
+	print_s("runqueue_remove: the tid has been removed\n");
+	
 }
 
 // add a thread to the runqueue
 void runqueue_add(pcb* t)
 {
-	if(runqueue)
+	// runqueue is pointing to the head 
+	// first time it is NULL
+	if(runqueue->next == 0)
 	{
-		print_s("add to runqueue: not first time\n");
-
-		// we don't wanna change where runqueue points to
-		// we get tail
-		// and change next and prev in tail
-		// we wanna add t between tail and [what is running now] kinda:
-		// [what is running now] is what runqueue point to
-		// linked list look like below:
-		//  tail : [what is running now] : next to run
-		
-		pcb * tail = runqueue->prev;
-		t->next = runqueue;
-		t->prev = tail;
-		tail->next = t;
-		runqueue->prev = t;
-
+		print_s("add to runqueue: first time\n");	
+		runqueue->next = t;
 	}
 	else{
-		print_s("add to runqueue: first time\n");
-		runqueue = t;
-		runqueue->next = runqueue;
-		runqueue->prev = runqueue;
-
+		print_s("add to runqueue: not first time\n");
+		// need to iterate through pcbs to find the last one
+		pcb* tmp = runqueue->next;
+		while(tmp->next != 0)
+		{}
+		// the last one is gonna point to t
+		tmp->next = t;
 	}
 }
 /*TODO add a stack*/
@@ -198,10 +193,11 @@ int thread_create(void *stack, void *func){
 	/* Found new PCB */
 	fifos_threads[new_pcb].tid = new_pcb;
 	fifos_threads[new_pcb].bp = (uint32_t) stack;
-	fifos_threads[new_pcb].entry = (int) func;
+	fifos_threads[new_pcb].entry = (int*) func;
 	fifos_threads[new_pcb].status = 0;
 	fifos_threads[new_pcb].next = 0;
 	fifos_threads[new_pcb].prev = 0;
+	
 
 	/* Fake an initial context for the new thread */
 	fifos_threads[new_pcb].sp = (uint32_t) (((uint16_t *) stack) - 24);
@@ -227,17 +223,19 @@ int thread_create(void *stack, void *func){
 
 	// add to the run queue
 	runqueue_add(&fifos_threads[new_pcb]);
-
+	return 0;
 }
 
 
 void init_threads(void){
-	
+
+	runqueue->next = 0;
 	int i;
 	print_s("creating the threads\n");
 	
 	for (i = 0; i < MAX_THREADS; i++){
-		thread_create(&stacks[i], thread1);
+
+		thread_create(&stacks[i], &thread1);
 	}
 }
 
