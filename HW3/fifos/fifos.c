@@ -2,6 +2,8 @@
 #include "helper.h"
 #include "multiboot.h"
 #include "vga.h"
+#include "schedule.h"
+#include "types.h"
 /*
 	Store the usable memory regions in an array for
 	future use. Used the same methodology as memos-2
@@ -12,6 +14,8 @@ unsigned long base_addr[10];
 unsigned long end_addr[10];
 int mem_pointer[10];
 int cnt = 0;   // Memory Region Counter
+
+pcb fifos_threads[MAX_THREADS];
 
 /*
  * 	We assume that the total memory is below 4GB
@@ -84,8 +88,6 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 
 //	thread_create();
 	terminal_initialize();
-
-	print_s("\n\n\n\n\n\n\n\n");
 
 	print_s("Getting memory regions!!!!\n");
 

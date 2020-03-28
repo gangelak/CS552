@@ -12,7 +12,6 @@
                          case __LINE__:; } while (0)
 #define crFinish }
 
-void schedule (void) ;
 void init_threads(void);
 
 #endif

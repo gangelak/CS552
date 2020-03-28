@@ -5,7 +5,7 @@
 #include "helper.h"
 #include "threads.h"
 #include "types.h"
-pcb fifos_threads[MAX_THREADS];
+extern pcb fifos_threads[MAX_THREADS];
 
 static bool done[MAX_THREADS];
 static bool in_use[MAX_THREADS] = {0,0};
@@ -18,9 +18,10 @@ int get_pcb(){
 	
 	int i;
 	for (i =0; i< MAX_THREADS; i++){
-		if (in_use[i] == 0){
-			in_use[i] = 1;
+		if (fifos_threads[i].in_use == 0){
+//			fifos_threads[i].in_use = 1;
 			pcb temp;
+			temp.in_use = 1;
 			fifos_threads[i] = temp;
 			return i;
 		}
@@ -78,7 +79,7 @@ int thread2 () {
   return 2;
 }
 
-
+/*
 void schedule (void) {
 	int i;
 	for (i =0; i< MAX_THREADS; i++){
@@ -93,6 +94,7 @@ void schedule (void) {
 
 	return;
 }
+*/
 
 /*TODO add a stack*/
 
@@ -110,7 +112,9 @@ int thread_create(void *func){
 	fifos_threads[new_pcb].flag = 0;
 	fifos_threads[new_pcb].next = 0;
 	fifos_threads[new_pcb].prev = 0;
-	
+
+	fifos_threads[new_pcb].done = 0;
+
 	return 0;
 }
 

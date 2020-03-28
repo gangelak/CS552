@@ -39,6 +39,9 @@ struct proc_crtl_block{
 	int *bp;
 	int (*task)();
 	int flag;
+	bool idle;
+	bool done;
+	bool in_use;
 	struct proc_crtl_block *next;
 	struct proc_crtl_block *prev;
 	int *sp;

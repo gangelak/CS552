@@ -1,7 +1,7 @@
 CC := gcc
 CFLAGS := -m32 -fno-stack-protector -fno-builtin -nostdinc -O -g -Wall -I. -c
 AS := as
-SRCS := threads.c vga.c helper.c 
+SRCS := threads.c vga.c helper.c schedule.c 
 OBJS = $(SRCS:.c=.o)
 all: fifos
 
