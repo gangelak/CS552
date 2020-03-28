@@ -8,12 +8,11 @@ void schedule () {
 	int i;
 	for (i =0; i < MAX_THREADS; i++)
 	{
-		if (fifos_threads[i].in_use & !fifos_threads[i].done)
+		if (!fifos_threads[i].idle)
 		{
 			print_s("scheduling threads\n");
 			fifos_threads[i].task();
-			fifos_threads[i].in_use = 0;
-			fifos_threads[i].done = 1;
+			fifos_threads[i].idle = 1;
 		}
 	}
 	return;

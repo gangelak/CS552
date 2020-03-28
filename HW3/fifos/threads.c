@@ -7,9 +7,6 @@
 #include "types.h"
 extern pcb fifos_threads[MAX_THREADS];
 
-static bool done[MAX_THREADS];
-static bool in_use[MAX_THREADS] = {0,0};
-
 
 int (*f[MAX_THREADS])(void);
 
@@ -18,10 +15,10 @@ int get_pcb(){
 	
 	int i;
 	for (i =0; i< MAX_THREADS; i++){
-		if (fifos_threads[i].in_use == 0){
+		if (fifos_threads[i].idle == 1){
 //			fifos_threads[i].in_use = 1;
 			pcb temp;
-			temp.in_use = 1;
+			temp.idle = 0;
 			fifos_threads[i] = temp;
 			return i;
 		}
@@ -46,7 +43,7 @@ static int thread1 () {
     if (++j == 6)
       break;
   }
-  done[0] = TRUE;
+//  done[0] = TRUE;
 
   print_s ("Done 1\n");
 
@@ -72,7 +69,7 @@ int thread2 () {
     if (++j == 10)
       break;
   }
-  done[1] = TRUE;
+// done[1] = TRUE;
 
   print_s ("Done 2\n");
 
@@ -98,7 +95,7 @@ void schedule (void) {
 
 /*TODO add a stack*/
 
-int thread_create(void *func){
+int thread_create(void *func, void *stack){
 	int new_pcb = -1;
 
 	new_pcb = get_pcb();
@@ -112,8 +109,9 @@ int thread_create(void *func){
 	fifos_threads[new_pcb].flag = 0;
 	fifos_threads[new_pcb].next = 0;
 	fifos_threads[new_pcb].prev = 0;
+	fifos_threads[new_pcb].sp = (unsigned int )&stack;
+	fifos_threads[new_pcb].idle = 0;
 
-	fifos_threads[new_pcb].done = 0;
 
 	return 0;
 }
@@ -122,9 +120,14 @@ int thread_create(void *func){
 
 
 void init_threads(void){
+	// make all the threads idle
+	for (int i = 0 ; i < MAX_THREADS ; i++)
+	{
+		fifos_threads[i].idle = 1;
+	}
 	print_s("creating the threads\n");
-   	thread_create(thread1);
-	thread_create(thread2);
+   	thread_create(thread1, 0);
+	thread_create(thread2, 0);
 
 }
 
