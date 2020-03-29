@@ -6,6 +6,7 @@
 #include "threads.h"
 #include "types.h"
 #include "vga.h"
+#include "schedule.h"
 static bool done[MAX_THREADS];
 static bool in_use[MAX_THREADS] = {0,0};
 static uint32_t stacks[MAX_THREADS][1024];
@@ -51,6 +52,7 @@ static int thread1 ()
 	      	print_s ("<1>"); 
     		}
 		print_s("\n");
+		//yield();
 		if (++j> 6)
 		{
 			break;
@@ -86,22 +88,6 @@ int thread2 ()
 	return 2;
 }
 
-/*
-void schedule (void) {
-	int i;
-	for (i =0; i< MAX_THREADS; i++){
-		if (in_use[i] & !done[i])
-		{
-			print_s("scheduling thread\n");
-			fifos_threads[i].task();
-			in_use[i] = 0;
-			done[i] = 1;
-		}
-	}
-
-	return;
-}
-*/
 
 void thread_yield() {
 	// save state and call scheduler
@@ -143,7 +129,7 @@ void runqueue_remove(int tid)
 {
 	if (runqueue->next == 0 )
 	{
-		print_s("there is no running thread here!\n");
+		//print_s("there is no running thread here!\n");
 		return;
 	}
 
@@ -155,7 +141,7 @@ void runqueue_remove(int tid)
 	{
 		if ( tmp->next == 0 )
 		{
-			print_s("the tid not found!!\n");
+			//print_s("the tid not found!!\n");
 			return;
 		}
 		tmp = tmp->next;
@@ -165,7 +151,7 @@ void runqueue_remove(int tid)
 	// so we want the thread before temp to point to the thread after tmp
 	// technically remove tmp from the linked list
 	btmp->next = tmp->next;
-	print_s("runqueue_remove: the tid has been removed\n");
+	//print_s("runqueue_remove: the tid has been removed\n");
 	
 }
 
@@ -176,11 +162,11 @@ void runqueue_add(pcb* t)
 	// first time it is NULL
 	if(runqueue->next == 0)
 	{
-		print_s("add to runqueue: first time\n");	
+		//print_s("add to runqueue: first time\n");	
 		runqueue->next = t;
 	}
 	else{
-		print_s("add to runqueue: not first time\n");
+		//print_s("add to runqueue: not first time\n");
 		// need to iterate through pcbs to find the last one
 		pcb* tmp = runqueue->next;
 		while(tmp->next != 0)
@@ -244,8 +230,8 @@ int thread_create(void *stack, void *func){
 	/* FS */ *(((uint16_t *)stack) - 21) = fs; 
 	/* GS */ *(((uint16_t *)stack) - 22) = gs; 
 	
-	print_s("Printing the context\n");
-	print_context((uint32_t*)fifos_threads[new_pcb].sp,new_pcb);
+//	print_s("Printing the context\n");
+//	print_context((uint32_t*)fifos_threads[new_pcb].sp,new_pcb);
 	// add to the run queue
 	runqueue_add(&fifos_threads[new_pcb]);
 	return 0;
@@ -256,11 +242,11 @@ void init_threads(void){
 
 	runqueue->next = 0;
 	int i;
-	print_s("creating the threads\n");
-	
+//	print_s("creating the threads\n");
+	int* threads[MAX_THREADS] = {(int*)thread1, (int*)thread2};	
 	for (i = 0; i < MAX_THREADS; i++){
 
-		thread_create(&stacks[i], &thread1);
+		thread_create(&stacks[i], threads[i]);
 	}
 }
 
