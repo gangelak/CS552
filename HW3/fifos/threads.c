@@ -9,6 +9,7 @@
 static bool done[MAX_THREADS];
 static bool in_use[MAX_THREADS] = {0,0};
 static uint32_t stacks[MAX_THREADS][1024];
+static uint32_t dstack[1024]; 			//dummy stack for the 1st context switch
 
 // our runqueue works on this
 
@@ -200,7 +201,7 @@ int thread_create(void *stack, void *func){
 	
 
 	/* Fake an initial context for the new thread */
-	fifos_threads[new_pcb].sp = (uint32_t) (((uint16_t *) stack) - 24);
+	fifos_threads[new_pcb].sp = (uint32_t) (((uint16_t *) stack) - 22);
 	
 	
 	/* Fake initial context */
@@ -210,16 +211,16 @@ int thread_create(void *stack, void *func){
 	/* EAX */ *(((uint32_t *)stack) - 2) = 0; 
 	/* ECX */ *(((uint32_t *)stack) - 3) = 0; 
 	/* EDX */ *(((uint32_t *)stack) - 4) = 0; 
-	/* EBX */ *(((uint32_t *)stack) - 5) = 0; 
-	/* ESP */ *(((uint32_t *)stack) - 6) = (uint32_t) (((uint32_t *) stack) - 3);
-	/* EBP */ *(((uint32_t *)stack) - 7) = (uint32_t) (((uint32_t *) stack) - 3);
-	/* ESI */ *(((uint32_t *)stack) - 8) = 0; 
-	/* EDI */ *(((uint32_t *)stack) - 9) = 0; 
+//	/* ESP */ *(((uint32_t *)stack) - 6) = (uint32_t) (((uint32_t *) stack) - 3);
+	/* EBP */ *(((uint32_t *)stack) - 5) = (uint32_t) (((uint32_t *) stack) - 3);
+	/* EBX */ *(((uint32_t *)stack) - 6) = 0; 
+	/* ESI */ *(((uint32_t *)stack) - 7) = 0; 
+	/* EDI */ *(((uint32_t *)stack) - 8) = 0; 
 	
-	/* DS */ *(((uint16_t *)stack) - 21) = 0; 
-	/* ES */ *(((uint16_t *)stack) - 22) = 0; 
-	/* FS */ *(((uint16_t *)stack) - 23) = 0; 
-	/* GS */ *(((uint16_t *)stack) - 24) = 0; 
+	/* DS */ *(((uint16_t *)stack) - 19) = ds; 
+	/* ES */ *(((uint16_t *)stack) - 20) = es; 
+	/* FS */ *(((uint16_t *)stack) - 21) = fs; 
+	/* GS */ *(((uint16_t *)stack) - 22) = gs; 
 
 	// add to the run queue
 	runqueue_add(&fifos_threads[new_pcb]);
