@@ -11,9 +11,10 @@ pcb * get_current_stack() {
 	for (;tmp->next != 0; )
 	{
 		if (current_tid == tmp->tid)
-			return &tmp;
+			return tmp;
 		tmp = tmp->next;
 	}
+	return tmp;
 }
 pcb * get_next_stack() {
 	pcb* tmp = runqueue->next;
@@ -23,11 +24,20 @@ pcb * get_next_stack() {
 			return (tmp->next);
 		tmp = tmp->next;
 	}
+	return tmp;
 }
 
 void yield (){
 	pcb* cur = get_current_stack();
 	pcb* next = get_next_stack();
+	print_s("yielding from ");
+	char tmp[10];
+	itoa(tmp, 'd', cur->tid);
+	print_s(tmp);
+	print_s(" to ");
+	itoa(tmp, 'd', next->tid);
+	print_s(tmp);
+	print_s("\n");
 	swtch(cur->sp, next->sp);
 }
 
@@ -44,11 +54,12 @@ void schedule () {
 	pcb* tmp = runqueue->next;
 	for (;runqueue->next != 0;)
 	{
-//		print_s("here in scheduler\n");
+
 //		swtch(num, tmp->sp);
+
 		current_tid = tmp->tid;
-		(tmp->entry)();
 		print_s("running the thread\n");
+		(tmp->entry)();
 		runqueue_remove(tmp->tid);
 		if( tmp->next == 0 )
 		{

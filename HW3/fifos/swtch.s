@@ -42,6 +42,6 @@ swtch:
   popl %edx
   popl %ecx
   popl %eax
-  popf
-  
+  popf 
+
   ret                #Jump to the new thread's eip
