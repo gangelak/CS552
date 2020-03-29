@@ -120,13 +120,20 @@ void print_context(uint32_t *stack, int tid){
 	uint32_t bp = (uint32_t)fifos_threads[tid].bp;
 
 	uint32_t *cur;
-	for (cur = (uint32_t*)stack; cur < bp; cur++){
+	int i = 0;
+	for (cur = (uint32_t*)stack; cur <= bp; cur++){
 		char buf[10];
 		itoa(buf,10,*cur);
 		print_s(buf);
-		print_s("\n");
-	}
+		print_s(" ");
+		i++;
+		if (i%4 == 0){
+			print_s("\n");
+			i = 0;
 
+		}
+	
+	}
 }
 
 
