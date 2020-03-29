@@ -37,7 +37,7 @@ typedef uint64 uint64_t;
 #define _PCB
 struct proc_crtl_block{
 	int tid;
-	int *bp;
+	uint32_t *bp;
 	int (*entry)();
 	int status;
 	struct proc_crtl_block *next;

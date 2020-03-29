@@ -115,6 +115,21 @@ void exit_thread() {
 
 }
 
+
+void print_context(uint32_t *stack, int tid){
+	uint32_t bp = (uint32_t)fifos_threads[tid].bp;
+
+	uint32_t *cur;
+	for (cur = (uint32_t*)stack; cur < bp; cur++){
+		char buf[10];
+		itoa(buf,10,*cur);
+		print_s(buf);
+		print_s("\n");
+	}
+
+}
+
+
 // remove the pcb with the passed tid from runqueue
 
 void runqueue_remove(int tid)
@@ -221,7 +236,9 @@ int thread_create(void *stack, void *func){
 	/* ES */ *(((uint16_t *)stack) - 20) = es; 
 	/* FS */ *(((uint16_t *)stack) - 21) = fs; 
 	/* GS */ *(((uint16_t *)stack) - 22) = gs; 
-
+	
+	print_s("Printing the context\n");
+	print_context((uint32_t*)fifos_threads[new_pcb].sp,new_pcb);
 	// add to the run queue
 	runqueue_add(&fifos_threads[new_pcb]);
 	return 0;
