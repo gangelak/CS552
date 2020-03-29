@@ -8,7 +8,7 @@ all: fifos
 fifos: stub.o fifos.o fifos.ld $(OBJS)
 	ld -m elf_i386 -T fifos.ld -o fifos fifos.o stub.o $(OBJS)
 fifos.o:fifos.c $(OBJS)
-	$(CC) $(CFLAGS) -o fifos.o fifos.c $(OBJS)
+	$(CC) $(CFLAGS) -o fifos.o fifos.c
 
 .c.o:
 	$(CC) $(CFLAGS) $< -o $@
