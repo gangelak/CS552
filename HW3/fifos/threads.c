@@ -11,12 +11,6 @@ static bool done[MAX_THREADS];
 static bool in_use[MAX_THREADS] = {0,0};
 static uint32_t stacks[MAX_THREADS][1024];
 
-// our runqueue works on this
-
-/* 
- * Create an array of stacks to be used by the 
- * different hreads
-*/
 extern pcb fifos_threads[MAX_THREADS];
 
 /* Get an available pcb spot from the array */
@@ -38,57 +32,6 @@ int get_pcb(){
 
 /* Thread functions */
 
-
-static int thread1 () 
-{
-	int i; 
-  	int j = 0;
-	
-	print_s("Executing Thread1!\n");
-  	while (1) 
-  	{
-		for (i = 0; i < 10; i++) 
-    		{
-	      	print_s ("<1>"); 
-    		}
-		print_s("\n");
-		//yield();
-		if (++j> 6)
-		{
-			break;
-		}
-	}
-
-	//  done[0] = TRUE;
-	print_s ("Done 1\n");
-	return 1;
-}
-
-static
-int thread2 () 
-{
-	int i;
-	int j = 0;
-
-	print_s("Executing Thread2!\n");
-	while (1) 
-	{
-		for (i = 0; i < 5; i++) 
-		{
-			print_s ("<2>");
-		}
-		print_s("\n");
-
-		if (++j == 10)
-			break;
-  	}
-	// done[1] = TRUE;
-	print_s ("Done 2\n");
-
-	return 2;
-}
-
-
 void thread_yield() {
 	// save state and call scheduler
 	// our scheduler is wrong for now
@@ -106,10 +49,71 @@ void exit_thread() {
 	 * so need to change status -> Status.killed
 	 */
 	pcb * tmp = get_current_thread();
+	
+	in_use[tmp->tid] = 0; 			// This PCB is not use anymore
+
 	tmp->status = 1; // means killed
 	schedule();
 
 }
+
+
+static 
+void thread1 () 
+{
+	int i; 
+  	int j = 0;
+	
+	print_s("Executing Thread1!\n");
+  	while (1) 
+  	{
+		for (i = 0; i < 10; i++) 
+    		{
+	      	print_s ("<1>"); 
+    		}
+		print_s("\n");
+		
+		/* Yield at this point */
+		thread_yield();
+		
+		if (++j> 6)
+		{
+			break;
+		}
+	}
+
+	//  done[0] = TRUE;
+	print_s ("Done 1\n");
+	return;
+}
+
+static
+void thread2 () 
+{
+	int i;
+	int j = 0;
+
+	print_s("Executing Thread2!\n");
+	while (1) 
+	{
+		for (i = 0; i < 5; i++) 
+		{
+			print_s ("<2>");
+		}
+		print_s("\n");
+		
+		/* Yield at this point */
+		thread_yield();
+
+		if (++j == 10)
+			break;
+  	}
+	// done[1] = TRUE;
+	print_s ("Done 2\n");
+
+	return;
+}
+
 
 /* For debugging purposes only */
 
@@ -238,7 +242,7 @@ int thread_create(void *stack, void *func){
 	fifos_threads[new_pcb].sp = (uint32_t) (((uint32_t *) stack) - 1);
 	
 //	print_s("Printing the context\n");
-	print_context((uint32_t*)fifos_threads[new_pcb].sp,new_pcb);
+//	print_context((uint32_t*)fifos_threads[new_pcb].sp,new_pcb);
 	// add to the run queue
 	runqueue_add(&fifos_threads[new_pcb]);
 	return 0;
@@ -251,7 +255,7 @@ void init_threads(void){
 	current->next = 0; // set up current running to null
 	int i;
 //	print_s("creating the threads\n");
-	int* threads[MAX_THREADS] = {(int*)thread1, (int*)thread2};	
+	void* threads[MAX_THREADS] = {(void*)thread1, (void*)thread2};	
 	for (i = 0; i < MAX_THREADS; i++){
 
 		thread_create(&stacks[i], threads[i]);
