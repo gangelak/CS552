@@ -13,7 +13,7 @@ pcb * get_current_thread()
 {
 	return current;
 }
-void schedule () {
+void schedule (int status) {
 	int prev_tid = -1;
 	
 
@@ -38,6 +38,13 @@ void schedule () {
 				print_s("Context switch to first thread\n");
 				swtch(&dummy, fifos_threads[current->tid].ctx);
 			}
+			else{
+				// means there is nothing left
+				while(1)
+				{
+					// stay in an infinite loop
+				}
+			}
 			// We' never get here
 		}
 		else {
@@ -61,6 +68,9 @@ void schedule () {
 			if (current !=0){
 				print_s("Context switching to the next thread\n");
 				swtch(&fifos_threads[prev_tid].ctx, fifos_threads[current->tid].ctx);
+				// after thread-yield we have to go back
+				if (status == 1 )
+					return;
 			}
 	
 		}

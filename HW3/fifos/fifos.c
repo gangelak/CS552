@@ -95,7 +95,7 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	init_threads();
 
 	
-	schedule();
+	schedule(0);
 	return ;
 
 

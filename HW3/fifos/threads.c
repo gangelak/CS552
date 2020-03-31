@@ -40,7 +40,7 @@ void thread_yield() {
 	
 
 	fifos_threads[get_current_thread()->tid].status = 0;
-	schedule();
+	schedule(1);
 	return;
 }
 void exit_thread() {
@@ -53,7 +53,7 @@ void exit_thread() {
 	in_use[tmp->tid] = 0; 			// This PCB is not use anymore
 
 	tmp->status = 1; // means killed
-	schedule();
+	schedule(0);
 
 }
 

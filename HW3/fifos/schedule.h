@@ -4,7 +4,7 @@
 pcb * current;     	        // pointing to the current thread running
 
 void yield();
-void schedule();
+void schedule(int);
 pcb* get_current_thread();
 
 
