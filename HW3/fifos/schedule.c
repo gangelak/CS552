@@ -9,52 +9,12 @@ extern pcb * runqueue;
 static uint32_t dstack[1024]; 			//dummy stack for the 1st context switch
 
 
-pcb * get_current_stack() {
-	pcb* tmp = runqueue->next;
-	for (;tmp->next != 0; )
-	{
-		if (current_tid == tmp->tid)
-			return tmp;
-		tmp = tmp->next;
-	}
-	return tmp;
-}
-pcb * get_next_stack() {
-	pcb* tmp = runqueue->next;
-	for (;tmp->next != 0; )
-	{
-		if (current_tid == tmp->tid)
-			return (tmp->next);
-		tmp = tmp->next;
-	}
-	return tmp;
-}
-
-/*void yield (){*/
-	/*pcb* cur = get_current_stack();*/
-	/*pcb* next = get_next_stack();*/
-	/*print_s("yielding from ");*/
-	/*char tmp[10];*/
-	/*itoa(tmp, 'd', cur->tid);*/
-	/*print_s(tmp);*/
-	/*print_s(" to ");*/
-	/*itoa(tmp, 'd', next->tid);*/
-	/*print_s(tmp);*/
-	/*print_s("\n");*/
-	/*swtch(cur->sp, next->sp);*/
-/*}*/
 pcb * get_current_thread()
 {
 	return current->next;
 }
 void schedule () {
 	int prev_tid;
-	//__asm volatile ("mov %%esp, %0": "=r"(num));
-//	char str[10] ;
-//	itoa(str, '10', num);
-//	print_s("esp value is: ");
-//	print_s(str);
-//	print_s("\n");
 	
 
 	/*TODO*/
