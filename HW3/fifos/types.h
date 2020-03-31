@@ -11,6 +11,8 @@ typedef signed short int sint16, s16;
 typedef signed long int sint32, s32;
 typedef signed long long int sint64, s64;
 
+
+
 #ifndef _SIZE_T
 typedef int size_t;
 #define _SIZE_T 1
@@ -32,17 +34,32 @@ typedef uint64 uint64_t;
 #define MAX_THREADS 2
 
 
+
+
 /* PCB for a process/thread */
 #ifndef _PCB
 #define _PCB
+struct context{
+	uint16_t ds;
+	uint16_t es;
+	uint16_t fs;
+	uint16_t gs;
+	uint32_t flg;
+	uint32_t edi;
+	uint32_t esi;
+	uint32_t ebp;
+	uint32_t eip;
+};
+
 struct proc_crtl_block{
 	int tid;
-	uint32_t *bp;
+	uint32_t bp;
 	int (*entry)();
 	int status;
 	struct proc_crtl_block *next;
 	struct proc_crtl_block *prev;
-	int *sp;
+	uint32_t sp;
+	struct context *ctx;
 };
 
 

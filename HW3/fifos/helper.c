@@ -1,5 +1,6 @@
 #include "vga.h"
 #include "helper.h"
+#include "types.h"
 
 void itoa (char *buf, int base, int d)
 {
@@ -67,10 +68,10 @@ void pad(char* str)
 }
 
 
-void my_memset(char *str){
-	int i;
-	for (i =0; i< 50; i++){
-		str[i] = '\0';
+void memset(uint32_t *buf, uint32_t num, uint32_t size){
+	uint32_t i;
+	for (i =0; i < size; i++){
+		buf[i] = num;
 	}
 
 	return;

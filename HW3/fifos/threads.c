@@ -10,7 +10,6 @@
 static bool done[MAX_THREADS];
 static bool in_use[MAX_THREADS] = {0,0};
 static uint32_t stacks[MAX_THREADS][1024];
-static uint32_t dstack[1024]; 			//dummy stack for the 1st context switch
 
 // our runqueue works on this
 
@@ -27,7 +26,6 @@ int get_pcb(){
 	int i;
 	for (i =0; i< MAX_THREADS; i++){
 		if (in_use[i] == 0){
-//			fifos_threads[i].in_use = 1;
 			pcb temp;
 			in_use[i] = 1;
 			fifos_threads[i] = temp;
@@ -36,6 +34,8 @@ int get_pcb(){
 	}
 	return -1;
 }
+
+
 /* Thread functions */
 
 
@@ -95,12 +95,18 @@ void thread_yield() {
 	// we should make a runqueue like west
 	// and add the threads to the end of it
 	// and in the scheduler do round robin
+	
+
+	fifos_threads[current_tid].status = 0;
+	schedule();
+	return;
 }
 void exit_thread() {
 	
 
 }
 
+/* For debugging purposes only */
 
 void print_context(uint32_t *stack, int tid){
 	uint32_t bp = (uint32_t)fifos_threads[tid].bp;
@@ -126,6 +132,7 @@ void print_context(uint32_t *stack, int tid){
 // remove the pcb with the passed tid from runqueue
 
 void runqueue_remove(int tid)
+
 {
 	if (runqueue->next == 0 )
 	{
@@ -194,9 +201,8 @@ int thread_create(void *stack, void *func){
 	 */
 
 
-	*(((uint32_t*) stack) - 0) = (uint32_t) new_pcb;
-	*(((uint32_t*) stack) - 1) = (uint32_t) exit_thread;
-	stack = (void*) (((uint32_t*) stack) - 2);
+	*(((uint32_t*) stack) - 0) = (uint32_t) exit_thread;
+	stack = (void*) (((uint32_t*) stack) - 1);
 
 	
 	/* Found new PCB */
@@ -207,31 +213,27 @@ int thread_create(void *stack, void *func){
 	fifos_threads[new_pcb].next = 0;
 	fifos_threads[new_pcb].prev = 0;
 	
+	/* Create a fake initial context for the process  */
+
+	stack = (void*) (((uint32_t*)stack) - sizeof(fifos_threads[new_pcb].ctx));
+	fifos_threads[new_pcb].ctx = (struct context*) stack;
+
+	struct context temp;
+	fifos_threads[new_pcb].ctx->eip = (uint32_t) fifos_threads[new_pcb].entry;
+	fifos_threads[new_pcb].ctx->ebp = (uint32_t) fifos_threads[new_pcb].bp - 1;
+	fifos_threads[new_pcb].ctx->esi = 0;
+	fifos_threads[new_pcb].ctx->edi = 0;
+	fifos_threads[new_pcb].ctx->flg = 0;
+	fifos_threads[new_pcb].ctx->gs = gs;
+	fifos_threads[new_pcb].ctx->fs = fs;
+	fifos_threads[new_pcb].ctx->es = es;
+	fifos_threads[new_pcb].ctx->ds = ds;
 
 	/* Fake an initial context for the new thread */
-	fifos_threads[new_pcb].sp = (uint32_t) (((uint16_t *) stack) - 22);
-	
-	
-	/* Fake initial context */
-
-	/* EIP */ *(((uint32_t *)stack) - 0) = (uint32_t) fifos_threads[new_pcb].entry; 
-	/* FLG */ *(((uint32_t *)stack) - 1) = 0 ;   //Set IF for preemption  (Not now)
-	/* EAX */ *(((uint32_t *)stack) - 2) = 0; 
-	/* ECX */ *(((uint32_t *)stack) - 3) = 0; 
-	/* EDX */ *(((uint32_t *)stack) - 4) = 0; 
-//	/* ESP */ *(((uint32_t *)stack) - 6) = (uint32_t) (((uint32_t *) stack) - 3);
-	/* EBP */ *(((uint32_t *)stack) - 5) = (uint32_t) (((uint32_t *) stack) - 3);
-	/* EBX */ *(((uint32_t *)stack) - 6) = 0; 
-	/* ESI */ *(((uint32_t *)stack) - 7) = 0; 
-	/* EDI */ *(((uint32_t *)stack) - 8) = 0; 
-	
-	/* DS */ *(((uint16_t *)stack) - 19) = ds; 
-	/* ES */ *(((uint16_t *)stack) - 20) = es; 
-	/* FS */ *(((uint16_t *)stack) - 21) = fs; 
-	/* GS */ *(((uint16_t *)stack) - 22) = gs; 
+	fifos_threads[new_pcb].sp = (uint32_t) (((uint32_t *) stack) - 1);
 	
 //	print_s("Printing the context\n");
-//	print_context((uint32_t*)fifos_threads[new_pcb].sp,new_pcb);
+	print_context((uint32_t*)fifos_threads[new_pcb].sp,new_pcb);
 	// add to the run queue
 	runqueue_add(&fifos_threads[new_pcb]);
 	return 0;
@@ -239,7 +241,8 @@ int thread_create(void *stack, void *func){
 
 
 void init_threads(void){
-
+	
+	current_tid = -1;
 	runqueue->next = 0;
 	int i;
 //	print_s("creating the threads\n");

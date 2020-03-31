@@ -9,39 +9,33 @@
 
 .globl swtch
 swtch:
-  #movl 4(%esp), %eax
-  #movl 8(%esp), %edx
+  movl 4(%esp), %eax
+  movl 8(%esp), %edx
 
   # Save old callee-saved registers
-  pushf                #Push the flags register to the stack
-  pushl %eax
-  pushl %ecx
-  pushl %edx
   pushl %ebp
   pushl %ebx
   pushl %esi
   pushl %edi
-  pushw %ds
-  pushw %es
+  pushf                #Push the flags register to the stack
+  pushw %gs
   pushw %fs
-  pushw %gs 
+  pushw %es
+  pushw %ds 
 
   # Switch stacks
-  movl %esp, 44(%esp)
-  movl 48(%esp), %esp
+  movl %esp, (%eax)
+  movl (%edx), %esp
 
   # Load new callee-saved registers
-  popw %gs
-  popw %fs
-  popw %es
   popw %ds
+  popw %es
+  popw %fs
+  popw %gs
+  popf 
   popl %edi
   popl %esi
   popl %ebx
   popl %ebp
-  popl %edx
-  popl %ecx
-  popl %eax
-  popf 
 
   ret                #Jump to the new thread's eip
