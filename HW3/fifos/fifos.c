@@ -65,7 +65,7 @@ void *my_malloc(int size){
 }
 
 void kmain (multiboot_info_t* mbt, unsigned long magic) {
-	int avail_regs;          // # of available memory regions
+	//int avail_regs;          // # of available memory regions
 	
 
 

@@ -7,7 +7,6 @@
 #include "types.h"
 #include "vga.h"
 #include "schedule.h"
-static bool done[MAX_THREADS];
 static bool in_use[MAX_THREADS] = {0,0};
 static uint32_t stacks[MAX_THREADS][1024];
 
@@ -229,7 +228,7 @@ int thread_create(void *stack, void *func){
 
 	struct context temp;
 	fifos_threads[new_pcb].ctx->eip = (uint32_t) fifos_threads[new_pcb].entry;
-	fifos_threads[new_pcb].ctx->ebp = (uint32_t) fifos_threads[new_pcb].bp - 1;
+	fifos_threads[new_pcb].ctx->ebp = (uint32_t) fifos_threads[new_pcb].bp - 2;
 	fifos_threads[new_pcb].ctx->esi = 0;
 	fifos_threads[new_pcb].ctx->edi = 0;
 	fifos_threads[new_pcb].ctx->flg = 0;
@@ -242,7 +241,7 @@ int thread_create(void *stack, void *func){
 	fifos_threads[new_pcb].sp = (uint32_t) (((uint32_t *) stack) - 1);
 	
 //	print_s("Printing the context\n");
-//	print_context((uint32_t*)fifos_threads[new_pcb].sp,new_pcb);
+	print_context((uint32_t*)fifos_threads[new_pcb].sp,new_pcb);
 	// add to the run queue
 	runqueue_add(&fifos_threads[new_pcb]);
 	return 0;

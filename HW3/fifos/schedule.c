@@ -14,7 +14,7 @@ pcb * get_current_thread()
 	return current->next;
 }
 void schedule () {
-	int prev_tid;
+	int prev_tid = -1;
 	
 
 	/*TODO*/
@@ -26,34 +26,34 @@ void schedule () {
 
 	for (;;)
 	{
-		if ( current->next == 0 ) // we haven't chosen one yet or nothing in the queue anymore
+		if ( current == 0 ) // we haven't chosen one yet or nothing in the queue anymore
 		{
-			current->next = runqueue->next; // the one that is going to run now
+			current = runqueue->next; // the one that is going to run now
 
 			// Create a dummy first context to pass to swtch
-			struct context *dummy = (struct context *) (&dstack[1023] - sizeof(struct context *));
+			struct context *dummy = (struct context *) (&dstack[1021] - sizeof(struct context *));
 			// Check if we have an available in the queue
-			if (current->next != 0)
+			if (current != 0)
 			{
-				swtch(&dummy, fifos_threads[(current->next)->tid].ctx);
+				swtch(&dummy, fifos_threads[current->tid].ctx);
 			}
 			// We' never get here
 		}
 		else {
-			int prev_id = current->next->tid;
-			if ( current->next->next == 0 )
+			int prev_id = current->tid;
+			if ( current->next == 0 )
 			{
 				// we reached the end of list
 				//  go back to the beginning again
-				current->next = runqueue->next;
+				current = runqueue->next;
 			}
 			else
 			{
-				current->next = current->next->next;
+				current = current->next;
 			}
 			runqueue_remove(prev_id);
 			print_s("Context switching to the next thread\n");
-			swtch(&fifos_threads[prev_tid].ctx, &fifos_threads[current->next->tid].ctx);
+			swtch(&fifos_threads[prev_tid].ctx, &fifos_threads[current->tid].ctx);
 		}
 
 	}

@@ -15,12 +15,7 @@ fifos.o:fifos.c $(OBJS)
 .c.o:
 	$(CC) $(CFLAGS) $< -o $@
 swtch.o: swtch.s
-	as --32 swtch.s -o swtch.o
-#helper.o: helper.c
-#	gcc -m32 -fno-stack-protector -fno-builtin -nostdinc -O -g -Wall -c -o helper.o helper.c
-
-#thread.o: crtn_sample.c
-#	gcc -m32 -fno-stack-protector -fno-builtin -nostdinc -O -g -Wall -c -o thread.o crtn_sample.c
+	$(AS) --32 swtch.s -o swtch.o
 
 stub.o: stub.s
 	$(AS) --32 stub.s -o stub.o

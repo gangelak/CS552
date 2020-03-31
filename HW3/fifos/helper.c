@@ -56,9 +56,9 @@ void pad(char* str)
  int i = 0;
  for (i; str[i] != '\0'; i ++) {}
 
- int j = 8 - i;
+ int j;
  int k = 0;
- for ( j ; j < 9 ; j++ )
+ for ( j= 8 - i ; j < 9 ; j++ )
  {
 	 padded[j] = str[k];
 	 k++;

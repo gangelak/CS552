@@ -1,3 +1,4 @@
+#include "types.h"
 #ifndef _HELPER
 #define _HELPER
 
@@ -19,6 +20,6 @@ void put(unsigned char);
 
 void print(char *);
 
-void my_memset(char *);
+void memset(uint32_t *buf, uint32_t num, uint32_t size);
 
 #endif
