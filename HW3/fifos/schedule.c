@@ -51,7 +51,7 @@ void schedule () {
 			{
 				current->next = current->next->next;
 			}
-			runqueue_remove(fifos_threads[prev_id]);
+			runqueue_remove(prev_id);
 			print_s("Context switching to the next thread\n");
 			swtch(&fifos_threads[prev_tid].ctx, &fifos_threads[current->next->tid].ctx);
 		}
