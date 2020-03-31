@@ -241,7 +241,7 @@ int thread_create(void *stack, void *func){
 	/*fifos_threads[new_pcb].ctx->edx = 0;*/
 	fifos_threads[new_pcb].ctx->esi = 0;
 	fifos_threads[new_pcb].ctx->edi = 0;
-	fifos_threads[new_pcb].ctx->flags = 0 | (1<<9);
+//	fifos_threads[new_pcb].ctx->flags = 0 | (1<<9);
 	fifos_threads[new_pcb].ctx->gs = gs;
 	fifos_threads[new_pcb].ctx->fs = fs;
 	fifos_threads[new_pcb].ctx->es = es;
