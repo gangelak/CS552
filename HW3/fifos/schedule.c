@@ -66,7 +66,7 @@ void schedule () {
 
 	for (;;)
 	{
-		if ( current->next == 0 ) // we haven't chosen one yet
+		if ( current->next == 0 ) // we haven't chosen one yet or nothing in the queue anymore
 		{
 			current->next = runqueue->next; // the one that is going to run now
 
@@ -91,6 +91,7 @@ void schedule () {
 			{
 				current->next = current->next->next;
 			}
+			runqueue_remove(fifos_threads[prev_id]);
 			print_s("Context switching to the next thread\n");
 			swtch(&fifos_threads[prev_tid].ctx, &fifos_threads[current->next->tid].ctx);
 		}
