@@ -20,7 +20,7 @@ swtch:
  # pushl %edx
   pushl %esi
   pushl %edi
-  pushf                #Push the eflags register to the stack
+#  pushf                #Push the eflags register to the stack
   pushw %gs
   pushw %fs
   pushw %es
@@ -35,7 +35,7 @@ swtch:
   popw %es
   popw %fs
   popw %gs
-  popf 
+ # popf 
   popl %edi
   popl %esi
 #  popl %edx

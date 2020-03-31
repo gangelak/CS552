@@ -44,7 +44,7 @@ struct context{
 	uint16_t es;
 	uint16_t fs;
 	uint16_t gs;
-	uint16_t flags;
+//	uint32_t flags;
 	uint32_t edi;
 	uint32_t esi;
 	uint32_t ebx;
