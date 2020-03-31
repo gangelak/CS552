@@ -97,12 +97,17 @@ void thread_yield() {
 	// and in the scheduler do round robin
 	
 
-	fifos_threads[current_tid].status = 0;
+	fifos_threads[get_current_thread()->tid].status = 0;
 	schedule();
 	return;
 }
 void exit_thread() {
-	
+	/* current running thread is done 
+	 * so need to change status -> Status.killed
+	 */
+	pcb * tmp = get_current_thread();
+	tmp->status = 1; // means killed
+	schedule();
 
 }
 
@@ -242,8 +247,8 @@ int thread_create(void *stack, void *func){
 
 void init_threads(void){
 	
-	current_tid = -1;
-	runqueue->next = 0;
+	runqueue->next = 0; // set up runqueue
+	current->next = 0; // set up current running to null
 	int i;
 //	print_s("creating the threads\n");
 	int* threads[MAX_THREADS] = {(int*)thread1, (int*)thread2};	

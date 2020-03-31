@@ -43,7 +43,10 @@ pcb * get_next_stack() {
 	/*print_s("\n");*/
 	/*swtch(cur->sp, next->sp);*/
 /*}*/
-
+pcb * get_current_thread()
+{
+	return current->next;
+}
 void schedule () {
 	int prev_tid;
 	//__asm volatile ("mov %%esp, %0": "=r"(num));
@@ -61,49 +64,37 @@ void schedule () {
 	 * One case when the last thread exits and there are no more threads to run
 	 */
 
-	pcb* tmp = runqueue->next;
-	for (;runqueue->next != 0;)
+	for (;;)
 	{
+		if ( current->next == 0 ) // we haven't chosen one yet
+		{
+			current->next = runqueue->next; // the one that is going to run now
 
-		
-		/* First context switch ever */
-		if (current_tid == -1){
 			// Create a dummy first context to pass to swtch
 			struct context *dummy = (struct context *) (&dstack[1023] - sizeof(struct context *));
 			// Check if we have an available in the queue
-			if (tmp != 0){
-				current_tid = tmp->tid;
-				swtch(&dummy, fifos_threads[current_tid].ctx);
+			if (current->next != 0)
+			{
+				swtch(&dummy, fifos_threads[(current->next)->tid].ctx);
 			}
 			// We' never get here
-
 		}
-		else{
-			
-			prev_tid = current_tid;
-			
-			// Go to the next thread in the queue
-			if( tmp->next == 0 )
+		else {
+			int prev_id = current->next->tid;
+			if ( current->next->next == 0 )
 			{
-				// we reached end of list
-				// so we are gonna go to the head again
-				tmp = runqueue->next;
+				// we reached the end of list
+				//  go back to the beginning again
+				current->next = runqueue->next;
 			}
-			else{
-				tmp = tmp->next;
+			else
+			{
+				current->next = current->next->next;
 			}
-			
-			current_tid = tmp->tid;
-			
-			print_s("Context switching to next thread\n");
-			//(tmp->entry)();
-			
-			swtch(&fifos_threads[prev_tid].ctx,fifos_threads[current_tid].ctx);
-			//runqueue_remove(tmp->tid);
-			
-
+			print_s("Context switching to the next thread\n");
+			swtch(&fifos_threads[prev_tid].ctx, &fifos_threads[current->next->tid].ctx);
 		}
+
 	}
-//	print_s("schedule: nothing to run\n");
-	return;
+
 }

@@ -1,10 +1,11 @@
 #ifndef _SCHED
 #define _SCHED
 
-static int current_tid;     	        // Id of the current thread running
+pcb * current;     	        // pointing to the current thread running
 
 void yield();
 void schedule();
+pcb* get_current_thread();
 
 
 #endif
