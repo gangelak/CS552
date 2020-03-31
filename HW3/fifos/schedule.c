@@ -11,7 +11,7 @@ static uint32_t dstack[1024]; 			//dummy stack for the 1st context switch
 
 pcb * get_current_thread()
 {
-	return current->next;
+	return current;
 }
 void schedule () {
 	int prev_tid = -1;
@@ -35,7 +35,8 @@ void schedule () {
 			// Check if we have an available in the queue
 			if (current != 0)
 			{
-				swtch(&dummy, fifos_threads[current->tid].ctx);
+				print_s("Context switch to first thread\n");
+		//		swtch(&dummy, fifos_threads[current->tid].ctx);
 			}
 			// We' never get here
 		}
@@ -53,7 +54,7 @@ void schedule () {
 			}
 			runqueue_remove(prev_id);
 			print_s("Context switching to the next thread\n");
-			swtch(&fifos_threads[prev_tid].ctx, &fifos_threads[current->tid].ctx);
+		//	swtch(&fifos_threads[prev_tid].ctx, &fifos_threads[current->tid].ctx);
 		}
 
 	}

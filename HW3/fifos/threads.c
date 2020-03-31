@@ -185,7 +185,9 @@ void runqueue_add(pcb* t)
 		// need to iterate through pcbs to find the last one
 		pcb* tmp = runqueue->next;
 		while(tmp->next != 0)
-		{}
+		{
+			tmp = tmp->next;
+		}
 		// the last one is gonna point to t
 		tmp->next = t;
 	}
@@ -228,17 +230,17 @@ int thread_create(void *stack, void *func){
 
 	struct context temp;
 	fifos_threads[new_pcb].ctx->eip = (uint32_t) fifos_threads[new_pcb].entry;
-	fifos_threads[new_pcb].ctx->ebp = (uint32_t) fifos_threads[new_pcb].bp - 2;
+	fifos_threads[new_pcb].ctx->ebp = (uint32_t) fifos_threads[new_pcb].bp;
 	fifos_threads[new_pcb].ctx->esi = 0;
 	fifos_threads[new_pcb].ctx->edi = 0;
-	fifos_threads[new_pcb].ctx->flg = 0;
+//	fifos_threads[new_pcb].ctx->flg = 0 | (1<<9);
 	fifos_threads[new_pcb].ctx->gs = gs;
 	fifos_threads[new_pcb].ctx->fs = fs;
 	fifos_threads[new_pcb].ctx->es = es;
 	fifos_threads[new_pcb].ctx->ds = ds;
 
 	/* Fake an initial context for the new thread */
-	fifos_threads[new_pcb].sp = (uint32_t) (((uint32_t *) stack) - 1);
+	fifos_threads[new_pcb].sp = (uint32_t) (((uint32_t *) stack));
 	
 //	print_s("Printing the context\n");
 	print_context((uint32_t*)fifos_threads[new_pcb].sp,new_pcb);
@@ -251,7 +253,7 @@ int thread_create(void *stack, void *func){
 void init_threads(void){
 	
 	runqueue->next = 0; // set up runqueue
-	current->next = 0; // set up current running to null
+	current = 0; // set up current running to null
 	int i;
 //	print_s("creating the threads\n");
 	void* threads[MAX_THREADS] = {(void*)thread1, (void*)thread2};	
