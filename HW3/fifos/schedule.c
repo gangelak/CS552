@@ -36,7 +36,7 @@ void schedule () {
 			if (current != 0)
 			{
 				print_s("Context switch to first thread\n");
-		//		swtch(&dummy, fifos_threads[current->tid].ctx);
+				swtch(&dummy, fifos_threads[current->tid].ctx);
 			}
 			// We' never get here
 		}
@@ -44,19 +44,26 @@ void schedule () {
 			int prev_id = current->tid;
 			if ( current->next == 0 )
 			{
+				print_s("Going to the start of the queue\n");
 				// we reached the end of list
 				//  go back to the beginning again
 				current = runqueue->next;
 			}
 			else
 			{
+				print_s("Going to the next node in the queue\n");
 				current = current->next;
 			}
-			runqueue_remove(prev_id);
-			print_s("Context switching to the next thread\n");
-		//	swtch(&fifos_threads[prev_tid].ctx, &fifos_threads[current->tid].ctx);
+			// It means the thread was killed!!!
+			while ( current != 0 && current->status == 1)
+				runqueue_remove(current->tid);
+			
+			if (current !=0){
+				print_s("Context switching to the next thread\n");
+				swtch(&fifos_threads[prev_tid].ctx, fifos_threads[current->tid].ctx);
+			}
+	
 		}
-
+	
 	}
-
 }

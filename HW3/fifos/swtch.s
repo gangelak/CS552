@@ -15,9 +15,12 @@ swtch:
   # Save old callee-saved registers
   pushl %ebp
   pushl %ebx
+ # pushl %eax
+ # pushl %ecx
+ # pushl %edx
   pushl %esi
   pushl %edi
-  pushf                #Push the flags register to the stack
+  pushf                #Push the eflags register to the stack
   pushw %gs
   pushw %fs
   pushw %es
@@ -25,7 +28,7 @@ swtch:
 
   # Switch stacks
   movl %esp, (%eax)
-  movl (%edx), %esp
+  movl %edx, %esp
 
   # Load new callee-saved registers
   popw %ds
@@ -35,6 +38,9 @@ swtch:
   popf 
   popl %edi
   popl %esi
+#  popl %edx
+#  popl %ecx
+#  popl %eax
   popl %ebx
   popl %ebp
 
