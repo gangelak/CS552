@@ -40,7 +40,7 @@ void thread_yield() {
 	
 
 	fifos_threads[get_current_thread()->tid].status = 0;
-	schedule(1);
+	schedule();
 	return;
 }
 void exit_thread() {
@@ -53,7 +53,7 @@ void exit_thread() {
 	in_use[tmp->tid] = 0; 			// This PCB is not use anymore
 
 	tmp->status = 1; // means killed
-	schedule(0);
+	schedule();
 
 }
 
@@ -61,18 +61,13 @@ void exit_thread() {
 static 
 void thread1 () 
 {
-	int i; 
-  	int j = 0;
+	/*int i; */
+          /*int j = 0;*/
 	
 	print_s("Executing Thread1!\n");
   	while (1) 
   	{
-		for (i = 0; i < 10; i++) 
-    		{
-	      	print_s ("<1>"); 
-    		}
-		print_s("\n");
-		
+	      	print_s ("<1>\n"); 
 		/* Yield at this point */
 	      	print_s ("Thread 1 yielding mathafuckaaaaaaaaaaaa\n"); 
 		thread_yield();
@@ -81,6 +76,7 @@ void thread1 ()
 		/*{*/
 			/*break;*/
 		/*}*/
+		break;
 	}
 
 	//  done[0] = TRUE;
@@ -91,22 +87,19 @@ void thread1 ()
 static
 void thread2 () 
 {
-	int i;
-	int j = 0;
+	/*int i;*/
+	/*int j = 0;*/
 
 	print_s("Executing Thread2!\n");
 	while (1) 
 	{
-		for (i = 0; i < 5; i++) 
-		{
-			print_s ("<2>");
-		}
-		print_s("\n");
+		print_s ("<2>\n");
 		
 		/* Yield at this point */
 	      	print_s ("Thread 2 yielding mathafuckaaaaaaaaaaaa\n"); 
 		thread_yield();
-
+		
+		break;
 		/*if (++j == 10)*/
 			/*break;*/
   	}
@@ -146,30 +139,24 @@ void print_context(uint32_t *stack, int tid){
 void runqueue_remove(int tid)
 
 {
-	if (runqueue->next == 0 )
-	{
-		//print_s("there is no running thread here!\n");
-		return;
-	}
-
-
 	// tmp points to the thread that its next thread has tid equal to passed argument
 	pcb* tmp = runqueue->next;
 	pcb* btmp = runqueue;
-	while (tmp->tid != tid)
+	while (tmp != 0)
 	{
-		if ( tmp->next == 0 )
+		if ( tmp->tid == tid )
 		{
-			//print_s("the tid not found!!\n");
-			return;
+			btmp->next = tmp->next;
+			current = tmp->next;
+			break;
 		}
+
 		tmp = tmp->next;
 		btmp = btmp->next;
 	}
 	// btmp points to the thread before tmp
 	// so we want the thread before temp to point to the thread after tmp
 	// technically remove tmp from the linked list
-	btmp->next = tmp->next;
 	//print_s("runqueue_remove: the tid has been removed\n");
 	
 }
@@ -217,24 +204,24 @@ int thread_create(void *stack, void *func){
 
 
 	*(((uint32_t*) stack) - 0) = (uint32_t) exit_thread;
-	stack = (void*) (((uint32_t*) stack) - 1);
+	//stack = (void*) (stack - 4);
 
 	
 	/* Found new PCB */
 	fifos_threads[new_pcb].tid = new_pcb;
-	fifos_threads[new_pcb].bp = (uint32_t) stack;
-	fifos_threads[new_pcb].entry = (int*) func;
+	fifos_threads[new_pcb].bp = (uint32_t) ((uint32_t*)stack -1);
+	fifos_threads[new_pcb].entry = (uint32_t) func;
 	fifos_threads[new_pcb].status = 0;
 	fifos_threads[new_pcb].next = 0;
 	fifos_threads[new_pcb].prev = 0;
 	
 	/* Create a fake initial context for the process  */
 
-	stack = (void*) (((uint32_t*)stack) - sizeof(fifos_threads[new_pcb].ctx));
+	stack = (void*) (stack - sizeof(struct context));
 	fifos_threads[new_pcb].ctx = (struct context*) stack;
 
-	fifos_threads[new_pcb].ctx->eip = (uint32_t) fifos_threads[new_pcb].entry;
-	fifos_threads[new_pcb].ctx->ebp = (uint32_t) fifos_threads[new_pcb].bp - 2;
+	fifos_threads[new_pcb].ctx->eip = fifos_threads[new_pcb].entry;
+	fifos_threads[new_pcb].ctx->ebp = (uint32_t) fifos_threads[new_pcb].bp;
 	fifos_threads[new_pcb].ctx->ebx = 0;
 	/*fifos_threads[new_pcb].ctx->eax = 0;*/
 	/*fifos_threads[new_pcb].ctx->ecx = 0;*/

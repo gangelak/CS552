@@ -55,7 +55,7 @@ struct context{
 struct proc_crtl_block{
 	int tid;
 	uint32_t bp;
-	int (*entry)();
+	uint32_t entry;
 	int status;
 	struct proc_crtl_block *next;
 	struct proc_crtl_block *prev;
