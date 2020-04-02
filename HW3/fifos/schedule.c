@@ -83,3 +83,75 @@ void schedule ()
 	}
 	return ;
 }
+
+/*
+void pcrschedule () 
+{
+	
+
+	//TODO
+	
+	// One case for the initial context switch : current_tid == -1
+	// One case when traversing the runqeue
+	// One case when the last thread exits and there are no more threads to run
+	
+	
+	for(;;){
+		if ( current == 0 ) // we haven't chosen one yet or nothing in the queue anymore
+		{
+			current = runqueue->next; // the one that is going to run now
+
+			// Create a dummy first context to pass to swtch
+			struct context *dummy = (struct context *) (&dstack[1023] - sizeof(struct context *));
+			// Check if we have an available in the queue
+			if (current != 0)
+			{
+				print_s("Context switch to first thread\n");
+				swtch(dummy, fifos_threads[current->tid].ctx);
+				break;
+			}
+
+			
+		}
+		else {
+			prev_tid = current->tid;
+			if ( current->next == 0 )
+			{
+			//	print_s("Going to the start of the queue\n");
+				// we reached the end of list
+				//  go back to the beginning again
+				current = runqueue->next;
+			}
+			else
+			{
+				print_s("Going to the next node in the queue\n");
+				current = current->next;
+			}
+			// It means the thread was killed!!!
+			while ( current != 0 && current->status == 1){
+				print_s("Removing thread from the queue\n");
+				runqueue_remove(current->tid);
+				if (runqueue->next == 0){
+					current = 0;
+					break;
+				}
+			}
+			
+			if (current !=0){
+				print_s("Context switching to the next thread\n");
+				swtch(&fifos_threads[prev_tid].ctx, fifos_threads[current->tid].ctx);
+				break;
+				// after thread-yield we have to go back
+			}
+
+		}
+		
+		if (runqueue->next == 0)
+			asm ("hlt");
+			
+
+		
+	}
+	return ;
+}
+*/

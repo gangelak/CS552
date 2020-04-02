@@ -7,7 +7,7 @@
 #include "types.h"
 #include "vga.h"
 #include "schedule.h"
-static bool in_use[MAX_THREADS] = {0,0};
+static bool in_use[MAX_THREADS] = {0,0,0};
 static uint32_t stacks[MAX_THREADS][1024];
 
 extern pcb fifos_threads[MAX_THREADS];
@@ -110,6 +110,26 @@ void thread2 ()
 }
 
 
+static void thread3 () 
+{
+	print_s("Executing Thread 3!\n");
+	while (1) 
+	{
+		print_s ("<3><3>\n");
+		
+		/* Yield at this point */
+	      	print_s ("Thread 3 yielding\n"); 
+		thread_yield();
+		
+		break;
+		/*if (++j == 10)*/
+			/*break;*/
+  	}
+	// done[1] = TRUE;
+	print_s ("Done 3\n");
+
+	return;
+}
 /* For debugging purposes only */
 
 void print_context(uint32_t *stack, int tid){
@@ -252,7 +272,7 @@ void init_threads(void){
 	current = 0; // set up current running to null
 	int i;
 //	print_s("creating the threads\n");
-	void* threads[MAX_THREADS] = {(void*)thread1, (void*)thread2};	
+	void* threads[MAX_THREADS] = {(void*)thread1, (void*)thread2, (void*)thread3};	
 	for (i = 0; i < MAX_THREADS; i++){
 
 		thread_create(&(stacks[i][1023]), threads[i]);
