@@ -8,12 +8,17 @@ extern pcb * runqueue;
 
 static uint32_t dstack[1024]; 			//dummy stack for the 1st context switch
 int prev_tid = -1;
-
+int Time = 0;
+extern pcr schedule_const[MAX_THREADS];
 
 pcb * get_current_thread()
 {
 	return current;
 }
+
+
+
+
 void schedule () 
 {
 	
@@ -24,7 +29,7 @@ void schedule ()
 	 * One case when traversing the runqeue
 	 * One case when the last thread exits and there are no more threads to run
 	 */
-	
+
 	for(;;){
 		if ( current == 0 ) // we haven't chosen one yet or nothing in the queue anymore
 		{
@@ -84,7 +89,36 @@ void schedule ()
 	return ;
 }
 
-/*
+
+void update_time()
+{
+	Time += 1;
+	// for instance
+	// if T_1 = 10 and C_1 = 3
+	// and thread1 only ran for 2 sec previous time slot -> rc = 1
+	// this means when the timer reaches second 20:
+	// we have to add 3 second to rc so that for this time slot 
+	// thread_1 would have 4 sec to run
+	for ( int i =0 ; i < MAX_THREADS; i++ )
+	if (Time % schedule_const[i].t == 0)
+	{
+		// the new time slot has begun so we add c to the rc
+		schedule_const[i].rc += schedule_const[i].c;
+	}
+}
+
+void timer ()
+{
+	// it is called when the time of a process has ended
+	// there will be an interrupt to handle this and jump here
+	// based on current_tid I know which time has ended
+	schedule_const[current->tid].rc = 0;
+	
+	// the thread's time has ended we update rc and call pcrschedule again
+	pcrschedule();
+
+}
+
 void pcrschedule () 
 {
 	
@@ -95,6 +129,10 @@ void pcrschedule ()
 	// One case when traversing the runqeue
 	// One case when the last thread exits and there are no more threads to run
 	
+	// need to track time the interrupt handler for timer update Time so
+	// that I know what time it is in during shceudling
+	// we should set a timer interrupt for each thread that is gonna run
+	// based on the remaining time in rc
 	
 	for(;;){
 		if ( current == 0 ) // we haven't chosen one yet or nothing in the queue anymore
@@ -107,6 +145,7 @@ void pcrschedule ()
 			if (current != 0)
 			{
 				print_s("Context switch to first thread\n");
+				// set the timer here
 				swtch(dummy, fifos_threads[current->tid].ctx);
 				break;
 			}
@@ -139,6 +178,7 @@ void pcrschedule ()
 			
 			if (current !=0){
 				print_s("Context switching to the next thread\n");
+				// set the timer here before switching the context
 				swtch(&fifos_threads[prev_tid].ctx, fifos_threads[current->tid].ctx);
 				break;
 				// after thread-yield we have to go back
@@ -154,4 +194,4 @@ void pcrschedule ()
 	}
 	return ;
 }
-*/
+
