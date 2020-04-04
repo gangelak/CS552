@@ -56,7 +56,7 @@ int_table:
 	.long 0  #30
 	.long 0  #31
 
-	/* 0x20 - 0x2f PIC IRQs 
+	/* 0x20 - 0x2f PIC IRQs */
 	.long timer #32
 	.long unhandled_interrupt  #33
 	.long unhandled_interrupt  #34
@@ -79,6 +79,16 @@ int_table:
 .align 0x4
 
 
+timer:
+	cli
+	sti
+	iret
+
+unhandled_interrupt:
+	cli
+	sti
+	iret
+
 exception_handler1:
 	cli
 	sti
@@ -96,6 +106,10 @@ exception_handler4:
 	sti
 	iret
 exception_handler5:
+	cli
+	sti
+	iret
+exception_handler6:
 	cli
 	sti
 	iret
