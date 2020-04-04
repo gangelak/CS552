@@ -19,12 +19,12 @@
 	.section .data
 	.align 0x4
 
-	CountDown .word 0
+#	CountDown .word 0
 
 
 int_table:
 	.long exception_handler0
-	.long exception_handler1
+/*	.long exception_handler1
 	.long exception_handler2
 	.long exception_handler3
 	.long exception_handler4
@@ -43,41 +43,44 @@ int_table:
 	.long exception_handler17
 	.long exception_handler18
 	.long exception_handler19
-	.long 0  //20
-	.long 0  //21
-	.long 0  //22
-	.long 0  //23
-	.long 0  //24
-	.long 0  //25
-	.long 0  //26
-	.long 0  //27
-	.long 0  //28
-	.long 0  //29
-	.long 0  //30
-	.long 0  //31
+	.long 0  #20
+	.long 0  #21
+	.long 0  #22
+	.long 0  #23
+	.long 0  #24
+	.long 0  #25
+	.long 0  #26
+	.long 0  #27
+	.long 0  #28
+	.long 0  #29
+	.long 0  #30
+	.long 0  #31
 
-	/* 0x20 - 0x2f PIC IRQs */
-	.long timer //32
-	.long unhandled_interrupt  //33
-	.long unhandled_interrupt  //34
-	.long unhandled_interrupt  //35
-	.long unhandled_interrupt  //36
-	.long unhandled_interrupt  //37
-	.long unhandled_interrupt  //38
-	.long unhandled_interrupt  //39
-	.long unhandled_interrupt  //40
-	.long unhandled_interrupt  //41
-	.long unhandled_interrupt  //42
-	.long unhandled_interrupt  //43
-	.long unhandled_interrupt  //44
-	.long unhandled_interrupt  //45
-	.long unhandled_interrupt  //46
-	.long unhandled_interrupt  //47
-
+	/* 0x20 - 0x2f PIC IRQs 
+	.long timer #32
+	.long unhandled_interrupt  #33
+	.long unhandled_interrupt  #34
+	.long unhandled_interrupt  #35
+	.long unhandled_interrupt  #36
+	.long unhandled_interrupt  #37
+	.long unhandled_interrupt  #38
+	.long unhandled_interrupt  #39
+	.long unhandled_interrupt  #40
+	.long unhandled_interrupt  #41
+	.long unhandled_interrupt  #42
+	.long unhandled_interrupt  #43
+	.long unhandled_interrupt  #44
+	.long unhandled_interrupt  #45
+	.long unhandled_interrupt  #46
+	.long unhandled_interrupt  #47
+*/
 .section .text
 .align 0x4
+
+exception_handler0:
+	call except0
 /* TODO: implement the rest of the timer handler  */
-timer:
+/* timer:
 	pushl %eax
 	pushl %ebx
 
@@ -93,7 +96,7 @@ timer:
 	popl %ebx
 	popl %eax
 
-	iretd
+	iret
 
 
 
@@ -209,4 +212,4 @@ sleep_done:
 	pop %ebp
 	ret $8
 
-
+*/

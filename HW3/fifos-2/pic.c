@@ -108,4 +108,7 @@ void init_pic(){
 
 }
 
-
+void except0()
+{
+	print_s("division 0 happened");
+}
