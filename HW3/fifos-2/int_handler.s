@@ -24,7 +24,8 @@
 
 int_table:
 	.long exception_handler0
-/*	.long exception_handler1
+/*	
+	.long exception_handler1
 	.long exception_handler2
 	.long exception_handler3
 	.long exception_handler4
@@ -55,7 +56,7 @@ int_table:
 	.long 0  #29
 	.long 0  #30
 	.long 0  #31
-
+*/
 	/* 0x20 - 0x2f PIC IRQs 
 	.long timer #32
 	.long unhandled_interrupt  #33
@@ -74,13 +75,53 @@ int_table:
 	.long unhandled_interrupt  #46
 	.long unhandled_interrupt  #47
 */
+
 .section .text
 .align 0x4
 
+
+
 exception_handler0:
+	cli
+	push 0x0
+
+	push 0x32
+
+	pushl %ebp
+	pushl %ebx
+	pushl %esi
+	pushl %edi
+	pushw %gs
+	pushw %fs
+	pushw %es
+	pushw %ds
+
+#	movw $0x10, %ax
+#	movw %ax, %gs 
+#	movw %ax, %fs
+#	movw %ax, %es
+#	movw %ax, %ds
+#	movl %esp , %eax
+#	pushl %eax
+	
 	call except0
+
+#	pop %eax
+	popw %ds
+	popw %es
+	popw %fs
+	popw %gs
+	popl %edi
+	popl %esi
+	popl %ebx
+	popl %ebp
+
+#	add %esp , 8
+	iret
+
 /* TODO: implement the rest of the timer handler  */
-/* timer:
+/*
+timer:
 	pushl %eax
 	pushl %ebx
 

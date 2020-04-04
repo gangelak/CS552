@@ -4,6 +4,7 @@
 #include "vga.h"
 #include "schedule.h"
 #include "types.h"
+#include "pic.h"
 /*
 	Store the usable memory regions in an array for
 	future use. Used the same methodology as memos-2
@@ -79,10 +80,10 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	
 
 	/* Initialize 8259 PIC */
-	 pic_init();
+	 init_pic();
 
 	/* Initialize 8254 PIT */
-	 pit_init();
+//	 pit_init();
 
 	/* Creating autostarting threads */
 
@@ -92,10 +93,11 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 //	print_s("Getting memory regions!!!!\n");
 
 //	print_s("Creating Threads!!!\n");
-	init_threads();
+//	init_threads();
 
-	
-	schedule();
+	int d= 10 / 0 ;	
+//	schedule();
+	print_s("we are here");
 	return ;
 
 
