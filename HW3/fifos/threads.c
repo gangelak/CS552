@@ -7,11 +7,12 @@
 #include "types.h"
 #include "vga.h"
 #include "schedule.h"
+
 static bool in_use[MAX_THREADS] = {0,0,0};
 static uint32_t stacks[MAX_THREADS][1024];
 
 extern pcb fifos_threads[MAX_THREADS];
-
+extern pcr schedule_const[MAX_THREADS];
 /* Get an available pcb spot from the array */
 
 int get_pcb(){
@@ -276,7 +277,12 @@ void init_threads(void){
 	for (i = 0; i < MAX_THREADS; i++){
 
 		thread_create(&(stacks[i][1023]), threads[i]);
-	}
+		
+		// setup pcr for the thread
+		schedule_const[i].t = 15;
+		schedule_const[i].c = 5;
+		schedule_const[i].rc = 0;
+	}	
 }
 
 

@@ -16,7 +16,7 @@ int mem_pointer[10];
 int cnt = 0;   // Memory Region Counter
 
 pcb fifos_threads[MAX_THREADS];
-
+pcr schedule_const[MAX_THREADS];
 /*
  * 	We assume that the total memory is below 4GB
  */ 
