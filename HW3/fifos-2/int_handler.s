@@ -24,7 +24,6 @@
 
 int_table:
 	.long exception_handler0
-/*	
 	.long exception_handler1
 	.long exception_handler2
 	.long exception_handler3
@@ -56,7 +55,7 @@ int_table:
 	.long 0  #29
 	.long 0  #30
 	.long 0  #31
-*/
+
 	/* 0x20 - 0x2f PIC IRQs 
 	.long timer #32
 	.long unhandled_interrupt  #33
@@ -74,12 +73,85 @@ int_table:
 	.long unhandled_interrupt  #45
 	.long unhandled_interrupt  #46
 	.long unhandled_interrupt  #47
-*/
+
 
 .section .text
 .align 0x4
 
 
+exception_handler1:
+	cli
+	sti
+	iret
+exception_handler2:
+	cli
+	sti
+	iret
+exception_handler3:
+	cli
+	sti
+	iret
+exception_handler4:
+	cli
+	sti
+	iret
+exception_handler5:
+	cli
+	sti
+	iret
+exception_handler7:
+	cli
+	sti
+	iret
+exception_handler8:
+	cli
+	sti
+	iret
+exception_handler9:
+	cli
+	sti
+	iret
+exception_handler10:
+	cli
+	sti
+	iret
+exception_handler11:
+	cli
+	sti
+	iret
+exception_handler12:
+	cli
+	sti
+	iret
+exception_handler13:
+	cli
+	sti
+	iret
+exception_handler14:
+	cli
+	sti
+	iret
+exception_handler15:
+	cli
+	sti
+	iret
+exception_handler16:
+	cli
+	sti
+	iret
+exception_handler17:
+	cli
+	sti
+	iret
+exception_handler18:
+	cli
+	sti
+	iret
+
+exception_handler19:
+	cli
+	sti
+	iret
 
 exception_handler0:
 	cli
