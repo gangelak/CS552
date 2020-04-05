@@ -3,24 +3,24 @@
 	.globl int_table
 	.globl timer_irq
 	.globl _sleep
+	.globl except0
+	.globl pit_init
 
 	.section .bss
 	.align 0x4
 	.comm system_timer_fractions,4
 	.comm system_timer_ms, 4
-	.comm IRQO_fractions, 4
+	.comm IRQ0_fractions, 4
 	.comm IRQ0_ms, 4
-	.comm IRQO_frequency, 4
+	.comm IRQ0_frequency, 4
 	.comm PIT_reload_value,2
+	.comm CountDown,4
 
 
 
 
 	.section .data
 	.align 0x4
-
-#	CountDown .word 0
-
 
 int_table:
 	.long exception_handler0
@@ -57,7 +57,7 @@ int_table:
 	.long 0  #31
 
 	/* 0x20 - 0x2f PIC IRQs */
-	.long timer #32
+	.long timer
 	.long unhandled_interrupt  #33
 	.long unhandled_interrupt  #34
 	.long unhandled_interrupt  #35
@@ -81,12 +81,20 @@ int_table:
 
 timer:
 	cli
-	sti
+	call except0
+	
+	movb $0x20, %al
+	outb %al, $0x20
+
 	iret
 
 unhandled_interrupt:
 	cli
 	sti
+	iret
+
+exception_handler0:
+	cli
 	iret
 
 exception_handler1:
@@ -167,80 +175,15 @@ exception_handler19:
 	sti
 	iret
 
-exception_handler0:
-	cli
-	push 0x0
 
-	push 0x32
-
-	pushl %ebp
-	pushl %ebx
-	pushl %esi
-	pushl %edi
-	pushw %gs
-	pushw %fs
-	pushw %es
-	pushw %ds
-
-#	movw $0x10, %ax
-#	movw %ax, %gs 
-#	movw %ax, %fs
-#	movw %ax, %es
-#	movw %ax, %ds
-#	movl %esp , %eax
-#	pushl %eax
-	
-	call except0
-
-#	pop %eax
-	popw %ds
-	popw %es
-	popw %fs
-	popw %gs
-	popl %edi
-	popl %esi
-	popl %ebx
-	popl %ebp
-
-#	add %esp , 8
-	iret
-
-/* TODO: implement the rest of the timer handler  */
-/*
-timer:
-	pushl %eax
-	pushl %ebx
-
-	movl %eax,IRQ0_fractions
-	movl %ebx, IRQ0_ms
-	add system_timer_fractions, %eax
-	adc system_timer_ms, %ebx
-
-
-	movb $0x20, %al
-	outb %al, $0x20
-
-	popl %ebx
-	popl %eax
-
-	iret
-
-
-
-
-
-
-init_pit:
-	pushad
-
-	movl 0x010000, %eax
+pit_init:
+	pushal
+	movl $0x010000, %eax
 	cmp  $18, %ebx
 	jbe gotReloadValue
-
 	mov $1, %eax
 	cmp $1193181, %ebx
 	jae gotReloadValue
-
 	mov $3579545, %eax
 	mov $0, %edx
 	div %ebx
@@ -255,65 +198,53 @@ l1:
 	jb l2
 	inc %eax
 l2:
-
-
 gotReloadValue:
 	push %eax
 	mov %ax, PIT_reload_value
 	mov %eax, %ebx
-
 	mov $3579545, %eax
 	mov $0, %edx
 	div %ebx
-	cmp $3579545 / 2, %edx
+	cmp $1789772, %edx
 	jb l3
 l3:
 	mov $3, %ebx
 	mov $0, %edx
 	div %ebx
-	cmp $3 / 2, %edx
+	cmp $, %edx
 	jb l4
 	inc %eax
 l4:
 	mov %eax, IRQ0_frequency
-
-
 	popl %ebx
 	mov $0xDBB3A062, %eax
 	mul %ebx
 	shrd %eax,10(%edx)
-	shrl %edx, $10
-
+	shrl $10, %edx
 	mov %edx, IRQ0_ms
 	mov %eax, IRQ0_fractions
-
-	pushfd
-
+	pushfl
 	cli
-	mov $00110100b, %al
+	mov $0x34, %al
 	out %al, $0x43
 	mov PIT_reload_value, %ax
 	out %al, $0x40
 	mov %ah, %al
 	out %al, $0x40
-
-	popfd
-	popad
+	popfl
+	popal
 	
 	ret
-
-
 timer_irq:
 	push %eax
 	mov CountDown, %eax
 	or %eax, %eax
 	jz timer_done
-	dec CountDown
+	dec %eax
+	mov %eax, CountDown
 timer_done:
 	pop %eax
-	iretd
-
-
+	iret
 _sleep:
 	push %ebp
 	mov %esp, %ebp
@@ -339,4 +270,5 @@ sleep_done:
 	pop %ebp
 	ret $8
 
-*/
+
+

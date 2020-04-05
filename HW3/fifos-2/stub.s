@@ -74,7 +74,7 @@ real_start:
 	lodsl
 	movw %ax, %dx
 
-	movw $0xEE00, %ax         # DPL = ring 3
+	movw $0x8E00, %ax         # DPL = ring 3
 	movl %edx, (%edi)
 
 	addl $4, %edi

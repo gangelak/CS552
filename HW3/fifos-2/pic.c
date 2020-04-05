@@ -100,15 +100,15 @@ uint16_t pic_get_isr(void)
 
 
 void init_pic(){
-	asm ("cli");
-	PIC_remap(PIC1,PIC2); 			//Remap the IRQs to 32 till 48
-	IRQ_clear_mask(0);                      //Unmask the IRQ) which is what the interrupt generates
-	asm  ("sti");
+	asm volatile("cli");
+	PIC_remap(0x20,0x28); 			//Remap the IRQs to 32 till 48
+	//IRQ_clear_mask(0);                      //Unmask the IRQ) which is what the interrupt generates
+	asm volatile("sti");
 	return;
 
 }
 
 void except0()
 {
-	print_s("division 0 happened");
+	print_s("division 0 happened\n");
 }

@@ -65,15 +65,6 @@ void *my_malloc(int size){
 	return 0;
 }
 
-void init_pit(void){
-	asm volatile("cli");
-	pit_init();
-	asm volatile("sti");
-
-}
-
-
-
 void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	//int avail_regs;          // # of available memory regions
 	
@@ -92,7 +83,7 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	 init_pic();
 
 	/* Initialize 8254 PIT */
-	 init_pit();
+//	 pit_init();
 
 	/* Creating autostarting threads */
 
@@ -106,8 +97,7 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	
 
 	print_s("causing divide_by zero\n");
-	
-	while(1);
+	int d= 10 / 0 ;	
 //	schedule();
 	print_s("we are here");
 	return ;
