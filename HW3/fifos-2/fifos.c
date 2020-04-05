@@ -77,8 +77,8 @@ void init_pit(void)
 {
   outb(0x34, 0x43); //00 11 010 0 to command port 0x43
 
-  outb((PIT_FREQ / 100) & 0xFF, 0x40); //counter 0 low byte written to channel 0 data port 0x40
-  outb((PIT_FREQ / 100) >> 8, 0x40); //counter 0 high byte
+  outb((PIT_FREQ / 1000000) & 0xFF, 0x40); //counter 0 low byte written to channel 0 data port 0x40
+  outb((PIT_FREQ / 1000000) >> 8, 0x40); //counter 0 high byte
 }
 
 
@@ -110,17 +110,8 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 //	print_s("Getting memory regions!!!!\n");
 
 //	print_s("Creating Threads!!!\n");
-//	init_threads();
-	
-
-	print_s("causing divide_by zero\n");
-	
-	while(1){
-		i++;
-		i--;
-	}
-//	schedule();
-	print_s("we are here");
+	init_threads();
+	schedule();
 	return ;
 
 

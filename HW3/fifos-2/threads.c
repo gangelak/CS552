@@ -13,7 +13,12 @@ static uint32_t stacks[MAX_THREADS][1024];
 extern pcb fifos_threads[MAX_THREADS];
 
 /* Get an available pcb spot from the array */
-
+void time(){
+	print_s("in the interrupt handler");
+	print_s("\n");
+	outb(0x20,0x20);
+	schedule();
+}
 int get_pcb(){
 	
 	int i;
@@ -61,22 +66,26 @@ void exit_thread() {
 static 
 void thread1 () 
 {
-	/*int i; */
-          /*int j = 0;*/
+	int i;
+        int j = 0;
 	
 	print_s("Executing Thread1!\n");
   	while (1) 
   	{
-	      	print_s ("<1>\n"); 
+		for ( i = 0 ; i < 400 ; i++ )
+		{
+		      	print_s ("1"); 
+			for ( j = 0 ; j < 1000000; j++ )
+				nop();
+		}
 		/* Yield at this point */
-	      	print_s ("Thread 1 yielding mathafuckaaaaaaaaaaaa\n"); 
-		thread_yield();
-		
-		/*if (++j> 6)*/
-		/*{*/
-			/*break;*/
-		/*}*/
-		break;
+//		thread_yield();
+
+	//	if (++j> 6)
+	//	{
+			break;
+	//	}
+
 	}
 
 	//  done[0] = TRUE;
@@ -87,21 +96,25 @@ void thread1 ()
 static
 void thread2 () 
 {
-	/*int i;*/
-	/*int j = 0;*/
+	int i;
+	int j = 0;
 
 	print_s("Executing Thread2!\n");
 	while (1) 
 	{
-		print_s ("<2>\n");
-		
+		for (i =0 ; i < 500; i++)
+		{
+		print_s ("2");
+			for ( j= 0 ; j < 1000000; j ++ )
+				nop();
+		}
 		/* Yield at this point */
-	      	print_s ("Thread 2 yielding mathafuckaaaaaaaaaaaa\n"); 
-		thread_yield();
-		
-		break;
-		/*if (++j == 10)*/
-			/*break;*/
+
+//		thread_yield();
+
+
+//		if (++j == 10)
+			break;
   	}
 	// done[1] = TRUE;
 	print_s ("Done 2\n");
@@ -112,18 +125,24 @@ void thread2 ()
 
 static void thread3 () 
 {
+	int i;
+	int j ;
 	print_s("Executing Thread 3!\n");
 	while (1) 
 	{
-		print_s ("<3><3>\n");
-		
+		for ( i = 0 ; i < 400 ; i++ )
+		{
+		print_s ("3");
+		for (j = 0 ; j < 5000000 ; j++)
+			nop();
+		}
 		/* Yield at this point */
-	      	print_s ("Thread 3 yielding\n"); 
-		thread_yield();
-		
-		break;
-		/*if (++j == 10)*/
-			/*break;*/
+//	      	print_s ("Thread 3 yielding\n"); 
+//		thread_yield();
+	
+
+//		if (++j == 10)
+			break;
   	}
 	// done[1] = TRUE;
 	print_s ("Done 3\n");
@@ -188,16 +207,16 @@ void runqueue_add(pcb* t)
 	// first time it is NULL
 	if(runqueue->next == 0)
 	{
-		print_s("add to runqueue: first time\n");	
+//		print_s("add to runqueue: first time\n");	
 		runqueue->next = t;
 	}
 	else{
-		print_s("add to runqueue: not first time\n");
+//		print_s("add to runqueue: not first time\n");
 		// need to iterate through pcbs to find the last one
 		pcb* tmp = runqueue->next;
 		while(tmp->next != 0)
 		{
-			print_s("iterating...\n");
+//			print_s("iterating...\n");
 			tmp = tmp->next;
 		}
 		// the last one is gonna point to t

@@ -114,8 +114,3 @@ void init_pic(){
   /*outb(PIC1_BASE_IRQ, 0x21); // 8259 (ICW2) set irq0 to init 0x20, IRQ offset adjustment,written to master PIC data port*/
 /*}*/
 
-
-void except0()
-{
-	print_s("division 0 happened\n");
-}
