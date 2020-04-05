@@ -11,6 +11,8 @@
 */
 
 
+#define PIT_FREQ 1193181 /* Frequency in hertz */
+
 unsigned long base_addr[10];
 unsigned long end_addr[10];
 int mem_pointer[10];
@@ -65,13 +67,19 @@ void *my_malloc(int size){
 	return 0;
 }
 
-void init_pit(void){
-	asm volatile("cli");
-	pit_init();
-	asm volatile("sti");
+/*void init_pit(void){*/
+	/*pit_init();*/
 
+/*}*/
+
+
+void init_pit(void)
+{
+  outb(0x34, 0x43); //00 11 010 0 to command port 0x43
+
+  outb((PIT_FREQ / 100) & 0xFF, 0x40); //counter 0 low byte written to channel 0 data port 0x40
+  outb((PIT_FREQ / 100) >> 8, 0x40); //counter 0 high byte
 }
-
 
 
 void kmain (multiboot_info_t* mbt, unsigned long magic) {

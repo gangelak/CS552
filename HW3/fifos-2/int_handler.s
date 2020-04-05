@@ -194,7 +194,7 @@ l1:
 	mov $3, %ebx
 	mov $0, %edx
 	div %ebx
-	cmp 3 / 2, %edx
+	cmp $3 / 2, %edx
 	jb l2
 	inc %eax
 l2:
@@ -205,13 +205,13 @@ gotReloadValue:
 	mov $3579545, %eax
 	mov $0, %edx
 	div %ebx
-	cmp $1789772, %edx
+	cmp $3579545 / 2, %edx
 	jb l3
 l3:
 	mov $3, %ebx
 	mov $0, %edx
 	div %ebx
-	cmp $, %edx
+	cmp $3/2, %edx
 	jb l4
 	inc %eax
 l4:
