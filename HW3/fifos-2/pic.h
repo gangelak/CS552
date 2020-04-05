@@ -1,5 +1,7 @@
+#include "helper.h"
 #ifndef _PIC
 #define _PIC
+
 
 /* reinitialize the PIC controllers, giving them specified vector offsets
    rather than 8h and 70h, as configured by default */

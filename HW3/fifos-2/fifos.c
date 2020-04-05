@@ -85,7 +85,7 @@ void init_pit(void)
 void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	//int avail_regs;          // # of available memory regions
 	
-
+	int i=0;
 
 	/*if (mbt->flags & 0b1000000){*/
 		/*mmap_entry_t* ent = (mmap_entry_t*) mbt->mmap_addr;*/
@@ -115,7 +115,10 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 
 	print_s("causing divide_by zero\n");
 	
-	while(1);
+	while(1){
+		i++;
+		i--;
+	}
 //	schedule();
 	print_s("we are here");
 	return ;

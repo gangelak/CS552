@@ -1,5 +1,5 @@
 #include "pic.h"
-#include "helper.h"
+#include "vga.h"
 
 void PIC_sendEOI(unsigned char irq)
 {
@@ -107,6 +107,13 @@ void init_pic(){
 	return;
 
 }
+
+/*void pic_init(void)*/
+/*{*/
+  /*outb(0x11, 0x20); // 8259 (ICW1) = xxx10xx10, written to master PIC command port*/
+  /*outb(PIC1_BASE_IRQ, 0x21); // 8259 (ICW2) set irq0 to init 0x20, IRQ offset adjustment,written to master PIC data port*/
+/*}*/
+
 
 void except0()
 {

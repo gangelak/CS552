@@ -176,65 +176,6 @@ exception_handler19:
 	iret
 
 
-pit_init:
-	pushal
-	movl $0x010000, %eax
-	cmp  $18, %ebx
-	jbe gotReloadValue
-	mov $1, %eax
-	cmp $1193181, %ebx
-	jae gotReloadValue
-	mov $3579545, %eax
-	mov $0, %edx
-	div %ebx
-	cmp $3579545 / 2, %edx
-	jb l1
-	inc %eax
-l1:
-	mov $3, %ebx
-	mov $0, %edx
-	div %ebx
-	cmp $3 / 2, %edx
-	jb l2
-	inc %eax
-l2:
-gotReloadValue:
-	push %eax
-	mov %ax, PIT_reload_value
-	mov %eax, %ebx
-	mov $3579545, %eax
-	mov $0, %edx
-	div %ebx
-	cmp $3579545 / 2, %edx
-	jb l3
-l3:
-	mov $3, %ebx
-	mov $0, %edx
-	div %ebx
-	cmp $3/2, %edx
-	jb l4
-	inc %eax
-l4:
-	mov %eax, IRQ0_frequency
-	popl %ebx
-	mov $0xDBB3A062, %eax
-	mul %ebx
-	shrd %eax,10(%edx)
-	shrl $10, %edx
-	mov %edx, IRQ0_ms
-	mov %eax, IRQ0_fractions
-	pushfl
-	cli
-	mov $0x34, %al
-	out %al, $0x43
-	mov PIT_reload_value, %ax
-	out %al, $0x40
-	mov %ah, %al
-	out %al, $0x40
-	popfl
-	popal
-	
-	ret
 timer_irq:
 	push %eax
 	mov CountDown, %eax

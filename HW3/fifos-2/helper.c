@@ -78,24 +78,3 @@ void memset(uint32_t *buf, uint32_t num, uint32_t size){
 }
 
 
-//inline unsigned char inb( unsigned short usPort ) {
-
-//    unsigned char uch;
-   
-//    asm volatile( "inb %1,%0" : "=a" (uch) : "Nd" (usPort) );
-//    return uch;
-//}
-
-//inline void outb( unsigned char uch, unsigned short usPort ) {
-
-//    asm volatile( "outb %0,%1" : : "a" (uch), "Nd" (usPort) );
-//}
-
-//inline void io_wait(void)
-//{
-    /* Port 0x80 is used for 'checkpoints' during POST. */
-    /* The Linux kernel seems to think it is free for use :-/ */
-//    asm volatile ( "outb %%al, $0x80" : : "a"(0) );
-    /* %%al instead of %0 makes no difference.  TODO: does the register need to be zeroed? */
-//}
-
