@@ -69,13 +69,13 @@ void thread1 ()
 	int i;
         int j = 0;
 	
-	print_s("Executing Thread1!\n");
+	//print_s("Executing Thread1!\n");
   	while (1) 
   	{
-		for ( i = 0 ; i < 400 ; i++ )
+		for ( i = 0 ; i < 4 ; i++ )
 		{
 		      	print_s ("1"); 
-			for ( j = 0 ; j < 10000000000; j++ )
+			for ( j = 0 ; j < 100000000; j++ )
 				nop();
 		}
 		/* Yield at this point */
@@ -99,13 +99,13 @@ void thread2 ()
 	int i;
 	int j = 0;
 
-	print_s("Executing Thread2!\n");
+	//print_s("Executing Thread2!\n");
 	while (1) 
 	{
-		for (i =0 ; i < 500; i++)
+		for (i =0 ; i < 5; i++)
 		{
 		print_s ("2");
-			for ( j= 0 ; j < 1000000000; j ++ )
+			for ( j= 0 ; j < 100000000; j ++ )
 				nop();
 		}
 		/* Yield at this point */
@@ -127,13 +127,13 @@ static void thread3 ()
 {
 	int i;
 	int j ;
-	print_s("Executing Thread 3!\n");
+	//print_s("Executing Thread 3!\n");
 	while (1) 
 	{
-		for ( i = 0 ; i < 400 ; i++ )
+		for ( i = 0 ; i < 6 ; i++ )
 		{
 		print_s ("3");
-		for (j = 0 ; j < 5000000000 ; j++)
+		for (j = 0 ; j < 100000000 ; j++)
 			nop();
 		}
 		/* Yield at this point */
