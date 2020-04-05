@@ -19,7 +19,7 @@ int mem_pointer[10];
 int cnt = 0;   // Memory Region Counter
 
 pcb fifos_threads[MAX_THREADS];
-
+pcr schedule_const[MAX_THREADS];
 /*
  * 	We assume that the total memory is below 4GB
  */ 
@@ -77,8 +77,8 @@ void init_pit(void)
 {
   outb(0x34, 0x43); //00 11 010 0 to command port 0x43
 
-  outb((PIT_FREQ / 1000000) & 0xFF, 0x40); //counter 0 low byte written to channel 0 data port 0x40
-  outb((PIT_FREQ / 1000000) >> 8, 0x40); //counter 0 high byte
+  outb((PIT_FREQ / 100000000000) & 0xFF, 0x40); //counter 0 low byte written to channel 0 data port 0x40
+  outb((PIT_FREQ / 100000000000) >> 8, 0x40); //counter 0 high byte
 }
 
 

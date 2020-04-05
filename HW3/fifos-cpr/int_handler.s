@@ -3,7 +3,7 @@
 	.globl int_table
 	.globl timer_irq
 	.globl _sleep
-	.globl time
+	.globl update_time
 	.globl pit_init
 
 	.section .bss
@@ -81,7 +81,7 @@ int_table:
 
 timer:
 	cli
-	call time
+	call update_time
 	
 	movb $0x20, %al
 	outb %al, $0x20

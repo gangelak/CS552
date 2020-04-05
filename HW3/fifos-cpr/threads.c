@@ -11,7 +11,7 @@ static bool in_use[MAX_THREADS] = {0,0,0};
 static uint32_t stacks[MAX_THREADS][1024];
 
 extern pcb fifos_threads[MAX_THREADS];
-
+extern pcr schedule_const[MAX_THREADS];
 /* Get an available pcb spot from the array */
 void time(){
 	print_s("in the interrupt handler");
@@ -75,7 +75,7 @@ void thread1 ()
 		for ( i = 0 ; i < 400 ; i++ )
 		{
 		      	print_s ("1"); 
-			for ( j = 0 ; j < 1000000; j++ )
+			for ( j = 0 ; j < 10000000000; j++ )
 				nop();
 		}
 		/* Yield at this point */
@@ -105,7 +105,7 @@ void thread2 ()
 		for (i =0 ; i < 500; i++)
 		{
 		print_s ("2");
-			for ( j= 0 ; j < 1000000; j ++ )
+			for ( j= 0 ; j < 1000000000; j ++ )
 				nop();
 		}
 		/* Yield at this point */
@@ -133,7 +133,7 @@ static void thread3 ()
 		for ( i = 0 ; i < 400 ; i++ )
 		{
 		print_s ("3");
-		for (j = 0 ; j < 5000000 ; j++)
+		for (j = 0 ; j < 5000000000 ; j++)
 			nop();
 		}
 		/* Yield at this point */
@@ -292,8 +292,12 @@ void init_threads(void){
 	int i;
 //	print_s("creating the threads\n");
 	void* threads[MAX_THREADS] = {(void*)thread1, (void*)thread2, (void*)thread3};	
-	for (i = 0; i < MAX_THREADS; i++){
-
+	for (i = 0; i < MAX_THREADS; i++)
+	{
+		schedule_const[i].t = 15;
+		schedule_const[i].c = 5;
+		schedule_const[i].rc = 0 ;
+		schedule_const[i].start = 0;
 		thread_create(&(stacks[i][1023]), threads[i]);
 	}
 }
