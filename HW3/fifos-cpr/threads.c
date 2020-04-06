@@ -52,7 +52,7 @@ void exit_thread() {
 	/* current running thread is done 
 	 * so need to change status -> Status.killed
 	 */
-	print_s("Calling exit thread!!!\n");
+//	print_s("Calling exit thread!!!\n");
 	pcb * tmp = get_current_thread();
 	
 	in_use[tmp->tid] = 0; 			// This PCB is not use anymore
@@ -72,7 +72,7 @@ void thread1 ()
 	//print_s("Executing Thread1!\n");
   	while (1) 
   	{
-		for ( i = 0 ; i < 4 ; i++ )
+		for ( i = 0 ; i < 10 ; i++ )
 		{
 		      	print_s ("1"); 
 			for ( j = 0 ; j < 100000000; j++ )
@@ -89,7 +89,7 @@ void thread1 ()
 	}
 
 	//  done[0] = TRUE;
-	print_s ("Done 1\n");
+//	print_s ("Done 1\n");
 	return;
 }
 
@@ -102,7 +102,7 @@ void thread2 ()
 	//print_s("Executing Thread2!\n");
 	while (1) 
 	{
-		for (i =0 ; i < 5; i++)
+		for (i =0 ; i < 10; i++)
 		{
 		print_s ("2");
 			for ( j= 0 ; j < 100000000; j ++ )
@@ -117,7 +117,7 @@ void thread2 ()
 			break;
   	}
 	// done[1] = TRUE;
-	print_s ("Done 2\n");
+//	print_s ("Done 2\n");
 
 	return;
 }
@@ -130,7 +130,7 @@ static void thread3 ()
 	//print_s("Executing Thread 3!\n");
 	while (1) 
 	{
-		for ( i = 0 ; i < 6 ; i++ )
+		for ( i = 0 ; i < 10 ; i++ )
 		{
 		print_s ("3");
 		for (j = 0 ; j < 100000000 ; j++)
@@ -145,7 +145,7 @@ static void thread3 ()
 			break;
   	}
 	// done[1] = TRUE;
-	print_s ("Done 3\n");
+//	print_s ("Done 3\n");
 
 	return;
 }

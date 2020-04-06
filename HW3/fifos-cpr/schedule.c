@@ -19,6 +19,7 @@ pcb * get_current_thread()
 
 update_time()
 {
+	__asm__ volatile("cli");
 	Time +=1;
 	// for instance
 	// if T_1 = 10 and C_1 = 3
@@ -40,13 +41,14 @@ update_time()
 	}
 	}
 	outb(0x20,0x20);
+	__asm__ volatile("sti");
 //	char tmp[10];
 //	itoa(tmp,'d',schedule_const[current->tid].start);
 //	print_s(tmp);
 //	print_s("\n");
-	if ((Time - schedule_const[current->tid].start) == schedule_const[current->tid].c)
+	if ((Time - schedule_const[current->tid].start) == schedule_const[current->tid].rc)
 	{
-		print_s("the time is up for this thread\n");
+		//print_s("the time is up for this thread\n");
 		// means the time is up for this thread and we should switch
 		schedule_const[current->tid].rc = 0;
 		schedule();
@@ -56,7 +58,7 @@ update_time()
 void schedule () 
 {
 	
-	__asm__ volatile("cli");
+
 	//TODO
 	
 	// One case for the initial context switch : current_tid == -1
@@ -77,7 +79,7 @@ void schedule ()
 				//print_s("Context switch to first thread\n");
 				// set the time that the threads has started
 				schedule_const[current->tid].start = Time;
-				__asm__ volatile("sti");
+
 				swtch(dummy, fifos_threads[current->tid].ctx);
 				break;
 			}
@@ -107,13 +109,28 @@ void schedule ()
 					break;
 				}
 			}
-			
-			if (current !=0){
+			while (schedule_const[current->tid].rc == 0)
+			{
+				if ( current->next ==0  )
+					current = runqueue->next;
+				else
+					current = current->next;
+				
+			}
+			if (current){ // !=0 && schedule_const[current->tid].rc != 0){
 				//print_s("Context switching to the next thread\n");
+//				if (schedule_const[current->tid].rc == 0)
+//					continue;
+//				else {
 				schedule_const[current->tid].start = Time;
-				__asm__ volatile("sti");
+//				char tmp[10];
+//				itoa(tmp,'d', schedule_const[current->tid].rc);
+//				print_s("(");
+//				print_s(tmp);
+//				print_s(")");
 				swtch(&fifos_threads[prev_tid].ctx, fifos_threads[current->tid].ctx);
 				break;
+//				}
 				// after thread-yield we have to go back
 			}
 
