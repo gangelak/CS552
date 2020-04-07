@@ -80,12 +80,9 @@ int_table:
 
 
 timer:
-	cli
+	pusha
 	call update_time
-	
-	movb $0x20, %al
-	outb %al, $0x20
-
+	popa
 	iret
 
 unhandled_interrupt:

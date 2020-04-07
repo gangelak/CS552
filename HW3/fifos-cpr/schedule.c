@@ -19,6 +19,7 @@ pcb * get_current_thread()
 
 update_time()
 {
+	__asm__ volatile("cli");
 	Time +=1;
 	// for instance
 	// if T_1 = 10 and C_1 = 3
@@ -26,10 +27,11 @@ update_time()
 	// this means when the timer reaches second 20:
 	// we have to add 3 second to rc so that for this time slot 
 	// thread_1 would have 4 sec to run
-	char tmp[10];
-	itoa(tmp,'d',Time);
-	print_s(tmp);
-	print_s("\n");
+//	char tmp[10];
+//	itoa(tmp,'d',Time);
+//	print_s(tmp);
+//	print_s("\n");
+	print_s("");
 	for ( int i =0 ; i < MAX_THREADS; i++  )
 	{
 	if (Time % schedule_const[i].t == 0)
@@ -39,13 +41,14 @@ update_time()
 	}
 	}
 	outb(0x20,0x20);
+	__asm__ volatile("sti");
 //	char tmp[10];
 //	itoa(tmp,'d',schedule_const[current->tid].start);
 //	print_s(tmp);
 //	print_s("\n");
-	if ((Time - schedule_const[current->tid].start) == schedule_const[current->tid].c)
+	if ((Time - schedule_const[current->tid].start) == schedule_const[current->tid].rc)
 	{
-		print_s("the time is up for this thread");
+		//print_s("the time is up for this thread\n");
 		// means the time is up for this thread and we should switch
 		schedule_const[current->tid].rc = 0;
 		schedule();
@@ -73,9 +76,10 @@ void schedule ()
 			// Check if we have an available in the queue
 			if (current != 0)
 			{
-				print_s("Context switch to first thread\n");
+				//print_s("Context switch to first thread\n");
 				// set the time that the threads has started
 				schedule_const[current->tid].start = Time;
+
 				swtch(dummy, fifos_threads[current->tid].ctx);
 				break;
 			}
@@ -93,24 +97,40 @@ void schedule ()
 			}
 			else
 			{
-				print_s("Going to the next node in the queue\n");
+				//print_s("Going to the next node in the queue\n");
 				current = current->next;
 			}
 			// It means the thread was killed!!!
 			while ( current != 0 && current->status == 1){
-				print_s("Removing thread from the queue\n");
+				//print_s("Removing thread from the queue\n");
 				runqueue_remove(current->tid);
 				if (runqueue->next == 0){
 					current = 0;
 					break;
 				}
 			}
-			
-			if (current !=0){
-				print_s("Context switching to the next thread\n");
+			while (schedule_const[current->tid].rc == 0)
+			{
+				if ( current->next ==0  )
+					current = runqueue->next;
+				else
+					current = current->next;
+				
+			}
+			if (current){ // !=0 && schedule_const[current->tid].rc != 0){
+				//print_s("Context switching to the next thread\n");
+//				if (schedule_const[current->tid].rc == 0)
+//					continue;
+//				else {
 				schedule_const[current->tid].start = Time;
+//				char tmp[10];
+//				itoa(tmp,'d', schedule_const[current->tid].rc);
+//				print_s("(");
+//				print_s(tmp);
+//				print_s(")");
 				swtch(&fifos_threads[prev_tid].ctx, fifos_threads[current->tid].ctx);
 				break;
+//				}
 				// after thread-yield we have to go back
 			}
 
