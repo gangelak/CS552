@@ -17,7 +17,7 @@ extern pcb fifos_threads[MAX_THREADS];
 /* Function to add some delay */
 void sleep (){
 	int j;
-	for ( j=0; j < 100000000; j++ )
+	for ( j=0; j < 10000000; j++ )
 		nop();
 	/*int k2 = 0;*/
 	/*for (int i2=0; i2 < usecs; i2++){*/
@@ -73,7 +73,7 @@ void exit_thread() {
 	 * Current running thread is done 
 	 * Need to change status -> Status.killed
 	 */
-	//print_s("Calling exit thread!!!\n");
+	//print_s("Exit!\n");
 	pcb * tmp = get_current_thread();
 	
 	in_use[tmp->tid] = 0; 			// This PCB is not use anymore
@@ -97,7 +97,7 @@ void thread_func()
 	
 	while (1) 
 	{
-		for ( i = 0 ; i < 20 ; i++ )
+		for ( i = 0 ; i < (10 + current->tid) ; i++ )
 		{
 			print_s ("<");
 			print_s (name);
@@ -113,10 +113,9 @@ void thread_func()
 			break;
   	}
 	
-	print_s ("\nDone <");
+	print_s ("Done <");
 	print_s(name);
-	print_s(">!\n");
-	asm volatile("cli");
+	print_s(">!");
 
 	return;
 }

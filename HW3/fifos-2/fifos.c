@@ -68,13 +68,6 @@ void *my_malloc(int size){
 	return 0;
 }
 
-void test(void){
-	PIC_sendEOI();
-	print_s("yo");
-	return;
-}
-
-
 
 void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	
@@ -93,7 +86,7 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	 init_pic();
 
 	/* Initialize 8254 PIT */
-	 init_pit();
+//	 init_pit();
 
 	/* Creating autostarting threads */
 
