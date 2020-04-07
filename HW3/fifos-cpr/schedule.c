@@ -19,129 +19,125 @@ pcb * get_current_thread()
 
 update_time()
 {
+	
 	__asm__ volatile("cli");
 	Time +=1;
-	// for instance
 	// if T_1 = 10 and C_1 = 3
 	// and thread1 only ran for 2 sec previous time slot -> rc = 1
-	// this means when the timer reaches second 20:
+	// this means when the timer reaches second 10:
 	// we have to add 3 second to rc so that for this time slot 
 	// thread_1 would have 4 sec to run
-//	char tmp[10];
-//	itoa(tmp,'d',Time);
-//	print_s(tmp);
-//	print_s("\n");
-	print_s("");
+	
 	for ( int i =0 ; i < MAX_THREADS; i++  )
 	{
 	if (Time % schedule_const[i].t == 0)
 	{	
 	        // the new time slot has begun so we add c to the rc
+		print_s("|");
 		schedule_const[i].rc += schedule_const[i].c;
 	}
 	}
-	outb(0x20,0x20);
-	__asm__ volatile("sti");
-//	char tmp[10];
-//	itoa(tmp,'d',schedule_const[current->tid].start);
-//	print_s(tmp);
-//	print_s("\n");
-	if ((Time - schedule_const[current->tid].start) == schedule_const[current->tid].rc)
+	// look out for the dummy one
+	if ( current->tid > 0 )
 	{
+		schedule_const[current->tid].rc -= 1;
+	
+		if ( schedule_const[current->tid].rc <= 0)
+		{
+			print_s("TU");
+			schedule_const[current->tid].rc = 0;
+			intrp = 1;
+			outb(0x20,0x20);
+			asm volatile("sti");
+			schedule();
+		}
+		else {
+			outb(0x20,0x20);
+			asm volatile("sti");
+		}
+	}
+	
+//	if ((Time - schedule_const[current->tid].start) == schedule_const[current->tid].rc)
+//	{
 		//print_s("the time is up for this thread\n");
 		// means the time is up for this thread and we should switch
+
 		schedule_const[current->tid].rc = 0;
-		schedule();
-	}
+//	}
 }
 
 void schedule () 
 {
+	asm volatile("cli");
 	
-
 	//TODO
-	
 	// One case for the initial context switch : current_tid == -1
 	// One case when traversing the runqeue
 	// One case when the last thread exits and there are no more threads to run
 	
-	
-	for(;;){
-		if ( current == 0 ) // we haven't chosen one yet or nothing in the queue anymore
+	if (runqueue->next == 0 )
+		asm volatile("hlt");
+
+	if ( current == 0 ) // we haven't chosen one yet or nothing in the queue anymore
+	{
+		current = runqueue->next; // the one that is going to run now
+
+		// Create a dummy first context to pass to swtch
+		struct context *dummy = (struct context *) (&dstack[1023] - sizeof(struct context *));
+		// Check if we have an available in the queue
+		if (current != 0)
 		{
-			current = runqueue->next; // the one that is going to run now
-
-			// Create a dummy first context to pass to swtch
-			struct context *dummy = (struct context *) (&dstack[1023] - sizeof(struct context *));
-			// Check if we have an available in the queue
-			if (current != 0)
-			{
-				//print_s("Context switch to first thread\n");
-				// set the time that the threads has started
-				schedule_const[current->tid].start = Time;
-
-				swtch(dummy, fifos_threads[current->tid].ctx);
-				break;
-			}
-
-			
+			// set the time that the threads has started
+			schedule_const[current->tid].start = Time;
+			outb(0x20,0x20);
+			asm volatile("sti");
+			swtch(dummy, fifos_threads[current->tid].ctx);	
 		}
-		else {
-			prev_tid = current->tid;
-			if ( current->next == 0 )
-			{
-			//	print_s("Going to the start of the queue\n");
-				// we reached the end of list
-				//  go back to the beginning again
-				current = runqueue->next;
-			}
-			else
-			{
-				//print_s("Going to the next node in the queue\n");
-				current = current->next;
-			}
+
+	}
+	else {
+		prev_tid = current->tid;
+		if ( current->next == 0 )
+		{	
+			// we reached the end of list
+			//  go back to the beginning again
+			current = runqueue->next;
+		}
+		else
+		{
+			current = current->next;
+		}
 			// It means the thread was killed!!!
-			while ( current != 0 && current->status == 1){
-				//print_s("Removing thread from the queue\n");
-				runqueue_remove(current->tid);
-				if (runqueue->next == 0){
-					current = 0;
-					break;
-				}
+		while ( current != 0 && current->status == 1)
+		{
+			runqueue_remove(current->tid);
+			if (runqueue->next == 0){
+				current = 0;
+				asm volatile("hlt");
 			}
-			while (schedule_const[current->tid].rc == 0)
-			{
-				if ( current->next ==0  )
-					current = runqueue->next;
-				else
-					current = current->next;
-				
-			}
-			if (current){ // !=0 && schedule_const[current->tid].rc != 0){
-				//print_s("Context switching to the next thread\n");
-//				if (schedule_const[current->tid].rc == 0)
-//					continue;
-//				else {
-				schedule_const[current->tid].start = Time;
+		}
+		while (schedule_const[current->tid].rc == 0)
+		{
+			if ( current->next ==0  )
+				current = runqueue->next;
+			else
+				current = current->next;
+		}
+		if (current != 0 & prev_tid != current->tid)
+		{ 
+			schedule_const[current->tid].start = Time;
 //				char tmp[10];
 //				itoa(tmp,'d', schedule_const[current->tid].rc);
 //				print_s("(");
 //				print_s(tmp);
 //				print_s(")");
-				swtch(&fifos_threads[prev_tid].ctx, fifos_threads[current->tid].ctx);
-				break;
-//				}
-				// after thread-yield we have to go back
-			}
 
+			outb(0x20,0x20);
+			asm volatile("sti");
+			swtch(&fifos_threads[prev_tid].ctx, fifos_threads[current->tid].ctx);	
 		}
-		
-		if (runqueue->next == 0)
-			asm ("hlt");
-			
-
-		
-	}
+	}	
+	
 	return ;
 }
 
