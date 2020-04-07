@@ -26,8 +26,8 @@ void schedule ()
 	 * One case when the last thread exits and there are no more threads to run
 	 */
 	// No more threads in our queue
-	if (runqueue->next == 0)
-		asm volatile("hlt");
+	/*if (runqueue->next == 0)*/
+		/*asm volatile("hlt");*/
 	
 	if ( current == 0 ) // we haven't chosen one yet or nothing in the queue anymore
 	{
