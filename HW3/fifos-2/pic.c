@@ -118,8 +118,8 @@ void init_pit(void)
    outb(0x43,0x34); //00 11 010 0 to command port 0x43
 	
 
-   outb(0x40, (PIT_FREQ / 10) & 0xFF); //counter 0 low byte written to channel 0 data port 0x40
-   outb(0x40,(PIT_FREQ / 10) >> 8); //counter 0 high byte
+   outb(0x40, (PIT_FREQ / 100) & 0xFF); //counter 0 low byte written to channel 0 data port 0x40
+   outb(0x40,(PIT_FREQ / 100) >> 8); //counter 0 high byte
    asm volatile("cli");
 
 }

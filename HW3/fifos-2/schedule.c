@@ -64,9 +64,9 @@ void schedule ()
 				runqueue_remove(current->tid);
 				if (runqueue->next == 0){
 
-					__asm__ volatile("cli");
-					current = 0;
-					break;
+					__asm__ volatile("hlt");
+					/*current = 0;*/
+					/*break;*/
 				}
 			}
 			

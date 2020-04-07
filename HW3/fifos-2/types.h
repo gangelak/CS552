@@ -31,7 +31,7 @@ typedef uint32 uint32_t;
 typedef uint64 uint64_t;
 #endif
 
-#define MAX_THREADS 3
+#define MAX_THREADS 10
 
 
 

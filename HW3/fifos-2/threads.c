@@ -73,8 +73,7 @@ void exit_thread() {
 	 * Current running thread is done 
 	 * Need to change status -> Status.killed
 	 */
-	asm volatile("cli");
-	print_s("Calling exit thread!!!\n");
+	//print_s("Calling exit thread!!!\n");
 	pcb * tmp = get_current_thread();
 	
 	in_use[tmp->tid] = 0; 			// This PCB is not use anymore
@@ -91,14 +90,14 @@ void thread_func()
 	char name[10];
 	itoa(name,'d',current->tid);
 
-	print_s("Executing Thread <");
-	print_s(name);
-	print_s(">\n");
+	/*print_s("Executing Thread <");*/
+	/*print_s(name);*/
+	/*print_s(">\n");*/
 
 	
 	while (1) 
 	{
-		for ( i = 0 ; i < ((current->tid + 1) * 10) ; i++ )
+		for ( i = 0 ; i < 20 ; i++ )
 		{
 			print_s ("<");
 			print_s (name);
@@ -106,8 +105,9 @@ void thread_func()
 			sleep();
 		}
 		
-		print_s ("Y"); 
-		thread_yield();
+		print_s ("Y");
+		print_s (name);
+		schedule();
 		
 		if (++j == 3)
 			break;
@@ -116,6 +116,7 @@ void thread_func()
 	print_s ("\nDone <");
 	print_s(name);
 	print_s(">!\n");
+	asm volatile("cli");
 
 	return;
 }
@@ -244,7 +245,7 @@ int thread_create(void *stack, void *func){
 
 
 void init_threads(void){
-	__asm__ volatile ("cli");
+	//__asm__ volatile ("cli");
 	runqueue->next = 0; // set up runqueue
 	current = 0; // set up current running to null
 	int i;
