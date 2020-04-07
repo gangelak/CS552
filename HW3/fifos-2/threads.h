@@ -5,5 +5,6 @@
 pcb * runqueue;
 void init_threads(void);
 void runqueue_remove(int);
+void preempt_thread(void);
 #endif
 

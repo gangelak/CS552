@@ -1,10 +1,10 @@
 #include "pic.h"
 #include "vga.h"
+#include "helper.h"
 
-void PIC_sendEOI(unsigned char irq)
+
+void PIC_sendEOI(void)
 {
-	if(irq >= 8)
-		outb(PIC2_COMMAND,PIC_EOI);
 
 	outb(PIC1_COMMAND,PIC_EOI);
 }
@@ -108,9 +108,19 @@ void init_pic(){
 
 }
 
-/*void pic_init(void)*/
-/*{*/
-  /*outb(0x11, 0x20); // 8259 (ICW1) = xxx10xx10, written to master PIC command port*/
-  /*outb(PIC1_BASE_IRQ, 0x21); // 8259 (ICW2) set irq0 to init 0x20, IRQ offset adjustment,written to master PIC data port*/
-/*}*/
+void init_pit(void)
+{
+   /* Acess mode: lobyte/hibyte
+    * Operating mode: Rate generator
+    * Binary mode
+    */
+
+   outb(0x43,0x34); //00 11 010 0 to command port 0x43
+	
+
+   outb(0x40, (PIT_FREQ / 10000) & 0xFF); //counter 0 low byte written to channel 0 data port 0x40
+   outb(0x40,(PIT_FREQ / 10000) >> 8); //counter 0 high byte
+   asm volatile("cli");
+
+}
 

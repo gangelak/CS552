@@ -3,10 +3,6 @@
 
 #include "types.h"
 
-static inline void outb( uint16_t, uint8_t);
-static inline unsigned char inb( uint16_t);
-static inline void io_wait(void);
-
 #define nop() asm("nop")
 typedef struct multiboot_memory_map {
 	unsigned int size;
@@ -27,9 +23,8 @@ void print(char *);
 
 void memset(uint32_t *, uint32_t, uint32_t );
 
-//static inline void outb( unsigned char, unsigned short);
-//static inline unsigned char inb( unsigned short);
-//static inline void io_wait(void);
+
+
 
 static inline void outb(uint16_t port, uint8_t val)
 {
@@ -56,5 +51,6 @@ inline void io_wait(void)
     asm volatile ( "outb %%al, $0x80" : : "a"(0) );
  //    %%al instead of %0 makes no difference.  TODO: does the register need to be zeroed? 
 }
+
 
 #endif

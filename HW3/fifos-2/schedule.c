@@ -17,6 +17,7 @@ pcb * get_current_thread()
 void schedule () 
 {
 	
+	__asm__ volatile("cli");
 
 	/*TODO*/
 	/*
@@ -35,7 +36,8 @@ void schedule ()
 			// Check if we have an available in the queue
 			if (current != 0)
 			{
-		//		print_s("Context switch to first thread\n");
+				__asm__ volatile("sti");
+	//			print_s("Context switch to first thread\n");
 				swtch(dummy, fifos_threads[current->tid].ctx);
 				break;
 			}
@@ -46,19 +48,19 @@ void schedule ()
 			prev_tid = current->tid;
 			if ( current->next == 0 )
 			{
-			//	print_s("Going to the start of the queue\n");
+	//			print_s("Going to the start of the queue\n");
 				// we reached the end of list
 				//  go back to the beginning again
 				current = runqueue->next;
 			}
 			else
 			{
-		//		print_s("Going to the next node in the queue\n");
+	//			print_s("Going to the next node in the queue\n");
 				current = current->next;
 			}
 			// It means the thread was killed!!!
 			while ( current != 0 && current->status == 1){
-		//		print_s("Removing thread from the queue\n");
+	//			print_s("Removing thread from the queue\n");
 				runqueue_remove(current->tid);
 				if (runqueue->next == 0){
 					current = 0;
@@ -67,7 +69,9 @@ void schedule ()
 			}
 			
 			if (current !=0){
-		//		print_s("Context switching to the next thread\n");
+
+				__asm__ volatile("sti");
+	//			print_s("Context switching to the next thread\n");
 				swtch(&fifos_threads[prev_tid].ctx, fifos_threads[current->tid].ctx);
 				break;
 				// after thread-yield we have to go back
@@ -75,8 +79,11 @@ void schedule ()
 
 		}
 		
+//		__asm__ volatile("sti");
+		
+		// No more threads in our queue
 		if (runqueue->next == 0)
-			asm ("hlt");
+			__asm__ volatile("hlt");
 			
 
 		

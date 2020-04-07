@@ -1,4 +1,3 @@
-#include "helper.h"
 #ifndef _PIC
 #define _PIC
 
@@ -6,6 +5,7 @@
 /* reinitialize the PIC controllers, giving them specified vector offsets
    rather than 8h and 70h, as configured by default */
  
+
 #define ICW1_ICW4	0x01		/* ICW4 (not) needed */
 #define ICW1_SINGLE	0x02		/* Single (cascade) mode */
 #define ICW1_INTERVAL4	0x04		/* Call address interval 4 (8) */
@@ -38,9 +38,13 @@
 #define PIC_READ_ISR                0x0b    /* OCW3 irq service next CMD read */
 
 
+#define PIT_FREQ 1193181 /* Frequency in hertz */
+
+
 void init_pic(void);
 
-void PIC_sendEOI(unsigned char irq);
-void except0();
+void PIC_sendEOI(void);
+
+void init_pit(void);
 
 #endif

@@ -11,12 +11,13 @@
 */
 
 
-#define PIT_FREQ 1193181 /* Frequency in hertz */
 
 unsigned long base_addr[10];
 unsigned long end_addr[10];
 int mem_pointer[10];
 int cnt = 0;   // Memory Region Counter
+
+extern int CountDown;
 
 pcb fifos_threads[MAX_THREADS];
 
@@ -67,23 +68,15 @@ void *my_malloc(int size){
 	return 0;
 }
 
-/*void init_pit(void){*/
-	/*pit_init();*/
-
-/*}*/
-
-
-void init_pit(void)
-{
-  outb(0x34, 0x43); //00 11 010 0 to command port 0x43
-
-  outb((PIT_FREQ / 1000000) & 0xFF, 0x40); //counter 0 low byte written to channel 0 data port 0x40
-  outb((PIT_FREQ / 1000000) >> 8, 0x40); //counter 0 high byte
+void test(void){
+	PIC_sendEOI();
+	print_s("yo");
+	return;
 }
 
 
+
 void kmain (multiboot_info_t* mbt, unsigned long magic) {
-	//int avail_regs;          // # of available memory regions
 	
 	int i=0;
 
@@ -104,14 +97,18 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 
 	/* Creating autostarting threads */
 
-//	thread_create();
 	terminal_initialize();
 
-//	print_s("Getting memory regions!!!!\n");
-
-//	print_s("Creating Threads!!!\n");
+	
+//	asm ("int $0x20");
+	print_s("Creating Threads!!!\n");
+	
 	init_threads();
+	
 	schedule();
+	
+
+
 	return ;
 
 
