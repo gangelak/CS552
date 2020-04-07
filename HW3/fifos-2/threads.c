@@ -33,11 +33,11 @@ void sleep (int usecs){
  * Called when an IRQ0 occurs 
  */
 void preempt_thread(){
-	
+	__asm__ volatile("cli");	
 	/* Acknowledge that the interrupt is serviced */
 	PIC_sendEOI();
-	
-	print_s("Handler");
+	__asm__ volatile("sti");
+
 	schedule();
 }
 
@@ -102,6 +102,8 @@ void thread_func()
 			print_s ("<");
 			print_s (name);
 			print_s (">");
+			for ( j=0; j < 100000000; j++ )
+				nop();
 		//	sleep(100000);
 		}
 		

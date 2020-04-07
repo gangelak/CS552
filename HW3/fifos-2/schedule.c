@@ -17,7 +17,7 @@ pcb * get_current_thread()
 void schedule () 
 {
 	
-	__asm__ volatile("cli");
+//	__asm__ volatile("cli");
 
 	/*TODO*/
 	/*
@@ -36,7 +36,7 @@ void schedule ()
 			// Check if we have an available in the queue
 			if (current != 0)
 			{
-				__asm__ volatile("sti");
+//				__asm__ volatile("sti");
 	//			print_s("Context switch to first thread\n");
 				swtch(dummy, fifos_threads[current->tid].ctx);
 				break;
@@ -70,7 +70,7 @@ void schedule ()
 			
 			if (current !=0){
 
-				__asm__ volatile("sti");
+//				__asm__ volatile("sti");
 	//			print_s("Context switching to the next thread\n");
 				swtch(&fifos_threads[prev_tid].ctx, fifos_threads[current->tid].ctx);
 				break;
