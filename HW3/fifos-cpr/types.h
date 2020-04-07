@@ -70,6 +70,7 @@ typedef struct proc_crtl_block pcb;
 
 #ifndef _PCR
 #define _PCR
+
 struct processor_capacity_reserve {
 	uint32_t c; // C_i that shows how long the thread_i can run on period of T_i
 	uint32_t start; // we wanna keep track of when the thread started so we know how much time it was executed

@@ -7,18 +7,42 @@
 #include "types.h"
 #include "vga.h"
 #include "schedule.h"
-static bool in_use[MAX_THREADS] = {0,0,0};
+#include "pic.h"
+
+static bool in_use[MAX_THREADS];
 static uint32_t stacks[MAX_THREADS][1024];
 
 extern pcb fifos_threads[MAX_THREADS];
 extern pcr schedule_const[MAX_THREADS];
-/* Get an available pcb spot from the array */
-void time(){
-	print_s("in the interrupt handler");
-	print_s("\n");
-	outb(0x20,0x20);
+/* Function to add some delay */
+void sleep (){
+	int j;
+	for ( j=0; j < 100000000; j++ )
+		nop();
+	/*int k2 = 0;*/
+	/*for (int i2=0; i2 < usecs; i2++){*/
+		/*for (int j2=0; j2 < usecs; j2++){*/
+			/*for (int j3=0; j3 < usecs; j3++){*/
+				/*k2 += i2 + j2;*/
+				/*k2 -= j2;*/
+			/*}*/
+		/*}*/
+	/*}*/
+}
+
+
+/* 
+ * Task preemption function 
+ * Called when an IRQ0 occurs 
+ */
+void preempt_thread(){
+	/* Acknowledge that the interrupt is serviced */
+	PIC_sendEOI();
+
 	schedule();
 }
+
+/* Get an available pcb spot from the array */
 int get_pcb(){
 	
 	int i;
@@ -37,22 +61,19 @@ int get_pcb(){
 /* Thread functions */
 
 void thread_yield() {
-	// save state and call scheduler
-	// our scheduler is wrong for now
-	// we should make a runqueue like west
-	// and add the threads to the end of it
-	// and in the scheduler do round robin
 	
-
+	/* Just set status and call scheduler */
 	fifos_threads[get_current_thread()->tid].status = 0;
 	schedule();
 	return;
 }
 void exit_thread() {
-	/* current running thread is done 
-	 * so need to change status -> Status.killed
+	
+	/* 
+	 * Current running thread is done 
+	 * Need to change status -> Status.killed
 	 */
-//	print_s("Calling exit thread!!!\n");
+	//print_s("Exit!\n");
 	pcb * tmp = get_current_thread();
 	
 	in_use[tmp->tid] = 0; 			// This PCB is not use anymore
@@ -62,90 +83,37 @@ void exit_thread() {
 
 }
 
-
-static 
-void thread1 () 
-{
-	int i;
-        int j = 0;
-	
-	//print_s("Executing Thread1!\n");
-  	while (1) 
-  	{
-		for ( i = 0 ; i < 10 ; i++ )
-		{
-		      	print_s ("1"); 
-			for ( j = 0 ; j < 100000000; j++ )
-				nop();
-		}
-		/* Yield at this point */
-//		thread_yield();
-
-	//	if (++j> 6)
-	//	{
-			break;
-	//	}
-
-	}
-
-	//  done[0] = TRUE;
-//	print_s ("Done 1\n");
-	return;
-}
-
-static
-void thread2 () 
-{
-	int i;
-	int j = 0;
-
-	//print_s("Executing Thread2!\n");
-	while (1) 
-	{
-		for (i =0 ; i < 10; i++)
-		{
-		print_s ("2");
-			for ( j= 0 ; j < 100000000; j ++ )
-				nop();
-		}
-		/* Yield at this point */
-
-//		thread_yield();
-
-
-//		if (++j == 10)
-			break;
-  	}
-	// done[1] = TRUE;
-//	print_s ("Done 2\n");
-
-	return;
-}
-
-
-static void thread3 () 
+void thread_func() 
 {
 	int i;
 	int j ;
-	//print_s("Executing Thread 3!\n");
+	char name[10];
+	itoa(name,'d',current->tid);
+
+	/*print_s("Executing Thread <");*/
+	/*print_s(name);*/
+	/*print_s(">\n");*/
+
+	
 	while (1) 
 	{
-		for ( i = 0 ; i < 10 ; i++ )
+		for ( i = 0 ; i < (10 + current->tid) ; i++ )
 		{
-		print_s ("3");
-		for (j = 0 ; j < 100000000 ; j++)
-			nop();
+			print_s ("<");
+			print_s (name);
+			print_s (">");
+			sleep();
 		}
-		/* Yield at this point */
-//	      	print_s ("Thread 3 yielding\n"); 
-//		thread_yield();
-	
-
-//		if (++j == 10)
+		
+		schedule();
+		
+		if (++j == 3)
 			break;
   	}
-	// done[1] = TRUE;
-//	print_s ("Done 3\n");
+	
+	print_s ("Done <");
+	print_s(name);
+	print_s(">!");
 
 	return;
 }
@@ -176,7 +144,6 @@ void print_context(uint32_t *stack, int tid){
 // remove the pcb with the passed tid from runqueue
 
 void runqueue_remove(int tid)
-
 {
 	// tmp points to the thread that its next thread has tid equal to passed argument
 	pcb* tmp = runqueue->next;
@@ -223,7 +190,6 @@ void runqueue_add(pcb* t)
 		tmp->next = t;
 	}
 }
-/*TODO add a stack*/
 
 int thread_create(void *stack, void *func){
 	int new_pcb = -1;
@@ -241,10 +207,7 @@ int thread_create(void *stack, void *func){
 	 * Secondly the return address of the function
 	 */
 
-
 	*(((uint32_t*) stack) - 0) = (uint32_t) exit_thread;
-	//stack = (void*) (stack - 4);
-
 	
 	/* Found new PCB */
 	fifos_threads[new_pcb].tid = new_pcb;
@@ -262,12 +225,8 @@ int thread_create(void *stack, void *func){
 	fifos_threads[new_pcb].ctx->eip = fifos_threads[new_pcb].entry;
 	fifos_threads[new_pcb].ctx->ebp = (uint32_t) fifos_threads[new_pcb].bp;
 	fifos_threads[new_pcb].ctx->ebx = 0;
-	/*fifos_threads[new_pcb].ctx->eax = 0;*/
-	/*fifos_threads[new_pcb].ctx->ecx = 0;*/
-	/*fifos_threads[new_pcb].ctx->edx = 0;*/
 	fifos_threads[new_pcb].ctx->esi = 0;
 	fifos_threads[new_pcb].ctx->edi = 0;
-//	fifos_threads[new_pcb].ctx->flags = 0 | (1<<9);
 	fifos_threads[new_pcb].ctx->gs = gs;
 	fifos_threads[new_pcb].ctx->fs = fs;
 	fifos_threads[new_pcb].ctx->es = es;
@@ -276,9 +235,6 @@ int thread_create(void *stack, void *func){
 	/* Fake an initial context for the new thread */
 	fifos_threads[new_pcb].sp = (uint32_t) (((uint32_t *) stack));
 	
-//	print_s("Printing the context\n");
-//	print_context((uint32_t*)fifos_threads[new_pcb].sp,new_pcb);
-//	print_s("\n");
 	// add to the run queue
 	runqueue_add(&fifos_threads[new_pcb]);
 	return 0;
@@ -286,19 +242,24 @@ int thread_create(void *stack, void *func){
 
 
 void init_threads(void){
-	
+	//__asm__ volatile ("cli");
 	runqueue->next = 0; // set up runqueue
 	current = 0; // set up current running to null
 	int i;
-//	print_s("creating the threads\n");
-	void* threads[MAX_THREADS] = {(void*)thread1, (void*)thread2, (void*)thread3};	
-	for (i = 0; i < MAX_THREADS; i++)
-	{
-		schedule_const[i].t = 15;
-		schedule_const[i].c = 5;
-		schedule_const[i].rc = 0 ;
+	
+	for (i = 0; i < MAX_THREADS; i++){
+		schedule_const[i].t = 5;
 		schedule_const[i].start = 0;
-		thread_create(&(stacks[i][1023]), threads[i]);
+		if ( i== 0  )
+		{
+			schedule_const[i].rc = 3;
+			schedule_const[i].c = 3;
+		}
+		else {
+			schedule_const[i].rc = 1;
+			schedule_const[i].c = 1;
+		}
+		thread_create(&(stacks[i][1023]), thread_func);
 	}
 }
 

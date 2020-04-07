@@ -1,11 +1,8 @@
 #include "pic.h"
 #include "vga.h"
 
-void PIC_sendEOI(unsigned char irq)
+void PIC_sendEOI(void)
 {
-	if(irq >= 8)
-		outb(PIC2_COMMAND,PIC_EOI);
-
 	outb(PIC1_COMMAND,PIC_EOI);
 }
 

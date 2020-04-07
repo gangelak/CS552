@@ -40,7 +40,7 @@
 
 void init_pic(void);
 
-void PIC_sendEOI(unsigned char irq);
+void PIC_sendEOI();
 void except0();
 
 #endif
