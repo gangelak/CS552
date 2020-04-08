@@ -242,6 +242,7 @@ int thread_create(void *stack, void *func){
 	fifos_threads[new_pcb].sp = (uint32_t) (((uint32_t *) stack));
 	
 #ifdef PCR
+
 	fifos_threads[new_pcb].ci = new_pcb + 1;
 	fifos_threads[new_pcb].ti = 10;
 	fifos_threads[new_pcb].ai = 0;
