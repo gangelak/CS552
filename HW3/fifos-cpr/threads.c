@@ -9,25 +9,24 @@
 #include "schedule.h"
 #include "pic.h"
 
-static bool in_use[MAX_THREADS];
+static bool pcb_in_use[MAX_THREADS];
 static uint32_t stacks[MAX_THREADS][1024];
+static uint32_t dstack[1024]; 			//dummy stack for the dummy thread
+
+
+#ifdef PCR
+rpl repl_pool[MAX_REPLS]
+#endif
 
 extern pcb fifos_threads[MAX_THREADS];
-extern pcr schedule_const[MAX_THREADS];
+extern pcb dum_dum;
+
 /* Function to add some delay */
+
 void sleep (){
 	int j;
 	for ( j=0; j < 100000000; j++ )
 		nop();
-	/*int k2 = 0;*/
-	/*for (int i2=0; i2 < usecs; i2++){*/
-		/*for (int j2=0; j2 < usecs; j2++){*/
-			/*for (int j3=0; j3 < usecs; j3++){*/
-				/*k2 += i2 + j2;*/
-				/*k2 -= j2;*/
-			/*}*/
-		/*}*/
-	/*}*/
 }
 
 
@@ -38,6 +37,7 @@ void sleep (){
 void preempt_thread(){
 	/* Acknowledge that the interrupt is serviced */
 	PIC_sendEOI();
+	Time += 1;        // Increment the time counter by one
 
 	schedule();
 }
@@ -47,9 +47,9 @@ int get_pcb(){
 	
 	int i;
 	for (i =0; i< MAX_THREADS; i++){
-		if (in_use[i] == 0){
+		if (pcb_in_use[i] == 0){
 			pcb temp;
-			in_use[i] = 1;
+			pcb_in_use[i] = 1;
 			fifos_threads[i] = temp;
 			return i;
 		}
@@ -76,11 +76,16 @@ void exit_thread() {
 	//print_s("Exit!\n");
 	pcb * tmp = get_current_thread();
 	
-	in_use[tmp->tid] = 0; 			// This PCB is not use anymore
+	pcb_in_use[tmp->tid] = 0; 			// This PCB is not use anymore
 
 	tmp->status = 1; // means killed
 	schedule();
 
+}
+
+/* Dummy Thread's function */
+void do_nothing(){
+	while(1);
 }
 
 void thread_func() 
@@ -105,7 +110,7 @@ void thread_func()
 			sleep();
 		}
 		
-		schedule();
+//		schedule();
 		
 		if (++j == 3)
 			break;
@@ -153,6 +158,7 @@ void runqueue_remove(int tid)
 		if ( tmp->tid == tid )
 		{
 			btmp->next = tmp->next;
+			prev_node = current;
 			current = tmp->next;
 			break;
 		}
@@ -235,6 +241,13 @@ int thread_create(void *stack, void *func){
 	/* Fake an initial context for the new thread */
 	fifos_threads[new_pcb].sp = (uint32_t) (((uint32_t *) stack));
 	
+#ifdef PCR
+	fifos_threads[new_pcb].ci = new_pcb + 1;
+	fifos_threads[new_pcb].ti = 10;
+	fifos_threads[new_pcb].ai = 0;
+	fifo_threads[new_pcb].repl_list = 0;
+#endif
+
 	// add to the run queue
 	runqueue_add(&fifos_threads[new_pcb]);
 	return 0;
@@ -248,19 +261,37 @@ void init_threads(void){
 	int i;
 	
 	for (i = 0; i < MAX_THREADS; i++){
-		schedule_const[i].t = 5;
-		schedule_const[i].start = 0;
-		if ( i== 0  )
-		{
-			schedule_const[i].rc = 3;
-			schedule_const[i].c = 3;
-		}
-		else {
-			schedule_const[i].rc = 1;
-			schedule_const[i].c = 1;
-		}
 		thread_create(&(stacks[i][1023]), thread_func);
 	}
+	
+	/* Initialize the dummy thread */
+	void *stk = &dstack[1023];
+
+	*(((uint32_t*) stk) - 0) = 0;
+	
+	dum_dum.tid = -1;
+	dum_dum.bp = (uint32_t) ((uint32_t*)stk -1);
+	dum_dum.entry = (uint32_t) do_nothing;
+	dum_dum.status = 0;
+	dum_dum.next = 0;
+	dum_dum.prev = 0;
+	
+	stk = (void*) (stk - sizeof(struct context));
+	dum_dum.ctx = (struct context*) stk;
+
+	dum_dum.ctx->eip = dum_dum.entry;
+	dum_dum.ctx->ebp = (uint32_t) dum_dum.bp;
+	dum_dum.ctx->ebx = 0;
+	dum_dum.ctx->esi = 0;
+	dum_dum.ctx->edi = 0;
+	dum_dum.ctx->gs = 0x10;
+	dum_dum.ctx->fs = 0x10;
+	dum_dum.ctx->es = 0x10;
+	dum_dum.ctx->ds = 0x10;
+
+	/* Fake an initial context for the new thread */
+	dum_dum.sp = (uint32_t) (((uint32_t *) stk));
+
 }
 
 

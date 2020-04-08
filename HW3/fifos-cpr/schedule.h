@@ -2,8 +2,8 @@
 #define _SCHED
 
 pcb * current;     	        // pointing to the current thread running
-int intrp;
-void yield();
+pcb * prev_node 			//pointing to the previous thread running
+
 void schedule();
 pcb* get_current_thread();
 
