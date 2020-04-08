@@ -10,6 +10,7 @@ extern pcb dum_dum;
 
 #ifdef PCR
 extern rpl repl_pool[MAX_REPLS];
+static int time=0;
 #endif
 
 
@@ -19,8 +20,11 @@ pcb * get_current_thread()
 {
 	return current;
 }
-
-
+#ifdef PCR
+void update_time(){
+	time += 1;
+}
+#endif
 
 #ifndef PCR
 void schedule () 
@@ -81,7 +85,7 @@ void schedule ()
 /* Allocate an available replenishment node from the pool */ 
 
 rpl *get_repl(void){
-	for (int i = 0; i < MAX_REPL; i++){
+	for (int i = 0; i < MAX_REPLS; i++){
 		if (!repl_pool[i].in_use){
 			repl_pool[i].in_use = 1;
 			repl_pool[i].next = 0;
@@ -221,7 +225,7 @@ void schedule ()
 		 */
 		
 		// Check for the current threads resources -> Can it continue to run?
-		if (still_has_resources(current->list, time, 1)){
+		if (still_has_resources(current->rpl_list, time, 1)){
 			current->ai++; 					//Increment the used resources
 		}
 		// The thread has not any more resources to run -> it must switch
@@ -263,7 +267,7 @@ void schedule ()
 	
 
 	// Make the switch if we dont have to switch back to ourselves
-	if (current !=0 && prev->tid != current->tid ){
+	if (current !=0 && prev_node->tid != current->tid ){
 
 		asm volatile("sti");
 //			print_s("Context switching to the next thread\n");

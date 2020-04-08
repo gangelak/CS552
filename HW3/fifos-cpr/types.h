@@ -32,7 +32,9 @@ typedef uint64 uint64_t;
 #endif
 
 #define MAX_THREADS 3
+#ifdef PCR
 #define MAX_REPLS 40
+#endif
 
 
 
@@ -52,20 +54,15 @@ struct context{
 	uint32_t ebp;
 	uint32_t eip;
 };
-
-#ifdef PCR
 struct replenish{
 	struct replenish *next;
 	int when;
 	int hmuch;
 	int in_use;
 };
-
-
+#ifdef PCR
 typedef struct replenish rpl;
 #endif
-
-
 struct proc_crtl_block{
 	int tid;
 	uint32_t bp;
@@ -76,20 +73,18 @@ struct proc_crtl_block{
 	uint32_t sp;
 	struct context *ctx;
 
-#ifdef _PCR
+#ifdef PCR
 	
 	rpl *rpl_list;
 	int ci; // C_i that shows how long the thread_i can run on period of T_i
 	int ai; // the remaining time from previous round of running thread_i
 	int ti; // Period of T_i
 	
-};
+
 #endif
 };
-
-
 typedef struct proc_crtl_block pcb;
 
-
-typedef struct processor_capacity_reserve pcr;
 #endif
+
+

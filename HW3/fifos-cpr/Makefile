@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -m32 -fno-stack-protector -fno-builtin -nostdinc -O -g -Wall -I. -c
+CFLAGS := -m32 -fno-stack-protector -fno-builtin -nostdinc -O -g -Wall -I. -c -DPCR
 AS := as
 SRCS := threads.c vga.c pic.c helper.c schedule.c
 ASM := swtch.s

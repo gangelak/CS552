@@ -15,7 +15,7 @@ static uint32_t dstack[1024]; 			//dummy stack for the dummy thread
 
 
 #ifdef PCR
-rpl repl_pool[MAX_REPLS]
+rpl repl_pool[MAX_REPLS];
 #endif
 
 extern pcb fifos_threads[MAX_THREADS];
@@ -245,7 +245,7 @@ int thread_create(void *stack, void *func){
 	fifos_threads[new_pcb].ci = new_pcb + 1;
 	fifos_threads[new_pcb].ti = 10;
 	fifos_threads[new_pcb].ai = 0;
-	fifo_threads[new_pcb].repl_list = 0;
+	fifos_threads[new_pcb].rpl_list = 0;
 #endif
 
 	// add to the run queue
