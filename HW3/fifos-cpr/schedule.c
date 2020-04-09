@@ -23,7 +23,7 @@ pcb * get_current_thread()
 #ifdef PCR
 void update_time(){
 	PIC_sendEOI();
-	print_s("|");
+//	print_s("|");
 	time += 1;
 //	char tmp[10];
 //	itoa(tmp,'d', time);
@@ -199,8 +199,9 @@ void schedule ()
 	
 	//If the runqueue is empty just hlt the program
 	if (runqueue->next == 0)
+	{
 		asm volatile("hlt");
-	
+	}
 	// It means we have scheduled the dummy thread
 	// Lets try again to find a thread that can run
 	if (current == &dum_dum){
@@ -251,8 +252,8 @@ void schedule ()
 		 */
 
 		// Check for the current threads resources -> Can it continue to run?
-		if (still_has_resources(current->rpl_list, time, 1) == 1){
-			remove_resources(current, time, current->ai);
+		if (still_has_resources(current->rpl_list, time, current->ai) == 1){
+//			remove_resources(current, time, current->ai);
 			current->ai++; 					//Increment the used resources
 			prev_node = current;
 		}
@@ -284,7 +285,6 @@ void schedule ()
 //				print_s("\n");
 
 				if(still_has_resources(current->rpl_list, time, 1) == 1){
-					print_s("here");
 					// We found a thread that can run in this time frame
 					found = 1;
 
@@ -306,7 +306,6 @@ void schedule ()
 		swtch(&prev_node->ctx, current->ctx);
 		// after thread-yield we have to go back
 	}
-		
 	return ;
 }
 
