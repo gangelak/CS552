@@ -10,7 +10,7 @@ extern pcb dum_dum;
 
 #ifdef PCR
 extern rpl repl_pool[MAX_REPLS];
-static int time=0;
+extern int time;
 #endif
 
 
@@ -20,18 +20,6 @@ pcb * get_current_thread()
 {
 	return current;
 }
-#ifdef PCR
-void update_time(){
-	PIC_sendEOI();
-//	print_s("|");
-	time += 1;
-//	char tmp[10];
-//	itoa(tmp,'d', time);
-//	print_s(tmp);
-//	print_s("\n");
-	schedule();
-}
-#endif
 
 #ifndef PCR
 void schedule () 

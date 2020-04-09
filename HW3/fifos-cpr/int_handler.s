@@ -3,7 +3,7 @@
 	.globl int_table
 	.globl timer_irq
 	.globl _sleep
-	.globl update_time
+	.globl preempt_thread
 	.globl pit_init
 
 	.section .bss
@@ -81,7 +81,7 @@ int_table:
 
 timer:
 	pusha
-	call update_time
+	call preempt_thread
 	popa
 	iret
 

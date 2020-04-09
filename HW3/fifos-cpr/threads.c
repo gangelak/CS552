@@ -15,6 +15,7 @@ static uint32_t dstack[1024]; 			//dummy stack for the dummy thread
 
 
 #ifdef PCR
+extern int time;
 rpl repl_pool[MAX_REPLS];
 #endif
 
@@ -37,8 +38,9 @@ void sleep (){
 void preempt_thread(){
 	/* Acknowledge that the interrupt is serviced */
 	PIC_sendEOI();
-	Time += 1;        // Increment the time counter by one
-
+#ifdef PCR
+	time += 1;        // Increment the time counter by one
+#endif
 	schedule();
 }
 

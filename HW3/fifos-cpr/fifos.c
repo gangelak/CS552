@@ -21,7 +21,9 @@ int cnt = 0;   // Memory Region Counter
 pcb fifos_threads[MAX_THREADS];
 pcb dum_dum; 				//dummy thread doing nothing;
 
-
+#ifdef PCR
+int time= 0;
+#endif
 
 /*
  * 	We assume that the total memory is below 4GB
@@ -113,7 +115,6 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 //	print_s("Creating Threads!!!\n");
 	init_threads();
 
-	Time = 0;  			// Set the Time counter to 0
 	schedule();
 	return ;
 
