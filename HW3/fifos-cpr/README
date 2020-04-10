@@ -1,41 +1,24 @@
-## Creating the disk image
-Followed instruction in BOCHS HOWTO
-- use qemu-img to create c2.img
-- fdisk c2.img to specify the geometries such as number of sectors and stuff and partition numbers.
-- losetup -o 32256 /dev/loop0 c2.img
-- create paritions on the image using mke2fs
-- mount c2 image
-	mount c2.img /mnt/C -text2 -o loop,offset=32256
-- place grub files in /boot/grub
-- create the menu for grub
-- copy memos2 binary to c2.img
-	cp memos2 /mnt/C/boot/memos-2
+Giannis 
+Rasoul Jahanshahi rasoulj@bu.edu
 
-# make file
-- First we compile stub file which is basically the multiboot header, setting up stack, and passing arguments to stack and then call the C function
-- Then we use gcc to compile our C file using -no-builtin flag to make sure there is no dependency
-- We link our stub file and C binary using ld and make elf binary
-- We use the last command in previous section to place it in /boot
+fifos-2 and fifos-pcr are implemented in the same code. based on the flags sent during the compilation the features will be different.
 
-# memos2.c
-- we create the structure for holding memory-map
-- There is also another structure that hold the cursor values
-- put function
-	# copy from slides
-	In this function we put the argument passed to the function in the right memory address to be shown on the screen
-	The address is defined as TEXT_BUFFER_LOC which is 0xB8000
-- print function
-	get a pointer to an string
-	Loop over all the chars in the string and print them using put function
-- itoa function
-	we needed a function to converting an integer to a string 
-	Since we have hex values we also pass the base to the function to correctly calculate the string based on the base value.
-- pad
-	This is just to make sure all the addresses are shown aligned on the screen
-- kmain
-	This is the main function that stub calls
-	We check the flag in multiboot_info_t to make sure the data that we are retrieving is valid
-	We retrieve mmap_addr which points to the memory_map region and we loop over the structure till the end
-	In the loop we print out he the base address and base_addr + length of the memory region
-	At the end we print out total memory
+- run fifos-2:
+	make
+- run fifos-pcr:
+	./pcr
+
+resources:
+
+set up pic:
+	https://wiki.osdev.org/8259_PIC
+set up interrupts, idt:
+	https://wiki.osdev.org/Interrupts_tutorial
+set up context switch:
+	https://github.com/mit-pdos/xv6-riscv/blob/riscv/kernel/swtch.S
+	https://pdos.csail.mit.edu/6.828/2019/xv6/book-riscv-rev0.pdf
+set up gdt:
+	https://wiki.osdev.org/GDT_Tutorial
+set up serial port for qemu in vga.c:
+	https://wiki.osdev.org/Serial_Ports
 
