@@ -1,0 +1,25 @@
+Collaborators:
+Ioannis Angelakopoulos jaggel@bu.edu
+Rasoul Jahanshahi rasoulj@bu.edu
+
+fifos-2 and fifos-pcr are implemented in the same code. based on the flags sent during the compilation the features will be different.
+
+- run fifos-2:
+	./preemption.sh
+- run fifos-pcr:
+	./pcr.sh
+
+resources:
+
+set up pic:
+	https://wiki.osdev.org/8259_PIC
+set up interrupts, idt:
+	https://wiki.osdev.org/Interrupts_tutorial
+set up context switch:
+	https://github.com/mit-pdos/xv6-riscv/blob/riscv/kernel/swtch.S
+	https://pdos.csail.mit.edu/6.828/2019/xv6/book-riscv-rev0.pdf
+set up gdt:
+	https://wiki.osdev.org/GDT_Tutorial
+set up serial port for qemu in vga.c:
+	https://wiki.osdev.org/Serial_Ports
+
