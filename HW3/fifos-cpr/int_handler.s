@@ -1,23 +1,6 @@
 /* Here implement the save register logic*/
 
 	.globl int_table
-	.globl timer_irq
-	.globl _sleep
-	.globl update_time
-	.globl pit_init
-
-	.section .bss
-	.align 0x4
-	.comm system_timer_fractions,4
-	.comm system_timer_ms, 4
-	.comm IRQ0_fractions, 4
-	.comm IRQ0_ms, 4
-	.comm IRQ0_frequency, 4
-	.comm PIT_reload_value,2
-	.comm CountDown,4
-
-
-
 
 	.section .data
 	.align 0x4
@@ -81,7 +64,7 @@ int_table:
 
 timer:
 	pusha
-	call update_time
+	call preempt_thread
 	popa
 	iret
 
@@ -171,42 +154,4 @@ exception_handler19:
 	cli
 	sti
 	iret
-
-
-timer_irq:
-	push %eax
-	mov CountDown, %eax
-	or %eax, %eax
-	jz timer_done
-	dec %eax
-	mov %eax, CountDown
-timer_done:
-	pop %eax
-	iret
-_sleep:
-	push %ebp
-	mov %esp, %ebp
-	push %eax
-	mov 8(%ebp), %eax
-	mov %eax, CountDown
-sleep_loop:
-	cli
-	mov CountDown, %eax
-	or %eax,%eax
-	jz sleep_done
-	sti
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	jmp sleep_loop
-sleep_done:
-	sti
-	pop %eax
-	pop %ebp
-	ret $8
-
-
 

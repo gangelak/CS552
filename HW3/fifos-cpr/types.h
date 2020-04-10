@@ -76,14 +76,13 @@ struct proc_crtl_block{
 	uint32_t sp;
 	struct context *ctx;
 
-#ifdef _PCR
+#ifdef PCR
 	
 	rpl *rpl_list;
 	int ci; // C_i that shows how long the thread_i can run on period of T_i
 	int ai; // the remaining time from previous round of running thread_i
 	int ti; // Period of T_i
 	
-};
 #endif
 };
 

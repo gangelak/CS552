@@ -59,9 +59,9 @@ void schedule ()
 
 	}
 	
+	asm volatile("sti");
 	if (current !=0 && prev_node->tid != current->tid ){
 
-		asm volatile("sti");
 //			print_s("Context switching to the next thread\n");
 		swtch(&prev_node->ctx, current->ctx);
 		// after thread-yield we have to go back
@@ -81,7 +81,7 @@ void schedule ()
 /* Allocate an available replenishment node from the pool */ 
 
 rpl *get_repl(void){
-	for (int i = 0; i < MAX_REPL; i++){
+	for (int i = 0; i < MAX_REPLS; i++){
 		if (!repl_pool[i].in_use){
 			repl_pool[i].in_use = 1;
 			repl_pool[i].next = 0;
@@ -92,24 +92,29 @@ rpl *get_repl(void){
 
 /* Add resources to the list of the current thread at time = when  */
 
-void add_resources(rpl* list, int when, int hmuch){
+void add_resources(pcb* cur, int when, int hmuch){
 	rpl *node = get_repl();
+	
+	if (node == 0){
+		print_s("No resource available\n");
+	}
+
 	node->when = when;
 	node->hmuch = hmuch;
 	node->next = 0;
 	
 	// If the list is empty add the node at the head
-	if (list == 0){
-		list = node;
+	if (cur->rpl_list == 0){
+		cur->rpl_list = node;
 		return;
 	}
 	
 	// Else add it to the end of the list
-	rpl *cur = list;
-	while (cur->next != 0){
-		cur = cur->next;
+	rpl *tmp = cur->rpl_list;
+	while (tmp->next != 0){
+		tmp = tmp->next;
 	}
-	cur->next = node;
+	tmp->next = node;
 	return;
 }
 
@@ -130,28 +135,28 @@ int still_has_resources(rpl *list, int time, int hmuch){
 
 /* Remove resources from the current threads replenish list */
 
-int remove_resources(rpl *list, int time, int hmuch){
-	rpl *cur = list;
-	while (cur != 0){
+int remove_resources(pcb* cur, int time, int hmuch){
+	rpl *tmp = cur->rpl_list;
+	while (tmp != 0){
 		//Check if the resource is available timewise and it has 
 		// a remaining budget
-		if (cur->when <=time && cur->hmuch >= hmuch){
-			cur->hmuch -= hmuch;
+		if (tmp->when <=time && tmp->hmuch >= hmuch){
+			tmp->hmuch -= hmuch;
 			return 1;
 
 		}
-		cur = cur->next;
+		tmp = tmp->next;
 	}
 
 	return 0;
 }
 
-void clear_zeroed_repls(rpl *list){
+void clear_zeroed_repls(pcb *task){
 	rpl *prev;
 	rpl *cur;
 
-	prev = list;
-	cur = list;
+	prev = task->rpl_list;
+	cur = task->rpl_list;
 	while (cur != 0){
 		if (cur->hmuch == 0){
 			prev->next = cur->next;
@@ -165,10 +170,49 @@ void clear_zeroed_repls(rpl *list){
 }
 
 
+void print_resources(){
+	pcb *tmp;
+	tmp = runqueue->next;
+	char buf[50];
+	rpl *tmp2;
+
+	while(tmp != 0){
+		itoa(buf,'d',tmp->tid);
+		print_s("Thread ");
+		print_s(buf);
+		print_s(" ai:");
+		itoa(buf,'d',tmp->ai);
+		print_s(buf);
+		print_s(" ci:");
+		itoa(buf,'d',tmp->ci);
+		print_s(buf);
+		print_s(" ti:");
+		itoa(buf,'d',tmp->ti);
+		print_s(buf);
+		print_s(" Replenishments (When,Hmuch):");
+		tmp2 = tmp->rpl_list;
+		while (tmp2 != 0){
+			itoa(buf,'d',tmp2->when);
+			print_s("(");
+			print_s(buf);
+			print_s(",");
+			itoa(buf,'d',tmp2->hmuch);
+			print_s(buf);
+			print_s(") ");
+			tmp2 = tmp2->next;
+		}
+		print_s("\n");
+		tmp = tmp->next;
+	}
+}
+
+
 
 void schedule () 
 {
 	
+	char buf[50]; 			//For printing time and next scheduled thread
+
 	asm volatile("cli");
 	int found = 0; 	                //Flag to check if we have a thread that can run at this point in time
 	
@@ -188,13 +232,14 @@ void schedule ()
 	{
 		// Iterate once through the entire queue and add the resources to each thread
 		for (current = runqueue->next; current != 0; current= current->next){
-			add_resources(current->rpl_list, 0 , current->ci);
+			add_resources(current, 0 , current->ci);
 		}
-
+		
+		print_resources();
 		// For the first switch we use the dummy thread
 		prev_node = &dum_dum;
 		current = runqueue->next; // the one that is going to run now
-		remove_resources(current->rpl_list, time, current->ai);        //Consume resources for the first thread
+		remove_resources(current->rpl_list, Time, current->ai);        //Consume resources for the first thread
 		current->ai++;
 	}
 	else {
@@ -221,16 +266,17 @@ void schedule ()
 		 */
 		
 		// Check for the current threads resources -> Can it continue to run?
-		if (still_has_resources(current->list, time, 1)){
+		if (still_has_resources(current->rpl_list, Time, 1)){
 			current->ai++; 					//Increment the used resources
 		}
 		// The thread has not any more resources to run -> it must switch
 		else{
+			// Case we are coming from a running thread
 			if (current->ai > 0){
 				// We must add these resources to its next period and then switch
-				add_resources(current->rpl_list, current->ti + current->ai -1 , current->ai);
+				add_resources(current, Time + current->ti - current->ai , current->ai);
 				// We must also remove the resources from its replenishment list
-				remove_resources(current->rpl_list, time, current->ai);
+				remove_resources(current->rpl_list, Time, current->ai);
 				// Clear any zeroed resources from the current threads replenish list
 				clear_zeroed_repls(current->rpl_list);
 				// Restart the currently used resources for the next time this thread is scheduled
@@ -244,10 +290,10 @@ void schedule ()
 					current = current->next;
 				else
 					current = runqueue->next;
-				if(still_has_resources(current->rpl_list, time, 1)){
+				if(still_has_resources(current->rpl_list, Time, 1)){
 					// We found a thread that can run in this time frame
 					found = 1;
-					remove_resources(current->rpl_list, time, current->ai); //Consume resources for next thread
+					remove_resources(current->rpl_list, Time, 1); //Consume resources for next thread
 					current->ai++;
 					break;
 				}
@@ -261,11 +307,20 @@ void schedule ()
 		}
 	}
 	
+	print_s("\nCurrent Time: ");
+	itoa(buf,'d',Time);
+	print_s(buf);
+	itoa(buf,'d',current->tid);
+	print_s("\nNext thread to run: ");
+	print_s(buf);
+	print_s("\n");
+	print_resources();
 
+	// Reenable the interrupts
+	asm volatile("sti");
 	// Make the switch if we dont have to switch back to ourselves
-	if (current !=0 && prev->tid != current->tid ){
+	if (current !=0 && prev_node->tid != current->tid ){
 
-		asm volatile("sti");
 //			print_s("Context switching to the next thread\n");
 		swtch(&prev_node->ctx, current->ctx);
 		// after thread-yield we have to go back
