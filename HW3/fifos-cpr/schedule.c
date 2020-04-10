@@ -248,8 +248,8 @@ void schedule ()
 		// For the first switch we use the dummy thread
 		prev_node = &dum_dum;
 		current = runqueue->next; // the one that is going to run now
-		remove_resources(current, time, current->ai);        //Consume resources for the first thread
 		current->ai++;
+		remove_resources(current, time, current->ai);        //Consume resources for the first thread
 	}
 	else {
 	
@@ -279,6 +279,7 @@ void schedule ()
 		if (still_has_resources(current, time, current->ai) == 1){
 //			remove_resources(current, time, current->ai);
 			current->ai++; 					//Increment the used resources
+			remove_resources(current, time, 1);        //Consume resources for the first thread
 			prev_node = current;
 		}
 		// The thread has not any more resources to run -> it must switch
@@ -290,7 +291,7 @@ void schedule ()
 				// We must add these resources to its next period and then switch
 				add_resources(current, current->ti + current->ai -1 , current->ai);
 				// We must also remove the resources from its replenishment list
-				remove_resources(current, Time, current->ai);
+				//remove_resources(current, Time, current->ai);
 				// Clear any zeroed resources from the current threads replenish list
 				clear_zeroed_repls(current);
 				// Restart the currently used resources for the next time this thread is scheduled
@@ -314,7 +315,7 @@ void schedule ()
 					// We found a thread that can run in this time frame
 					found = 1;
 
-					remove_resources(current, time, current->ai); //Consume resources for next thread
+					remove_resources(current, time, 1); //Consume resources for next thread
 					current->ai++;
 					break;
 				}
