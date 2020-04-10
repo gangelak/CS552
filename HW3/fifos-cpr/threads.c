@@ -80,18 +80,22 @@ void thread_yield() {
 }
 void exit_thread() {
 	
-	/* 
-	 * Current running thread is done 
-	 * Need to change status -> Status.killed
-	 */
-	//print_s("Exit!\n");
 	pcb * tmp = get_current_thread();
 	
 	pcb_in_use[tmp->tid] = 0; 			// This PCB is not use anymore
 
 	tmp->status = 1; // means killed
-	schedule();
 
+/*#ifdef PCR*/
+	/*while(1);*/
+/*#else*/
+	/* 
+	 * Current running thread is done 
+	 * Need to change status -> Status.killed
+	 */
+	//print_s("Exit!\n");
+	schedule();
+/*#endif*/
 }
 
 /* Dummy Thread's function */
@@ -179,7 +183,10 @@ void runqueue_remove(int tid)
 		{
 			btmp->next = tmp->next;
 			prev_node = current;
-			current = tmp->next;
+			if (tmp->next != 0)
+				current = tmp->next;
+			else
+				current = runqueue->next;
 			break;
 		}
 

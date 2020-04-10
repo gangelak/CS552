@@ -344,13 +344,13 @@ Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(60,1) 
 Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(61,2) 
 Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,0) (62,3) 
-Doing nothing!!Doing nothing!!
+Doing nothing!!Doing nothing!!Doing nothing!!
 Current Time: 57
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(60,1) 
 Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(61,2) 
 Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,0) (62,3) 
-Doing nothing!!Doing nothing!!Doing nothing!!
+Doing nothing!!Doing nothing!!
 Current Time: 58
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(60,1) 
@@ -406,12 +406,12 @@ Current Time: 66
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(70,1) 
 Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(71,2) 
-Doing nothing!!Doing nothing!!
+Doing nothing!!Doing nothing!!Doing nothing!!
 Current Time: 67
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(70,1) 
 Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(71,2) 
-Doing nothing!!Doing nothing!!Doing nothing!!
+Doing nothing!!Doing nothing!!
 Current Time: 68
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(70,1) 
@@ -435,11 +435,11 @@ Thread 1 ai:1 ci:2 ti:10 Replenishments (When,Hmuch):(71,1)
 Current Time: 71
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(80,1) 
-
+Doing nothing!!
 Current Time: 72
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(80,1) 
-Doing nothing!!Doing nothing!!Doing nothing!!
+Doing nothing!!Doing nothing!!
 Current Time: 73
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(80,1) 
@@ -491,11 +491,11 @@ Doing nothing!!Doing nothing!!
 Current Time: 85
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(90,1) 
-Doing nothing!!Doing nothing!!
+Doing nothing!!Doing nothing!!Doing nothing!!
 Current Time: 86
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(90,1) 
-Doing nothing!!Doing nothing!!Doing nothing!!
+Doing nothing!!Doing nothing!!
 Current Time: 87
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(90,1) 
@@ -567,11 +567,11 @@ Doing nothing!!Doing nothing!!
 Current Time: 104
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(110,1) 
-Doing nothing!!Doing nothing!!
+Doing nothing!!Doing nothing!!Doing nothing!!
 Current Time: 105
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(110,1) 
-Doing nothing!!Doing nothing!!Doing nothing!!
+Doing nothing!!Doing nothing!!
 Current Time: 106
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(110,1) 
@@ -643,11 +643,11 @@ Doing nothing!!Doing nothing!!
 Current Time: 123
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(130,1) 
-Doing nothing!!Doing nothing!!Doing nothing!!
+Doing nothing!!Doing nothing!!
 Current Time: 124
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(130,1) 
-Doing nothing!!Doing nothing!!
+Doing nothing!!Doing nothing!!Doing nothing!!
 Current Time: 125
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(130,1) 
@@ -699,11 +699,11 @@ Doing nothing!!Doing nothing!!
 Current Time: 137
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(140,1) 
-Doing nothing!!Doing nothing!!Doing nothing!!
+Doing nothing!!Doing nothing!!
 Current Time: 138
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(140,1) 
-Doing nothing!!Doing nothing!!
+Doing nothing!!Doing nothing!!Doing nothing!!
 Current Time: 139
 Next thread to run: -1
 Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(140,1) 

@@ -196,6 +196,27 @@ void clear_zeroed_repls(pcb *thr){
 	/*}*/
 }
 
+void clear_repls(pcb *thr){
+	rpl *prev;
+	rpl *cur;
+	if(thr->rpl_list == 0)
+		return;
+
+	while (thr->rpl_list != 0 ){
+		thr->rpl_list->in_use = 0;
+		thr->rpl_list = thr->rpl_list->next;
+	}
+	/*while (cur->next != 0){*/
+		/*if (cur->hmuch == 0){*/
+			/*cur->in_use = 0;*/
+			/*prev->next = cur->next;*/
+			/*cur = cur->next;*/
+			/*continue;*/
+		/*}*/
+		/*prev = cur;*/
+		/*cur = cur->next;*/
+	/*}*/
+}
 
 void print_resources(){
 	pcb *tmp;
@@ -239,6 +260,7 @@ void schedule ()
 {
 //	print_s("In scheduler\n");
 	char buf[50]; 			//For printing time and next scheduled thread
+	pcb * loop; 			//Used only to check if we ded a full loop
 
 	asm volatile("cli");
 	int found = 0; 	                //Flag to check if we have a thread that can run at this point in time
@@ -311,7 +333,10 @@ void schedule ()
 				print_s("Done with all the threads!! Bye!\n");
 				asm volatile("hlt");
 			}
+			remove_resources(prev_node, time,prev_node->ai);        //Remove the resources from the removed thread
+			prev_node->ai = 0;
 		}
+
 		
 		/*
 		 * TODO Add a case for yielding depending on the ID of the thread and the time 
@@ -351,12 +376,12 @@ void schedule ()
 				current->ai=0;
 			}
 			// Point to the next thread in line or the start of the runqueue if at the end
-			prev_node = current;
+			loop = current;
 			
-			while (current->next != prev_node && found != 1){
+			while (current->next != loop && found != 1){
 				if (current->next != 0)
 					current = current->next;
-				else if (current->next == 0 && prev_node != runqueue->next)
+				else if (current->next == 0 && loop != runqueue->next)
 					current = runqueue->next;
 				else
 					break;
