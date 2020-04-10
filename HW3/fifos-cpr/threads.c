@@ -69,7 +69,12 @@ int get_pcb(){
 void thread_yield() {
 	
 	/* Just set status and call scheduler */
-	fifos_threads[get_current_thread()->tid].status = 0;
+	//fifos_threads[get_current_thread()->tid].status = 0;
+	char buf[50];
+	itoa(buf,'d',current->tid);
+	print_s("(Y");
+	print_s(buf);
+	print_s(")");
 	schedule();
 	return;
 }
@@ -118,9 +123,9 @@ void thread_func()
 			print_s (">");
 			sleep();
 		}
-		
-//		schedule();
-		
+#ifndef PCR
+		thread_yield();
+#endif
 		if (++j == 3)
 			break;
   	}

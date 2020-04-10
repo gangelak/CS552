@@ -54,6 +54,7 @@ void schedule ()
 //			print_s("Removing thread from the queue\n");
 			runqueue_remove(current->tid);
 			if (runqueue->next == 0){
+				print_s("All threads done...Bye!!\n");
 				asm volatile("hlt");
 			}
 		}
@@ -351,16 +352,10 @@ void schedule ()
 				else
 					break;
 
-				//				char tmp[10];
-//				itoa(tmp,'d', current->tid);
-//				print_s(tmp);
-//				print_s("\n");
-
 				if(still_has_resources(current, time, 1) == 1){
 					// We found a thread that can run in this time frame
 					found = 1;
 					
-				//	print_s("Found a new thread that can run\n");
 					remove_resources(current, time, 1); //Consume resources for next thread
 					current->ai++;
 					break;
