@@ -8,6 +8,9 @@ extern pcb fifos_threads[MAX_THREADS];
 extern pcb * runqueue;
 extern pcb dum_dum;
 
+
+static uint32_t once_stack[1024];
+
 #ifdef PCR
 extern rpl repl_pool[MAX_REPLS];
 extern int time;
@@ -80,8 +83,13 @@ void schedule ()
 /* Allocate an available replenishment node from the pool */ 
 
 rpl *get_repl(void){
+	char id[50];
 	for (int i = 0; i < MAX_REPLS; i++){
-		if (!repl_pool[i].in_use){
+		if (repl_pool[i].in_use == 0){
+			/*itoa(id,'d',i);*/
+			/*print_s("Returning node ");*/
+			/*print_s(id);*/
+			/*print_s("\n");*/
 			repl_pool[i].in_use = 1;
 			repl_pool[i].next = 0;
 			return &repl_pool[i];
@@ -92,9 +100,14 @@ rpl *get_repl(void){
 
 /* Add resources to the list of the current thread at time = when  */
 
-void add_resources(pcb* cur, int when, int hmuch){
+void add_resources(pcb* thr, int when, int hmuch){
 	rpl *node = get_repl();
 	
+	/*char id[50];*/
+	/*itoa(id,'d',thr->tid);*/
+	/*print_s(id);*/
+	/*print_s("\n");*/
+
 	if (node == 0){
 		print_s("No resource available\n");
 	}
@@ -104,14 +117,16 @@ void add_resources(pcb* cur, int when, int hmuch){
 	node->next = 0;
 	
 	// If the list is empty add the node at the head
-	if (cur->rpl_list == 0){
-		cur->rpl_list = node;
+	if (thr->rpl_list == 0){
+		/*print_s("Adding resources to the start of the list\n");*/
+		thr->rpl_list = node;
 		return;
 	}
 	
 	// Else add it to the end of the list
-	rpl *tmp = cur->rpl_list;
+	rpl *tmp = thr->rpl_list;
 	while (tmp->next != 0){
+		/*print_s("Adding resources to the end of the list\n");*/
 		tmp = tmp->next;
 	}
 	tmp->next = node;
@@ -120,19 +135,16 @@ void add_resources(pcb* cur, int when, int hmuch){
 
 /* Check if the current thread still has resources in order to continue to run */
 
-int still_has_resources(pcb* cur, int time, int hmuch){
-	rpl *tmp = cur->rpl_list;
-	if ( tmp == 0  )
-	{
-		print_s("fucked up\n");
-	}
+int still_has_resources(pcb* thr, int time, int hmuch){
+	rpl *tmp = thr->rpl_list;
+	
 	while (tmp != 0){
 		//Check if the resource is available timewise and it has 
 		// a remaining budget
 
 		if (tmp->when <=time && tmp->hmuch >= hmuch)
 		{
-//			print_s("there is resource\n");
+			//print_s("there is resource\n");
 			return 1;
 		}
 		tmp = tmp->next;
@@ -143,8 +155,8 @@ int still_has_resources(pcb* cur, int time, int hmuch){
 
 /* Remove resources from the current threads replenish list */
 
-int remove_resources(pcb* cur, int time, int hmuch){
-	rpl *tmp = cur->rpl_list;
+int remove_resources(pcb* thr, int time, int hmuch){
+	rpl *tmp = thr->rpl_list;
 	while (tmp != 0){
 		//Check if the resource is available timewise and it has 
 		// a remaining budget
@@ -159,22 +171,28 @@ int remove_resources(pcb* cur, int time, int hmuch){
 	return 0;
 }
 
-void clear_zeroed_repls(pcb *task){
+void clear_zeroed_repls(pcb *thr){
 	rpl *prev;
 	rpl *cur;
+	if(thr->rpl_list == 0)
+		return;
 
-	prev = task->rpl_list;
-	cur = task->rpl_list;
-	while (cur != 0){
-		if (cur->hmuch == 0){
-			prev->next = cur->next;
-			cur->in_use = 0;
-			cur = cur->next;
-			continue;
-		}
-		prev = cur;
-		cur = cur->next;
+	while (thr->rpl_list->hmuch == 0 ){
+		thr->rpl_list->in_use = 0;
+		thr->rpl_list = thr->rpl_list->next;
+		if (thr->rpl_list == 0)
+			return;
 	}
+	/*while (cur->next != 0){*/
+		/*if (cur->hmuch == 0){*/
+			/*cur->in_use = 0;*/
+			/*prev->next = cur->next;*/
+			/*cur = cur->next;*/
+			/*continue;*/
+		/*}*/
+		/*prev = cur;*/
+		/*cur = cur->next;*/
+	/*}*/
 }
 
 
@@ -182,7 +200,6 @@ void print_resources(){
 	pcb *tmp;
 	tmp = runqueue->next;
 	char buf[50];
-	rpl *tmp2;
 
 	while(tmp != 0){
 		itoa(buf,'d',tmp->tid);
@@ -198,6 +215,7 @@ void print_resources(){
 		itoa(buf,'d',tmp->ti);
 		print_s(buf);
 		print_s(" Replenishments (When,Hmuch):");
+		rpl *tmp2;
 		tmp2 = tmp->rpl_list;
 		while (tmp2 != 0){
 			itoa(buf,'d',tmp2->when);
@@ -218,11 +236,12 @@ void print_resources(){
 
 void schedule () 
 {
-	
+//	print_s("In scheduler\n");
 	char buf[50]; 			//For printing time and next scheduled thread
 
 	asm volatile("cli");
 	int found = 0; 	                //Flag to check if we have a thread that can run at this point in time
+	int coming_from_dummy = 0; 	//Flag to check if dummy was running
 	
 	//If the runqueue is empty just hlt the program
 	if (runqueue->next == 0)
@@ -231,7 +250,12 @@ void schedule ()
 	}
 	// It means we have scheduled the dummy thread
 	// Lets try again to find a thread that can run
+	
+	prev_node = current;
+	
 	if (current == &dum_dum){
+		coming_from_dummy = 1;
+//		print_s("Current Thread running is dummy\n");
 		prev_node = &dum_dum;
 		current = runqueue->next;
 	}
@@ -239,17 +263,35 @@ void schedule ()
 	/* This is meant to run only the first time */
 	if ( current == 0 ) // we haven't chosen one yet
 	{
+	//	print_s("Entering here only once\n");
 		// Iterate once through the entire queue and add the resources to each thread
-		for (current = runqueue->next; current != 0; current= current->next){
+		current = runqueue->next;
+		while (current !=0){
 			add_resources(current, 0 , current->ci);
+			current = current->next;
 		}
-		
-		print_resources();
+
+		// Go back to the beginning
+		struct context *once = (struct context *) (&once_stack[1023]) - sizeof(struct context *);
+		//print_resources();
 		// For the first switch we use the dummy thread
-		prev_node = &dum_dum;
+		prev_node = &dum_dum;  	  //pretend that the first switch is from the inactive thread
 		current = runqueue->next; // the one that is going to run now
+		
+		print_s("\nCurrent Time: ");
+		itoa(buf,'d',time);
+		print_s(buf);
+		itoa(buf,'d',current->tid);
+		print_s("\nNext thread to run: ");
+		print_s(buf);
+		print_s("\n");
+		print_resources();
+		
 		current->ai++;
-		remove_resources(current, time, current->ai);        //Consume resources for the first thread
+		remove_resources(current, time, 1);        //Consume resources for the first thread
+		// Switch for the first time only
+		asm volatile("sti");
+		swtch(once, current->ctx);
 	}
 	else {
 	
@@ -261,11 +303,11 @@ void schedule ()
 		 * Also remove any other threads that might have finished but
 		 * are not removed from the queue
 		 */
-
 		while ( current!= 0 && current->status == 1){
 //			print_s("Removing thread from the queue\n");
 			runqueue_remove(current->tid);
 			if (runqueue->next == 0){
+				print_s("Done with all the threads!! Bye!\n");
 				asm volatile("hlt");
 			}
 		}
@@ -276,24 +318,25 @@ void schedule ()
 		 */
 
 		// Check for the current threads resources -> Can it continue to run?
-		if (still_has_resources(current, time, current->ai) == 1){
+		if (still_has_resources(current, time, 1) == 1){
 //			remove_resources(current, time, current->ai);
 			current->ai++; 					//Increment the used resources
 			remove_resources(current, time, 1);        //Consume resources for the first thread
-			prev_node = current;
 		}
 		// The thread has not any more resources to run -> it must switch
 		else{
 			// Case we are coming from a running thread
 
+			clear_zeroed_repls(current);
+			
 			if (current->ai > 0){
 
 				// We must add these resources to its next period and then switch
-				add_resources(current, current->ti + current->ai -1 , current->ai);
+				add_resources(current, time + current->ti - current->ai, current->ai);
 				// We must also remove the resources from its replenishment list
 				//remove_resources(current, Time, current->ai);
 				// Clear any zeroed resources from the current threads replenish list
-				clear_zeroed_repls(current);
+			//	clear_zeroed_repls(current);
 				// Restart the currently used resources for the next time this thread is scheduled
 				current->ai=0;
 			}
@@ -303,8 +346,10 @@ void schedule ()
 			while (current->next != prev_node && found != 1){
 				if (current->next != 0)
 					current = current->next;
-				else
+				else if (current->next == 0 && prev_node != runqueue->next)
 					current = runqueue->next;
+				else
+					break;
 
 				//				char tmp[10];
 //				itoa(tmp,'d', current->tid);
@@ -314,7 +359,8 @@ void schedule ()
 				if(still_has_resources(current, time, 1) == 1){
 					// We found a thread that can run in this time frame
 					found = 1;
-
+					
+				//	print_s("Found a new thread that can run\n");
 					remove_resources(current, time, 1); //Consume resources for next thread
 					current->ai++;
 					break;
@@ -322,7 +368,10 @@ void schedule ()
 			}
 			// No thread can run at this point so we must schedule the dummy one
 			if (found == 0){
-				current = &dum_dum;	
+		//		print_s("No other thread can run...switching to the dummy\n");
+				current = &dum_dum;
+				if (coming_from_dummy == 1)
+					prev_node = &dum_dum;
 			}
 		}
 	}
@@ -341,7 +390,7 @@ void schedule ()
 	// Make the switch if we dont have to switch back to ourselves
 	if (current !=0 && prev_node->tid != current->tid ){
 
-//			print_s("Context switching to the next thread\n");
+	//		print_s("Context switching to the next thread\n");
 		swtch(&prev_node->ctx, current->ctx);
 		// after thread-yield we have to go back
 	}

@@ -26,7 +26,11 @@ extern pcb dum_dum;
 
 void sleep (){
 	int j;
+#ifndef PCR
 	for ( j=0; j < 100000000; j++ )
+#else
+	for ( j=0; j < 10000000; j++ )
+#endif
 		nop();
 }
 
@@ -87,7 +91,10 @@ void exit_thread() {
 
 /* Dummy Thread's function */
 void do_nothing(){
-	while(1);
+	while(1){
+		print_s("Doing nothing!!");
+		sleep();
+	}
 }
 
 void thread_func() 
