@@ -323,7 +323,7 @@ void schedule ()
 //			remove_resources(current, time, current->ai);
 			current->ai++; 					//Increment the used resources
 			remove_resources(current, time, 1);        //Consume resources for the first thread
-			if ( time == 25)
+			if ( time % 30 == 25 && current->tid ==2)
 			{
 				// only for thread 2
 				// 5% of times we emulate a syscall which blocks the thread and switch to another thread
