@@ -1,337 +1,714 @@
-<0><1><1><1><2><2><2><3><3><3><4><4><4><5><5><5><6><6><6><7><7><7><8><8><8><9><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><1><1>
-(Yield 1)
-<2><3><3><3><4><4><4><5><5><5><6><6><6><7><7><7><8><8><8><9><9><9>
-(Yield 0)
-<1><1><2><2><3>
-(Yield 3)
-<5><5><6><6><7><7><8><8><9><9><0><0><0><1><1><1>
-(Yield 2)
-<3><3><4><4><5>
-(Yield 5)
-<6><7><7><8><8><9><9><0><0><1><1><2><2><2><3><3>
-(Yield 4)
-<5><5><5><6>
-(Yield 6)
-<7><8><8><9><9><0><0><1><1><2><2><3><3><3><4><4><4><5><5><6><6><6>
-(Yield 7)
 
-(Yield 8)
-<9>
-(Yield 9)
-<0<1><1><2><2><3><3><4><4><5><5><6><6><7><7><7><8><8><8><9><9><9>><0><0>
-(Yield 1)
-<2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9>
-(Yield 0)
-<1><1><2><2><2><3><3><4><4><5><5><5><6><6><7><7><8><8><9><9><0><0><0><1><1>
-(Yield 2)
+Current Time: 0
+Next thread to run: 0
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(0,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(0,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(0,3) 
+<0,100>
+Current Time: 1
+Next thread to run: 1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(10,1) 
+Thread 1 ai:1 ci:2 ti:10 Replenishments (When,Hmuch):(0,1) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(0,3) 
+<1,101><1,102><1,103>
+Current Time: 2
+Next thread to run: 1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(10,1) 
+Thread 1 ai:2 ci:2 ti:10 Replenishments (When,Hmuch):(0,0) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(0,3) 
+<1,104><1,105>
+Current Time: 3
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(10,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(11,2) 
+Thread 2 ai:1 ci:3 ti:10 Replenishments (When,Hmuch):(0,2) 
+<2,102><2,103><2,104>
+Current Time: 4
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(10,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(11,2) 
+Thread 2 ai:2 ci:3 ti:10 Replenishments (When,Hmuch):(0,1) 
+<2,105><2,106>
+Current Time: 5
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(10,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(11,2) 
+Thread 2 ai:3 ci:3 ti:10 Replenishments (When,Hmuch):(0,0) 
+<2,107><2,108>
+Current Time: 6
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(10,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(11,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(13,3) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 7
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(10,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(11,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(13,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 8
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(10,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(11,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(13,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 9
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(10,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(11,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(13,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 10
+Next thread to run: 0
+Thread 0 ai:1 ci:1 ti:10 Replenishments (When,Hmuch):(10,0) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(11,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(13,3) 
+<0,101><0,102>
+Current Time: 11
+Next thread to run: 1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(20,1) 
+Thread 1 ai:1 ci:2 ti:10 Replenishments (When,Hmuch):(11,1) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(13,3) 
+<1,106><1,107>
+Current Time: 12
+Next thread to run: 1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(20,1) 
+Thread 1 ai:2 ci:2 ti:10 Replenishments (When,Hmuch):(11,0) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(13,3) 
+<1,108><1,109>
+Current Time: 13
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(20,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(21,2) 
+Thread 2 ai:1 ci:3 ti:10 Replenishments (When,Hmuch):(13,2) 
+<2,109><2,110>
+Current Time: 14
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(20,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(21,2) 
+Thread 2 ai:2 ci:3 ti:10 Replenishments (When,Hmuch):(13,1) 
+<2,111><2,112><2,113>
+Current Time: 15
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(20,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(21,2) 
+Thread 2 ai:3 ci:3 ti:10 Replenishments (When,Hmuch):(13,0) 
+<2,114><2,115>
+Current Time: 16
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(20,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(21,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(23,3) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 17
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(20,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(21,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(23,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 18
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(20,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(21,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(23,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 19
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(20,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(21,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(23,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 20
+Next thread to run: 0
+Thread 0 ai:1 ci:1 ti:10 Replenishments (When,Hmuch):(20,0) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(21,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(23,3) 
+<0,103><0,104><0,105>
+Current Time: 21
+Next thread to run: 1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(30,1) 
+Thread 1 ai:1 ci:2 ti:10 Replenishments (When,Hmuch):(21,1) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(23,3) 
+<1,110><1,111><1,112>
+Current Time: 22
+Next thread to run: 1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(30,1) 
+Thread 1 ai:2 ci:2 ti:10 Replenishments (When,Hmuch):(21,0) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(23,3) 
+<1,113><1,114>
+Current Time: 23
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(30,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(31,2) 
+Thread 2 ai:1 ci:3 ti:10 Replenishments (When,Hmuch):(23,2) 
+<2,116><2,117>
+Current Time: 24
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(30,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(31,2) 
+Thread 2 ai:2 ci:3 ti:10 Replenishments (When,Hmuch):(23,1) 
+<2,118><2,119>
+syscall happened
 
-(Yield 3)
-<4><4><5><5><6><6><6><7><7><8><8><9><9><0><0><1><1><2><2><2><3><3><3><4><4><5>
-(Yield 5)
-<7><7><7><8><8><8><9><9><9><0><0><1><1><1><2><2><3><3><4>
-(Yield 4)
-<5><6><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><4><5><5><6>
-(Yield 6)
-<8><8><9><9><0>
-(Yield 0)
+Current Time: 25
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(30,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(31,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(23,0) (32,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 26
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(30,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(31,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(23,0) (32,3) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 27
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(30,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(31,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(23,0) (32,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 28
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(30,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(31,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(23,0) (32,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 29
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(30,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(31,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(23,0) (32,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 30
+Next thread to run: 0
+Thread 0 ai:1 ci:1 ti:10 Replenishments (When,Hmuch):(30,0) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(31,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(23,0) (32,3) 
+<0,106><0,107>
+Current Time: 31
+Next thread to run: 1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(40,1) 
+Thread 1 ai:1 ci:2 ti:10 Replenishments (When,Hmuch):(31,1) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(23,0) (32,3) 
+<1,115><1,116>
+Current Time: 32
+Next thread to run: 1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(40,1) 
+Thread 1 ai:2 ci:2 ti:10 Replenishments (When,Hmuch):(31,0) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(23,0) (32,3) 
+<1,117><1,118>
+Current Time: 33
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(40,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(41,2) 
+Thread 2 ai:1 ci:3 ti:10 Replenishments (When,Hmuch):(23,0) (32,2) 
+<2,120><2,121>
+Current Time: 34
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(40,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(41,2) 
+Thread 2 ai:2 ci:3 ti:10 Replenishments (When,Hmuch):(23,0) (32,1) 
+<2,122><2,123><2,124>
+Current Time: 35
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(40,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(41,2) 
+Thread 2 ai:3 ci:3 ti:10 Replenishments (When,Hmuch):(23,0) (32,0) 
+<2,125><2,126>
+Current Time: 36
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(40,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(41,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(43,3) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 37
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(40,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(41,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(43,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 38
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(40,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(41,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(43,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 39
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(40,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(41,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(43,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 40
+Next thread to run: 0
+Thread 0 ai:1 ci:1 ti:10 Replenishments (When,Hmuch):(40,0) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(41,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(43,3) 
+<0,108><0,109>
+Current Time: 41
+Next thread to run: 1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(50,1) 
+Thread 1 ai:1 ci:2 ti:10 Replenishments (When,Hmuch):(41,1) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(43,3) 
+<1,119><1,120>
+Current Time: 42
+Next thread to run: 1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(50,1) 
+Thread 1 ai:2 ci:2 ti:10 Replenishments (When,Hmuch):(41,0) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(43,3) 
+<1,121><1,122><1,123>
+Current Time: 43
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(50,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(51,2) 
+Thread 2 ai:1 ci:3 ti:10 Replenishments (When,Hmuch):(43,2) 
+<2,127><2,128>
+Current Time: 44
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(50,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(51,2) 
+Thread 2 ai:2 ci:3 ti:10 Replenishments (When,Hmuch):(43,1) 
+<2,129><2,130>
+Current Time: 45
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(50,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(51,2) 
+Thread 2 ai:3 ci:3 ti:10 Replenishments (When,Hmuch):(43,0) 
+<2,131><2,132><2,133>
+Current Time: 46
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(50,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(51,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 47
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(50,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(51,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,3) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 48
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(50,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(51,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 49
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(50,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(51,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 50
+Next thread to run: 0
+Thread 0 ai:1 ci:1 ti:10 Replenishments (When,Hmuch):(50,0) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(51,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,3) 
+<0,110><0,111>
+Current Time: 51
+Next thread to run: 1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(60,1) 
+Thread 1 ai:1 ci:2 ti:10 Replenishments (When,Hmuch):(51,1) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,3) 
+<1,124><1,125>
+Current Time: 52
+Next thread to run: 1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(60,1) 
+Thread 1 ai:2 ci:2 ti:10 Replenishments (When,Hmuch):(51,0) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,3) 
+<1,126><1,127>
+Current Time: 53
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(60,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(61,2) 
+Thread 2 ai:1 ci:3 ti:10 Replenishments (When,Hmuch):(53,2) 
+<2,134><2,135>
+Current Time: 54
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(60,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(61,2) 
+Thread 2 ai:2 ci:3 ti:10 Replenishments (When,Hmuch):(53,1) 
+<2,136><2,137>
+syscall happened
 
-(Yield 1)
-<2><3><3><4><4><5><5><5><6><6><6><7><7><7><8><8><9><9>Done <0>!Done <1>!<2><2><3><3><3><4><4><5><5><6><6>
-(Yield 7)
+Current Time: 55
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(60,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(61,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,0) (62,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 56
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(60,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(61,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,0) (62,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 57
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(60,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(61,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,0) (62,3) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 58
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(60,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(61,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,0) (62,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 59
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(60,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(61,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,0) (62,3) 
+Doing nothing!!Doing nothing!!
+Current Time: 60
+Next thread to run: 0
+Thread 0 ai:1 ci:1 ti:10 Replenishments (When,Hmuch):(60,0) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(61,2) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,0) (62,3) 
+<0,112><0,113><0,114>
+Current Time: 61
+Next thread to run: 1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(70,1) 
+Thread 1 ai:1 ci:2 ti:10 Replenishments (When,Hmuch):(61,1) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,0) (62,3) 
+<1,128><1,129>
+Current Time: 62
+Next thread to run: 1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(70,1) 
+Thread 1 ai:2 ci:2 ti:10 Replenishments (When,Hmuch):(61,0) 
+Thread 2 ai:0 ci:3 ti:10 Replenishments (When,Hmuch):(53,0) (62,3) 
+<1,130><1,131><1,132>
+Current Time: 63
+Next thread to run: 2
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(70,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(71,2) 
+Thread 2 ai:1 ci:3 ti:10 Replenishments (When,Hmuch):(53,0) (62,2) 
+Done <2>!
+Current Time: 63
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(70,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(71,2) 
+Doing nothing!!Doing nothing!!
+Current Time: 64
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(70,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(71,2) 
+Doing nothing!!Doing nothing!!
+Current Time: 65
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(70,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(71,2) 
+Doing nothing!!Doing nothing!!
+Current Time: 66
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(70,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(71,2) 
+Doing nothing!!Doing nothing!!
+Current Time: 67
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(70,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(71,2) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 68
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(70,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(71,2) 
+Doing nothing!!Doing nothing!!
+Current Time: 69
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(70,1) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(71,2) 
+Doing nothing!!Doing nothing!!
+Current Time: 70
+Next thread to run: 0
+Thread 0 ai:1 ci:1 ti:10 Replenishments (When,Hmuch):(70,0) 
+Thread 1 ai:0 ci:2 ti:10 Replenishments (When,Hmuch):(71,2) 
+<0,115><0,116>
+Current Time: 71
+Next thread to run: 1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(80,1) 
+Thread 1 ai:1 ci:2 ti:10 Replenishments (When,Hmuch):(71,1) 
+<1,133>Done <1>!
+Current Time: 71
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(80,1) 
 
-(Yield 8)
-<9>
-(Yield 9)
-<3>
-(Yield 3)
-<4><5><5><6><6><7><7><7><8><8><8><0><1><1><1><2><2><2><3><3><3><4><4><4><5><5><5><6><6><6><7><7><7><8><8><8><9><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><0><1><1>
-(Yield 1)
-<2><3><3><3><4><4><4><5><5><5><6><6><6><7><7><7><8><8><8><9><9><9>
-(Yield 0)
-<1><1><2><2><3>
-(Yield 3)
-<5><5><6><6><7><7><8><8><9><9><0><0><0><1><1>
-(Yield 2)
-<3><3><4><4><5>
-(Yield 5)
-<6><7><7><8><8><9><9><0><0><1><1><2><2><2><3><3>
-(Yield 4)
-<5><5><5><6>
-(Yield 6)
-<7><8><8><9><9><0><0><1><1><1><2><2><3><3><3><4><4><4><5><5><6><6><6>
-(Yield 7)
-
-(Yield 8)
-<9>
-(Yield 9)
-<1><1><2><2><3><3><4><4><5><5><6><6><7><7><7><8><8><8><9><9><9><0><0><0>
-(Yield 1)
-<2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9>
-(Yield 0)
-<1><1><2><2><3><3><4><4><5><5><5><6><6><7><7><8><8><9><9><0><0><0><1><1><2>
-(Yield 2)
-
-(Yield 3)
-<4><5><5><6><6><6><7><7><8><8><9><9><0><0><1><1><2><2><2><3><3><3><4><4><5>
-(Yield 5)
-<7><7><7><8><8><8><9><9><9><0><0><1><1><1><2><2><3><3><4><4>
-(Yield 4)
-<5><6><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><4><5><5><6>
-(Yield 6)
-<8><8><9><9><0>
-(Yield 0)
-
-(Yield 1)
-<2><3><3><4><4><5><5><6><6><6><7><7><7><8><8><9><9>Done <0>!Done <1>!<2><2><3><3><3><4><4><5><5><6><6>
-(Yield 7)
-
-(Yield 8)
-<9>
-(Yield 9)
-<3>
-(Yield 3)
-<4><5><5><5><6><6><7><7><7><8><8><8><0><1><1><1><2><2><2><3><3><3><4><4><4><5><5><5><6><6><6><7><7><7><8><8><8><9><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><0><1><1>
-(Yield 1)
-<2><3><3><3><4><4><4><5><5><5><6><6><6><7><7><7><8><8><8><9><9><9>
-(Yield 0)
-<1><1><2><2><3>
-(Yield 3)
-<5><5><6><6><7><7><8><8><9><9><0><0><0><1><1>
-(Yield 2)
-<3><3><4><4><5>
-(Yield 5)
-<6><7><7><8><8><9><9><0><0><1><1><2><2><2><3><3>
-(Yield 4)
-<5><5><5><6>
-(Yield 6)
-<7><8><8><9><9><0><0><1><1><1><2><2><3><3><3><4><4><4><5><5><6><6><6>
-(Yield 7)
-
-(Yield 8)
-<9>
-(Yield 9)
-<1><1><2><2><3><3><4><4><5><5><6><6><7><7><7><8><8><8><9><9><9><0><0><0>
-(Yield 1)
-<2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9>
-(Yield 0)
-<1><1><2><2><3><3><4><4><5><5><5><6><6><7><7><8><8><9><9><0><0><0><1><1><2>
-(Yield 2)
-
-(Yield 3)
-<4><5><5><6><6><6><7><7><8><8><9><9><0><0><1><1><2><2><2><3><3><3><4><4><5>
-(Yield 5)
-<7><7><7><8><8><8><9><9><9><0><0><1><1><1><2><2><3><3><4><4>
-(Yield 4)
-<5><6><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><4><5><5><6>
-(Yield 6)
-<8><8><9><9><0>
-(Yield 0)
-
-(Yield 1)
-<2><3><3><4><4><5><5><6><6><6><7><7><7><8><8><9><9>Done <0>!Done <1>!<2><2><3><3><3><4><4><5><5><6><6>
-(Yield 7)
-
-(Yield 8)
-<9>
-(Yield 9)
-<3>
-(Yield 3)
-<4><5><5><5><6><6><7><7><7><8><8><8><0><1><1><1><2><2><2><3><3><3><4><4><4><5><5><5><6><6><6><7><7><7><8><8><8><9><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><0><1><1>
-(Yield 1)
-<2><3><3><3><4><4><4><5><5><5><6><6><6><7><7><7><8><8><8><9><9><9>
-(Yield 0)
-<1><1><2><2><3>
-(Yield 3)
-<5><5><6><6><7><7><8><8><9><9><0><0><0><1><1>
-(Yield 2)
-<3><3><4><4><5>
-(Yield 5)
-<6><7><7><8><8><9><9><0><0><1><1><2><2><2><3><3>
-(Yield 4)
-<5><5><5><6>
-(Yield 6)
-<7><8><8><9><9><0><0><1><1><1><2><2><3><3><3><4><4><4><5><5><6><6><6>
-(Yield 7)
-
-(Yield 8)
-<9>
-(Yield 9)
-<0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><7><8><8><8><9><9><9><0><0>
-(Yield 1)
-<2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9>
-(Yield 0)
-<1><1><2><2><3><3><4><4><5><5><5><6><6><7><7><8><8><9><9><0><0><0><1><1><2>
-(Yield 2)
-
-(Yield 3)
-<4><5><5><6><6><6><7><7><8><8><9><9><0><0><1><1><1><2><2><2><3><3><3><4><4><4><5>
-(Yield 5)
-<7><7><7><8><8><8><9><9><9><0><0><1><1><2><2><3><3><4>
-(Yield 4)
-<5><6><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><4><5><5><6>
-(Yield 6)
-<8><8><9><9><0>
-(Yield 0)
-
-(Yield 1)
-<2><3><3><4><4><5><5><6><6><6><7><7><7><8><8><9><9>Done <0>!Done <1>!<2><2><3><3><3><4><4><5><5><6><6>
-(Yield 7)
-
-(Yield 8)
-<9>
-(Yield 9)
-<3>
-(Yield 3)
-<4><5><5><5><6><6><7><7><7><8><8><8><0><1><1><1><2><2><2><3><3><3><4><4><4><5><5><5><6><6><6><7><7><7><8><8><8><9><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><0><1><1>
-(Yield 1)
-<2><3><3><3><4><4><4><5><5><5><6><6><6><7><7><7><8><8><8><9><9><9>
-(Yield 0)
-<1><1><2><2><3>
-(Yield 3)
-<5><5><6><6><7><7><8><8><9><9><0><0><0><1><1>
-(Yield 2)
-<3><3><4><4><5>
-(Yield 5)
-<6><7><7><8><8><9><9><0><0><1><1><2><2><2><3><3>
-(Yield 4)
-<5><5><5><6>
-(Yield 6)
-<7><8><8><9><9><0><0><1><1><1><2><2><3><3><3><4><4><4><5><5><6><6><6>
-(Yield 7)
-
-(Yield 8)
-<9>
-(Yield 9)
-<1><1><2><2><3><3><4><4><5><5><6><6><7><7><7><8><8><8><9><9><9><0><0><0>
-(Yield 1)
-<2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9>
-(Yield 0)
-<1><1><2><2><3><3><4><4><5><5><5><6><6><7><7><8><8><9><9><0><0><0><1><1><2>
-(Yield 2)
-
-(Yield 3)
-<4><5><5><6><6><6><7><7><8><8><9><9><0><0><1><1><2><2><2><3><3><3><4><4><5>
-(Yield 5)
-<7><7><7><8><8><8><9><9><9><0><0><1><1><1><2><2><3><3><4><4>
-(Yield 4)
-<5><6><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><4><5><5><6>
-(Yield 6)
-<8><8><9><9><0>
-(Yield 0)
-
-(Yield 1)
-<2><3><3><4><4><5><5><6><6><6><7><7><7><8><8><9><9>Done <0>!Done <1>!<2><2><3><3><3><4><4><5><5><6><6>
-(Yield 7)
-
-(Yield 8)
-<9>
-(Yield 9)
-<3>
-(Yield 3)
-<4><5><5><5><6><6><7><7><7><8><8><8><0><1><1><1><2><2><2><3><3><3><4><4><4><5><5><5><6><6><6><7><7><7><8><8><8><9><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><0><1><1>
-(Yield 1)
-<2><3><3><3><4><4><4><5><5><5><6><6><6><7><7><7><8><8><8><9><9><9>
-(Yield 0)
-<1><1><2><2><3>
-(Yield 3)
-<5><5><6><6><7><7><8><8><9><9><0><0><0><1><1>
-(Yield 2)
-<3><3><4><4><5>
-(Yield 5)
-<6><7><7><8><8><9><9><0><0><1><1><2><2><2><3><3>
-(Yield 4)
-<5><5><5><6>
-(Yield 6)
-<7><8><8><9><9><0><0><1><1><1><2><2><3><3><3><4><4><4><5><5><6><6><6>
-(Yield 7)
-
-(Yield 8)
-<9>
-(Yield 9)
-<0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><7><8><8><8><9><9><9><0><0>
-(Yield 1)
-<2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9>
-(Yield 0)
-<1><1><2><2><3><3><4><4><5><5><5><6><6><7><7><8><8><9><9><0><0><0><1><1><2>
-(Yield 2)
-
-(Yield 3)
-<4><5><5><6><6><6><7><7><8><8><9><9><0><0><1><1><1><2><2><2><3><3><3><4><4><5>
-(Yield 5)
-<7><7><7><8><8><8><9><9><9><0><0><1><1><2><2><3><3><4><4>
-(Yield 4)
-<5><6><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><4><5><5><6>
-(Yield 6)
-<8><8><9><9><0>
-(Yield 0)
-
-(Yield 1)
-<2><3><3><4><4><5><5><6><6><6><7><7><7><8><8><9><9>Done <0>!Done <1>!<2><2><3><3><3><4><4><5><5><6><6>
-(Yield 7)
-
-(Yield 8)
-<9>
-(Yield 9)
-<3>
-(Yield 3)
-<4><5><5><5><6><6><7><7><7><8><8><8><0><1><1><1><2><2><2><3><3><3><4><4><4><5><5><5><6><6><6><7><7><7><8><8><8><9><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9><0><0><0><1><1>
-(Yield 1)
-<2><3><3><3><4><4><4><5><5><5><6><6><6><7><7><7><8><8><8><9><9><9>
-(Yield 0)
-<1><1><2><2><3>
-(Yield 3)
-<5><5><6><6><7><7><8><8><9><9><0><0><0><1><1>
-(Yield 2)
-<3><3><4><4><5>
-(Yield 5)
-<6><7><7><8><8><9><9><0><0><1><1><2><2><2><3><3>
-(Yield 4)
-<5><5><5><6>
-(Yield 6)
-<7><8><8><9><9><0><0><1><1><1><2><2><3><3><3><4><4><4><5><5><6><6><6>
-(Yield 7)
-
-(Yield 8)
-<9>
-(Yield 9)
-<0><1><1><2><2><3><3><4><4><5><5><6><6><7><7><7><8><8><8><9><9><9><0><0>
-(Yield 1)
-<2><2><3><3><4><4><5><5><6><6><7><7><8><8><9><9>
-(Yield 0)
-<1><1><2><2><3><3><4><4><5><5><5><6><6><7><7><8><8><9><9><0><0><0><1><1><2>
-(Yield 2)
-
-(Yield 3)
-<4><5><5><6><6><6><7><7><8><8><9><9><0><0><1><1><1><2><2><2><3><3><3><4><4><5>
-(Yield 5)
-<7><7><7><8><8><8><9><9><9><0><0><1><1><2><2><3><3><4><4>
-(Yield 4)
-<5><6><6><7><7><8><8><9><9><0><0><1><1><2><2><3><3><4><4><4><5><5><6><6>
-(Yield 6)
-<8><8><9><9><0>
-(Yield 0)
-
-(Yield 1)
-<2><3><3><4><4><5><5><6><6><6><7><7><8><8><9><9>Done <0>!Done <1>!<2><2><3><3><3><4><4><5><5><6><6><7>
-(Yield 7)
-
-(Yield 8)
-<9><2><2><3>
-(Yield 3)
-<4><5><5><5><6><6><7><7><7><8><8><8>
-(Yield 9)
-
-(Yield 2)
-Done <3>!<4><4><5><5><6><6><7><7><8><8><9><9><9>Done <2>!<4><4><5><5><6><6><6><7><7><8><8><9><9><4><4><5>
-(Yield 5)
-<7><7><8><8><9><9>
-(Yield 4)
-Done <5>!<6><6><7><7><7><8><8><8><9><9>Done <4>!<6><6><7><7><8><8><9><9><9>
-(Yield 6)
-<7><7><8><8><9><9>Done <6>!<7>
-(Yield 7)
-<8><9><9>Done <7>!<8>
-(Yield 8)
-<9>Done <8>!<9><9>
-(Yield 9)
-Done <9>!All threads done...Bye!!
+Current Time: 72
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(80,1) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 73
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(80,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 74
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(80,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 75
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(80,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 76
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(80,1) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 77
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(80,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 78
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(80,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 79
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(80,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 80
+Next thread to run: 0
+Thread 0 ai:1 ci:1 ti:10 Replenishments (When,Hmuch):(80,0) 
+<0,117><0,118>
+Current Time: 81
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(90,1) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 82
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(90,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 83
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(90,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 84
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(90,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 85
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(90,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 86
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(90,1) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 87
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(90,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 88
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(90,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 89
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(90,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 90
+Next thread to run: 0
+Thread 0 ai:1 ci:1 ti:10 Replenishments (When,Hmuch):(90,0) 
+<0,119><0,120>
+Current Time: 91
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(100,1) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 92
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(100,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 93
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(100,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 94
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(100,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 95
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(100,1) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 96
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(100,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 97
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(100,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 98
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(100,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 99
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(100,1) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 100
+Next thread to run: 0
+Thread 0 ai:1 ci:1 ti:10 Replenishments (When,Hmuch):(100,0) 
+<0,121><0,122><0,123>
+Current Time: 101
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(110,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 102
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(110,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 103
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(110,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 104
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(110,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 105
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(110,1) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 106
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(110,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 107
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(110,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 108
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(110,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 109
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(110,1) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 110
+Next thread to run: 0
+Thread 0 ai:1 ci:1 ti:10 Replenishments (When,Hmuch):(110,0) 
+<0,124><0,125>
+Current Time: 111
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(120,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 112
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(120,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 113
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(120,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 114
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(120,1) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 115
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(120,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 116
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(120,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 117
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(120,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 118
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(120,1) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 119
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(120,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 120
+Next thread to run: 0
+Thread 0 ai:1 ci:1 ti:10 Replenishments (When,Hmuch):(120,0) 
+<0,126><0,127>
+Current Time: 121
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(130,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 122
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(130,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 123
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(130,1) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 124
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(130,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 125
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(130,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 126
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(130,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 127
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(130,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 128
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(130,1) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 129
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(130,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 130
+Next thread to run: 0
+Thread 0 ai:1 ci:1 ti:10 Replenishments (When,Hmuch):(130,0) 
+<0,128><0,129>
+Current Time: 131
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(140,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 132
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(140,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 133
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(140,1) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 134
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(140,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 135
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(140,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 136
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(140,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 137
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(140,1) 
+Doing nothing!!Doing nothing!!Doing nothing!!
+Current Time: 138
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(140,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 139
+Next thread to run: -1
+Thread 0 ai:0 ci:1 ti:10 Replenishments (When,Hmuch):(140,1) 
+Doing nothing!!Doing nothing!!
+Current Time: 140
+Next thread to run: 0
+Thread 0 ai:1 ci:1 ti:10 Replenishments (When,Hmuch):(140,0) 
+Done <0>!Done with all the threads!! Bye!

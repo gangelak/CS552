@@ -106,7 +106,9 @@ void thread_func()
 {
 	int i;
 	int j = 0;
+	int cnt = current->tid + 100;
 	char name[10];
+	char counter[50];
 	itoa(name,'d',current->tid);
 
 	/*print_s("Executing Thread <");*/
@@ -120,7 +122,11 @@ void thread_func()
 		{
 			print_s ("<");
 			print_s (name);
+			print_s(",");
+			itoa(counter,'d',cnt);
+			print_s(counter);
 			print_s (">");
+			cnt++;
 			sleep();
 		}
 #ifndef PCR
