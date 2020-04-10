@@ -320,6 +320,14 @@ void schedule ()
 
 		// Check for the current threads resources -> Can it continue to run?
 		if (still_has_resources(current, time, 1) == 1){
+			if ( time % 20 == 15  & current->tid == 2)
+			{
+				// only for thread 2
+				// 5% of times we emulate a syscall which blocks the thread and switch to another thread
+//				add_resources(current, time+current->ti - current->ai, current->ai);
+				print_s("\nsyscall happened\n");
+				goto syscall_emul;
+			}
 //			remove_resources(current, time, current->ai);
 			current->ai++; 					//Increment the used resources
 			remove_resources(current, time, 1);        //Consume resources for the first thread
@@ -327,11 +335,11 @@ void schedule ()
 		// The thread has not any more resources to run -> it must switch
 		else{
 			// Case we are coming from a running thread
+syscall_emul:
 
 			clear_zeroed_repls(current);
 			
 			if (current->ai > 0){
-
 				// We must add these resources to its next period and then switch
 				add_resources(current, time + current->ti - current->ai, current->ai);
 				// We must also remove the resources from its replenishment list
