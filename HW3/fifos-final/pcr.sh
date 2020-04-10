@@ -2,4 +2,4 @@
 
 make clean
 make pcr
-qemu-system-i386 -m 128 -kernel fifos -curses -serial file:output
+qemu-system-i386 -m 128 -kernel fifos -serial file:output
