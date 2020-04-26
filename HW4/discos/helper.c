@@ -67,14 +67,22 @@ void pad(char* str)
  str = padded;
 }
 
-
-void memset(uint32_t *buf, uint32_t num, uint32_t size){
-	uint32_t i;
-	for (i =0; i < size; i++){
-		buf[i] = num;
-	}
-
-	return;
+void memset(void *s, int c, size_t n)
+{
+    unsigned char* p=s;
+    while(n--)
+        *p++ = (unsigned char)c;
+   // return s;
 }
+
+
+/*void memset(uint32_t *buf, uint32_t num, uint32_t size){*/
+	/*uint32_t i;*/
+	/*for (i =0; i < size; i++){*/
+		/*buf[i] = num;*/
+	/*}*/
+
+	/*return;*/
+/*}*/
 
 

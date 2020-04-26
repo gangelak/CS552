@@ -123,11 +123,14 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	/* Initialize 8254 PIT */
 	 /*init_pit();*/
 
+	/* Initialize file system */
+	//init_mem();
+
 	/* Creating autostarting threads */
-
-
 //	print_s("Creating Threads!!!\n");
 	/*init_threads();*/
+	
+
 
 	/*schedule();*/
 	return ;

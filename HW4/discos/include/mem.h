@@ -4,12 +4,17 @@
 #include "types.h"
 
 
-#define MAX_PARTITION_SIZE_MB 2
-#define BLOCK_SIZE 256
+#define MAX_PART_SZ_MB 2
+#define BLK_SZ 256
 #define INDEX_NODE_ARRAY 256
 #define INODE_SIZE 64
 #define BITMAP_SIZE 1024
+#define MAX_FILES 1023
 #define MAX_FILE_SIZE 1067008 
+#define DIRECT 8		/* Direct pointers in location attribute */
+#define PTR_SZ 4		/* 32-bit [relative] addressing */
+#define PTRS_PB  (BLK_SZ / PTR_SZ) /* Pointers per index block */
+
 
 /*TODO*/
 /* Create a partition superstruct that contains:
@@ -19,6 +24,17 @@
  *
  */
 
+typedef struct block_t{
+	uint8_t data_byte[256];
+}block;
+
+
+typedef struct directory{
+	char filename[14]; 		//Directory name
+	uint16_t inode_num; 		//Index into the inode array
+}dir;
+
+
 typedef struct superblock{
 	int block_num;
 	int free_indx;
@@ -27,25 +43,25 @@ typedef struct superblock{
 }sblock;
 
 
+typedef struct index_node{
+	uint32_t type;   		//File type (dir or reg)
+	uint32_t size; 			//File size in bytes
+	uint32_t location[10]; 		//Block pointers (1st 8 are direct data block pts - 9nth single indirect - 10nth double indirect)
+	uint32_t perm; 			//Permissions for the files (RO,WR,RW)
+	uint8_t pad[12];
+}indx_node;
+
 
 
 typedef struct partition{
-	sblock supblock;
+	sblock supblock; 		//256 bytes
+	indx_node inode[1024]; 		//256 blocks * 256 bytes/block / 64 bytes/inode = 1024 inodes
+	uint8_t bitmap[1024]; 		//4 blocks * 256 bytes/block = 1024 bytes
+	block d_blks[7931]; 		//(2MB - (256 + 256*256 + 1024)) / 256
+}pt;
 
-}
+pt *fs; 				//Our partition
 
-
-
-int rd_creat(char *pathname, mode_t mode);
-int rd_mkdir(char *pathname);
-int rd_open(char *pathname, int flags);
-int rd_close(int fd);
-int rd_read(int fd, char *address, int num_bytes);
-int rd_write(int fd, char *address, int num_bytes);
-int rd_lseek(int fd, int offset);
-int rd_unlink(char *pathname);
-int rd_chmod(char *pathname, mode_t mode);
-
-
+dir *root; 				//Root directory
 
 #endif

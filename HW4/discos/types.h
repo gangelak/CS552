@@ -10,7 +10,7 @@ typedef signed char sint8, s8;
 typedef signed short int sint16, s16;
 typedef signed long int sint32, s32;
 typedef signed long long int sint64, s64;
-
+typedef int mode_t;
 
 
 #ifndef _SIZE_T
@@ -62,9 +62,20 @@ struct replenish{
 	int hmuch;
 	int in_use;
 };
+
+
+typedef struct file_object{
+	int flags;
+	void *ps_ptr;
+	void *inode_ptr;
+} file_obj;
+
+
 #ifdef PCR
 typedef struct replenish rpl;
 #endif
+
+
 struct proc_crtl_block{
 	int tid;
 	uint32_t bp;
@@ -83,6 +94,11 @@ struct proc_crtl_block{
 	int ti; // Period of T_i
 	
 #endif
+
+#ifdef MEM
+	struct file_obj;
+#endif
+
 };
 typedef struct proc_crtl_block pcb;
 

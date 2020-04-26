@@ -25,7 +25,8 @@ void put(unsigned char);
 
 void print(char *);
 
-void memset(uint32_t *, uint32_t, uint32_t );
+void memset(void *s, int c, size_t n);
+
 
 //static inline void outb( unsigned char, unsigned short);
 //static inline unsigned char inb( unsigned short);
