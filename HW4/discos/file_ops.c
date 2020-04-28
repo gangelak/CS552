@@ -1,15 +1,78 @@
 #include "include/mem.h"
 #include "include/file_ops.h"
+#include "helper.h"
+#include "vga.h"
 
 
 
-int rde_creat(char *pathname, mode_t mode){
-;
+int check_pathname(char *pathname, char *filename);
+int exist_inodes(void);
+int update_parent(int parent_inode,char *filename, int action);
+
+
+/*TODO*/
+// Need one function to recurse through the pathnames
+// Need one function to recurse through the inodes
+// Need one strcmp function to compare string names
+
+
+
+
+// Create a file or a directory
+// TODO: Check if the path name exists
+// 	 Check if there are available inodes
+// 	 Check if there is at least one available block
+int rd_creat(char *pathname, mode_t mode){
+	
+	int res = 0;
+	char filename[14];
+	int parent_inode;
+	//Check if we are trying to create the root directory
+	if (strcmp(pathname,root->filename) == 0){
+		print_s("Root directory already exists!!!");
+		return ERROR;
+	}
+	
+	//Check if there are available inodes for our file
+	
+	res = exist_inodes();
+	
+	if (res < 0){
+		print_s("There are no available inodes...Try later, sorry\n");
+		return ERROR;
+	}
+
+	parent_inode = check_pathname(pathname,filename);
+	
+	if (parent_inode < 0){
+		print_s("Invalid path...Aborting\n");
+		return ERROR;
+	}
+
+	//Ok now we have the correct parent...Allocate resources for the file
+	//Also update the parent entry
+	
+	res = update_parent(parent_inode,filename, CR);
+	if (res < 0){
+		print_s("Cannot create a new entry for this file...Aborting\n");
+		return ERROR;
+	}
+
 }
 
 
 int rd_mkdir(char *pathname){
-;
+	int res = 0;
+
+	//Check if we are trying to create the root directory
+	if (strcmp(pathname,root->filename) == 0){
+		print_s("Root directory already exists!!!");
+		return ERROR;
+	}
+
+
+	res = check_pathname(pathname);
+
 }
 
 int rd_open(char *pathname, int flags){
@@ -37,6 +100,190 @@ int rd_unlink(char *pathname){
 ;	
 }
 
-int rd_cmmod(char *pathname, mode_t mode){
+int rd_chmod(char *pathname, mode_t mode){
 ;	
 }
+
+int next_block(int block_num, block_t *cur_block, int par_inode){
+	//We reached the blocks limit for a single inode 
+	if (block_num == MAX_INODE_BLOCKS - 1){
+		print_s("We reached the max number of blocks for this inode...\n");
+		return ERROR;
+	}
+
+	block_num++;
+	if(block_num <= 7){
+		cur_block = (block_t*) fs->inode[par_inode].location[block_num];
+		return block_num;
+	}
+	//First indirection
+	else if (block_num <= 71){
+		block_t *indirect = (block_t*) fs->inode[par_inode].location[8];
+		cur_block = (block_t*) &indirect[block_num - 8];
+		return block_num;
+	}
+	//Second indirection
+	else if (block_num <= MAX_INODE_BLOCKS - 1){
+		int ind_1 = (block_num - 72) / 64;
+		int ind_2 = (block_num - 72) % 64;
+		block_t *indirect_1 = fs->inode[par_inode].location[9];
+		block_t *indirect_2 = &indirect_1[ind_1];
+		cur_block = (block_t*) &indirect_2[ind_2];
+		return block_num;
+	}
+}
+
+// Check if the File/Dir with name exist under parent with inode par_inode
+int check_if_exists(char *name,int par_inode, int type){
+	
+	/*TODO*/
+	// Maybe add a check if the parent is full or not
+	// Because maybe we cannot add the new entry to parent even if there 
+	// is space for it in general (inodes, blocks)
+
+	//Case where the parent inode is a file
+	if(fs->inode[par_inode].type == FL){
+		print_s("The parent is a regular file...Invalid path!\n");
+		return ERROR;
+	}
+	// The parent is empty so the file/dir definitely does not exist
+	if(fs->inode[par_inode].size == 0){
+		return JUNK;
+	}
+
+	//We have to search in the parent if the file exists or not
+	block_t *cur_block;
+	cur_block = (block_t*) fs->inode[par_inode].location[0]; 	//Start from parent's first block
+	int block_num = JUNK;      					//First block (will help with indirections)
+
+	while (block_num != -1){
+		for (int i = 0; i < 16; i++){
+			//The file/dir we are looking for exists in this block...Yay!
+			if (strcmp(((char*)&cur_block[i * 16]), name) == 0){
+				print_s("File found!\n");
+				dir_t *entry;  					//Temporary entry struct to extract the inode num
+				entry = (dir_t*) &cur_block[i * 16];
+				return (int) entry->inode_num; 			//Return the inode number
+			}
+		}
+		block_num = next_block(block_num,cur_block,par_inode);
+	}
+
+	return ERROR;
+}
+
+
+int check_pathname(char *pathname, char *filename){
+	int par_inode = 0; 		// Start from the root inode
+	int status = 1;
+	int path_len;
+	path_len = strlen(pathname);
+
+	if (pathname[0] != '/'){
+		print_s("Pathnames must start with /...Abort!\n");
+		return ERROR;
+	}
+	
+	//Only '/' in pathname
+	if (path_len == 1){
+		print_s("Cannot create nor delete root...Abort!\n");
+		return ERROR;
+	}
+
+	
+	//Get the length of the path to know if we are at the end...
+
+	int name_finish = 1;
+	int final = 0 ; 		//Flag to check if we are at the last name or not
+
+	while (final != 1 && status != ERROR){
+		/* First get every directory in the path and check if they exist */
+		int type = 0; 			//type 0 = regular file  and 1 = directory
+		char temp_name[14];
+		int i = 0;
+		while(pathname[name_finish] != '/' && pathname[name_finish] != '\0'){
+			temp_name[i] = pathname[name_finish];
+			name_finish++;
+			i++;
+		}
+		
+		if (name_finish == path_len - 1){
+			final = 1;
+			filename = temp_name;
+		}
+
+		//This is a directory name
+		if (pathname[name_finish] == '/'){
+			type = 1;
+			temp_name[i] = '\0'; 		//Null terminator for name
+		}
+		else
+			type = 0; 		//No need for this type was already 0
+		
+		//Check if the file exists and return its inode if it exists else ERROR
+		par_inode = check_if_exists(temp_name,par_inode,type);
+		
+		//Case that the name requested does not exist yay
+		if (par_inode == ERROR && final == 1){
+			print_s("The path is valid and the file does not exist\n");
+			return par_inode;
+			
+		}
+		// This is a problem...A directory in the path does not exist
+		else if (par_inode == ERROR && final == 0){
+			print_s("The path does not exist\n");
+			return ERROR;
+		}
+		// The file/dir that we requested already exists...Return ERROR
+		else if (par_inode != ERROR && final == 1) {
+			print_s("The file that you requested already exists!\n");
+			return ERROR;
+		}
+
+
+	}
+	return ERROR;
+
+	
+}
+
+
+//We got the parent inode and the filename
+int update_parent(int parent_inode, char* filename, int action){
+	//Depending on the parent's size we can find the correct location pointer
+	//No space left in the parent
+	if (fs->inode[parent_inode].size == MAX_FILE_SIZE){
+		print_s("Parent has no space for a new entry\n");
+		return ERROR;
+	}
+	
+	//If we want to create something the search is smoother
+	if (action == CR){
+		//First we find how many blocks the parent has, then based on the block
+		//number we find which location pointer to use
+		int block_num = fs->inode[parent_inode].size / 256; 	//Last used block number
+		int offset = fs->inode[parent_inode].size % 256;  	//Offset in the last block number
+		// We are in the first direct pointers Yay!!!
+		
+		dir_t *temp_dir; 					//Temp pointer to update smth
+		if (block_num <= 7 ){
+			temp_dir = (dir_t*) (&(fs->inode[parent_inode].location[block_num]) + offset);
+			temp_dir->filename = strncpy(temp_dir->filename,filename,14);
+			temp_dir->size = 0;
+		}
+
+	}
+}
+
+
+int exist_inodes(void){
+	
+	if (fs->superblock.free_inodes > 0)
+		return TRUE;
+	else{
+		return FALSE;
+	}
+	
+}
+
+

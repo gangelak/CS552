@@ -75,6 +75,50 @@ void memset(void *s, int c, size_t n)
    // return s;
 }
 
+int strcmp(char string1[], char string2[] )
+{
+    for (int i = 0; ; i++)
+    {
+        if (string1[i] != string2[i])
+        {
+            return string1[i] < string2[i] ? -1 : 1;
+        }
+
+        if (string1[i] == '\0')
+        {
+            return 0;
+        }
+    }
+}
+
+//https://www.techiedelight.com/implement-strncpy-function-c/
+char* strncpy(char* destination, const char* source, size_t num)
+{
+    // return if no memory is allocated to the destination
+    if (destination == 0)
+        return 0;
+ 
+    // take a pointer pointing to the beginning of destination string
+    char* ptr = destination;
+ 
+    // copy first num characters of C-string pointed by source
+    // into the array pointed by destination
+    while (*source && num--)
+    {
+        *destination = *source;
+        destination++;
+        source++;
+    }
+ 
+    // null terminate destination string
+    *destination = '\0';
+ 
+    // destination is returned by standard strncpy()
+    return ptr;
+}
+
+
+
 
 /*void memset(uint32_t *buf, uint32_t num, uint32_t size){*/
 	/*uint32_t i;*/

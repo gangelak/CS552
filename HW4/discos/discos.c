@@ -5,6 +5,8 @@
 #include "schedule.h"
 #include "types.h"
 #include "pic.h"
+#include "mem.h"
+#include "file_ops.h"
 /*
 	Store the usable memory regions in an array for
 	future use. Used the same methodology as memos-2
@@ -84,9 +86,8 @@ void init_pit(void)
 
 
 void kmain (multiboot_info_t* mbt, unsigned long magic) {
-	int avail_regs;          // # of available memory regions
+	int avail_regs, indx;          // # of available memory regions
 	unsigned long avail_mem;
-
 
 	if (mbt->flags & 0b1000000){
 		mmap_entry_t* ent = (mmap_entry_t*) mbt->mmap_addr;
@@ -106,15 +107,21 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 		/*itoa(buf,'x',end_addr[i]);*/
 		/*print_s(buf);*/
 		/*print_s("\n");*/
-		/*avail_mem = end_addr[i] - base_addr[i];*/
+		avail_mem = end_addr[i] - base_addr[i];
 
 		if (((avail_mem >> 20) & 0xfff) >= 2){
 			print_s("Found avail mem at ");
+			indx = i;
 			itoa(buf,'d',i);
 			print_s(buf);
 			print_s("\n");
+			break;
 		}
 	}
+
+	init_mem(base_addr[indx]);
+
+
 	asm volatile("hlt");
 
 	/* Initialize 8259 PIC */

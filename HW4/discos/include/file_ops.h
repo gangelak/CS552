@@ -8,6 +8,14 @@
 
 #define DR 1
 #define FL 2
+#define USED 1
+#define FREE 0
+#define ERROR -1
+#define EMPTY_DIR 
+#define JUNK 2000
+#define CR 0 		//Create a file/dir
+#define DL 1 		//Delete a file/dir
+
 
 int rde_creat(char *pathname, mode_t mode);
 int rd_mkdir(char *pathname);
