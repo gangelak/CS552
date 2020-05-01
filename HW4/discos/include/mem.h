@@ -53,7 +53,8 @@ typedef struct index_node{
 	uint32_t size; 			//File size in bytes
 	block_t *location[10]; 		//Block pointers (1st 8 are direct data block pts - 9nth single indirect - 10nth double indirect)
 	uint32_t perm; 			//Permissions for the files (RO,WR,RW)
-	uint8_t pad[12];
+	uint8_t in_use;
+	uint8_t pad[11];
 }inode_t;
 
 

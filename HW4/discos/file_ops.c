@@ -7,8 +7,8 @@
 
 int check_pathname(char *pathname, char *filename);
 int exist_inodes(void);
-int update_parent(int parent_inode,char *filename, int action);
-
+int update_parent(int parent_inode,char *filename, int action, uint32_t type, uint32_t mode);
+int allocate_block(void);
 
 /*TODO*/
 // Need one function to recurse through the pathnames
@@ -52,7 +52,7 @@ int rd_creat(char *pathname, mode_t mode){
 	//Ok now we have the correct parent...Allocate resources for the file
 	//Also update the parent entry
 	
-	res = update_parent(parent_inode,filename, CR);
+	res = update_parent(parent_inode,filename, CR, FL, mode);
 	if (res < 0){
 		print_s("Cannot create a new entry for this file...Aborting\n");
 		return ERROR;
@@ -71,7 +71,7 @@ int rd_mkdir(char *pathname){
 	}
 
 
-	res = check_pathname(pathname);
+	//res = check_pathname(pathname);
 
 }
 
@@ -106,7 +106,7 @@ int rd_chmod(char *pathname, mode_t mode){
 
 int next_block(int block_num, block_t *cur_block, int par_inode){
 	//We reached the blocks limit for a single inode 
-	if (block_num == MAX_INODE_BLOCKS - 1){
+	if (block_num == MAX_INODE_BLOCKS){
 		print_s("We reached the max number of blocks for this inode...\n");
 		return ERROR;
 	}
@@ -247,9 +247,56 @@ int check_pathname(char *pathname, char *filename){
 	
 }
 
+int allocate_inode(uint32_t type, uint32_t permissions){
+	/*Loop through the inode array to see if there are free inodes*/
+	int ret = ERROR;
+	int blk_num;
+	for (int i = 1; i <= MAX_FILES; i++){
+		if (fs->inode[i].in_use == 0){
+			ret = i;
+			blk_num = allocate_block();
+
+			if (blk_num < 0){
+				print_s("There is no block available...Aborting\n");
+				return ERROR;
+			}
+			fs->inode[i].type = type;
+			fs->inode[i].size = 0;
+			fs->inode[i].location[0] = &fs->d_blks[blk_num];
+			fs->inode[i].perm = permissions;
+			fs->superblock.free_inodes--;
+			return ret;
+		}
+	}
+	return ret;
+}
+
+int allocate_block(void){
+	int block_num ;
+	uint8_t *bmap_ptr;
+	int bit;
+	//The first 32 * 8 = 256 blocks are allocated for the superblock inodes
+	//It is actually the first 261 blocks, so we need to start from index 32
+	//in the bitmap cause there are some unmapped blocks in that byte
+	//
+	for (int i = 32; i< BITMAP_SIZE; i++){
+		for (int j =0; j< 8; j++){
+			bmap_ptr = &fs->bitmap[i];
+			bit = (*bmap_ptr >> j) & 0x1;
+			// Case of a free block in bitmap
+			if (bit == 0){
+				block_num = i * 8 + j - 261;
+				*bmap_ptr |= (0x1 << j);
+				fs->superblock.block_num--;
+				return block_num;
+			}
+		}
+	}
+	return ERROR;
+}
 
 //We got the parent inode and the filename
-int update_parent(int parent_inode, char* filename, int action){
+int update_parent(int parent_inode, char* filename, int action, uint32_t type, uint32_t perm){
 	//Depending on the parent's size we can find the correct location pointer
 	//No space left in the parent
 	if (fs->inode[parent_inode].size == MAX_FILE_SIZE){
@@ -257,7 +304,7 @@ int update_parent(int parent_inode, char* filename, int action){
 		return ERROR;
 	}
 	
-	//If we want to create something the search is smoother
+	//If we want to create something, the search is smoother
 	if (action == CR){
 		//First we find how many blocks the parent has, then based on the block
 		//number we find which location pointer to use
@@ -265,16 +312,30 @@ int update_parent(int parent_inode, char* filename, int action){
 		int offset = fs->inode[parent_inode].size % 256;  	//Offset in the last block number
 		// We are in the first direct pointers Yay!!!
 		
+		int inode_num;
+		inode_num = allocate_inode(type, perm);
+		
 		dir_t *temp_dir; 					//Temp pointer to update smth
 		if (block_num <= 7 ){
 			temp_dir = (dir_t*) (&(fs->inode[parent_inode].location[block_num]) + offset);
-			temp_dir->filename = strncpy(temp_dir->filename,filename,14);
-			temp_dir->size = 0;
+			temp_dir->filename = filename;
+			temp_dir->inode_num = inode_num;
 		}
+		else if (block_num <= )
 
 	}
 }
 
+
+
+int exist_blocks(void){
+	
+	if (fs->superblock.block_num > 0)
+		return TRUE;
+	else{
+		return FALSE;
+	}
+}
 
 int exist_inodes(void){
 	
