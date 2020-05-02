@@ -353,12 +353,14 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 			temp_dir = (dir_t*) (&(fs->inode[parent_inode].location[block_num]) + offset);
 			strncpy(temp_dir->filename,filename,14); 		// Security is everything :)
 			temp_dir->inode_num = inode_num;
+			fs->inode[parent_inode].size +=16;
 		}
 		else if (block_num <= 71){
 			block_t *indirect = (block_t*) fs->inode[parent_inode].location[8];
 			strncpy(temp_dir->filename,filename,14);
 			temp_dir = (dir_t*) (&indirect[block_num - 8] + offset);
 			temp_dir->inode_num = inode_num;
+			fs->inode[parent_inode].size +=16;
 		}
 		//Second indirection
 		else if (block_num <= MAX_INODE_BLOCKS - 1){
@@ -369,6 +371,7 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 			temp_dir = (dir_t*) (&indirect_2[ind_2] + offset);
 			strncpy(temp_dir->filename,filename,14);
 			temp_dir->inode_num = inode_num;
+			fs->inode[parent_inode].size +=16;
 
 		}
 	}
