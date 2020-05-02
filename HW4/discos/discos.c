@@ -5,8 +5,8 @@
 #include "schedule.h"
 #include "types.h"
 #include "pic.h"
-#include "mem.h"
-#include "file_ops.h"
+#include "include/mem.h"
+#include "include/file_ops.h"
 /*
 	Store the usable memory regions in an array for
 	future use. Used the same methodology as memos-2
@@ -26,6 +26,8 @@ pcb dum_dum; 				//dummy thread doing nothing;
 #ifdef PCR
 int time= 0;
 #endif
+
+
 
 /*
  * 	We assume that the total memory is below 4GB
@@ -112,7 +114,7 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 		if (((avail_mem >> 20) & 0xfff) >= 2){
 			print_s("Found avail mem at ");
 			indx = i;
-			itoa(buf,'d',i);
+			itoa(buf,'x',base_addr[i]);
 			print_s(buf);
 			print_s("\n");
 			break;
@@ -120,6 +122,11 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	}
 
 	init_mem(base_addr[indx]);
+
+	rd_creat("/skata",RW);
+	
+	show_inode_info(0);
+	show_inode_info(1);
 
 
 	asm volatile("hlt");

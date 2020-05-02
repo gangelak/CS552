@@ -1,4 +1,3 @@
-#include "types.h"
 #include "vga.h"
 #include "helper.h"
 /* Hardware text mode color constants. */

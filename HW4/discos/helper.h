@@ -27,7 +27,7 @@ void print(char *);
 
 void memset(void *s, int c, size_t n);
 int strcmp(char string1[], char string2[] );
-char* strncpy(char* destination, const char* source, size_t num);
+void strncpy(char* destination, const char* source, size_t num);
 
 //static inline void outb( unsigned char, unsigned short);
 //static inline unsigned char inb( unsigned short);

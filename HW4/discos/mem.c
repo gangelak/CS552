@@ -1,24 +1,73 @@
-#include "mem.h"
+#include "include/mem.h"
 #include "helper.h"
-#include "file_ops.h"
+#include "include/file_ops.h"
+#include "vga.h"
+#define my_sizeof(x) ((&x + 1) - &x)
+#define my_sizeof(x) ((char *)(&x + 1) - (char *)&x)
 
-void init_mem(unsigned long *base_addr){
+extern pt FS;
 
-	unsigned long mem_size = (MAX_PART_SZ_MB<<20);
+
+void init_bitmap(void){
+	//first 256 blocks
+	uint8_t *bit_ptr;
+	for (int i =0 ; i <= 31; i++){
+		fs->bitmap[i] = 0xff;
+	}
+	bit_ptr = &fs->bitmap[32];
+	*bit_ptr = 0x0; 
+	*bit_ptr |= 0xf8; 		//1111 1000
+
+	for (int i =33 ; i < 1024; i++){
+		fs->bitmap[i] = 0x0;
+	}
 	
+}
+
+void init_inodes(void){
+	char buf[16];
+	for (int i = 0; i <= MAX_FILES ; i++){
+		fs->inode[i].in_use = FREE;
+		fs->inode[i].type = JUNK; 
+		fs->inode[i].size = JUNK; 				//Root is empty
+		//memset(fs->inode[0].location[0],JUNK,40); 	//Initialize the location pointers to JUNK = 2000 (Way above 1024)
+		for (int j= 0; j< 10; j++){
+			fs->inode[i].location[j] = 0;
+		}
+		fs->inode[i].perm = JUNK; 			//Root is read write
+		fs->inode[i].in_use = FREE; 			//Mark the first inode as used
+	}
+}
+
+
+void init_mem(){
+	
+	unsigned long mem_size = (MAX_PART_SZ_MB<<20);
+	char buf[16];
 
 	/* Initialize filesystem memory to 0 */
-	memset(base_addr,0,mem_size);
+	//memset(&base_addr,0,mem_size);
 
 	/* Set the partition to point to the start of our free memory*/
-	fs = (pt *)base_addr;
-	
+	fs = &FS;
+	//int size = my_sizeof(fs);
+	/*itoa(buf,'x',(int)fs);*/
+	/*print_s(buf);*/
+	/*print_s("\n");*/
+
 	/* Start initializing the different fields of the partition*/
 	
 	/*Superblock Setup */
 	fs->superblock.block_num = 7930; 	//Account for root directory
 	fs->superblock.free_inodes = 1023; 	//Same here
-
+	
+	/*Initialize bitmap*/
+	//The first 261 blocks are allocated for superblock, inode array, root dir
+	init_bitmap();
+	
+	/*Initialize the inode array*/
+	init_inodes();
+	
 	/*Setup root*/
 	root->filename[0] = '/';
 	root->filename[1] = '\0';
@@ -27,7 +76,11 @@ void init_mem(unsigned long *base_addr){
 
 	fs->inode[0].type = DR; 
 	fs->inode[0].size = 0; 				//Root is empty
-	memset(fs->inode[0].location[0],JUNK,40); 	//Initialize the location pointers to JUNK = 2000 (Way above 1024)
+	//memset(fs->inode[0].location[0],JUNK,40); 	//Initialize the location pointers to JUNK = 2000 (Way above 1024)
+	for (int i= 0; i< 10; i++){
+		fs->inode[0].location[i] = 0;
+	}
+	fs->inode[0].location[0] = &fs->d_blks[0]; 	//Initialize the first location pointer
 	fs->inode[0].perm = RW; 			//Root is read write
 	fs->inode[0].in_use = USED; 			//Mark the first inode as used
 

@@ -1,12 +1,13 @@
 
 	.globl stack
 	.globl idt
+	.globl FS
 
 	.bss
 	.align 0x1000
 	.comm stack, 0x1000  # Setup stack are in bss
 	.comm idt, 0x800
-
+	.comm FS, 2097152
 
 	.data
 	.align 0x4

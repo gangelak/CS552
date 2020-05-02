@@ -92,14 +92,14 @@ int strcmp(char string1[], char string2[] )
 }
 
 //https://www.techiedelight.com/implement-strncpy-function-c/
-char* strncpy(char* destination, const char* source, size_t num)
+void strncpy(char* destination, const char* source, size_t num)
 {
     // return if no memory is allocated to the destination
     if (destination == 0)
-        return 0;
+        return ;
  
     // take a pointer pointing to the beginning of destination string
-    char* ptr = destination;
+    //char* ptr = destination;
  
     // copy first num characters of C-string pointed by source
     // into the array pointed by destination
@@ -114,7 +114,7 @@ char* strncpy(char* destination, const char* source, size_t num)
     *destination = '\0';
  
     // destination is returned by standard strncpy()
-    return ptr;
+   // return ptr;
 }
 
 

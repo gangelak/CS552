@@ -1,0 +1,26 @@
+Found avail mem at 100000
+After checks 1
+Temp name is skata
+Here1
+Before check if exists
+The path is valid and the file does not exist
+Parent inode is 0
+Before updating the parent with the new entry
+Allocating inode
+Parent updated
+
+Showing information for inode
+0
+Inode type: 1
+Inode size: 0
+Inode location pointers: 1134080 0 0 65536 0 0 0 0 0 0 
+Inode permissions: 2
+Inode is used: 1
+
+Showing information for inode
+1
+Inode type: 2
+Inode size: 0
+Inode location pointers: 1134256 0 0 0 0 0 0 0 0 0 
+Inode permissions: 2
+Inode is used: 1

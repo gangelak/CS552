@@ -2,7 +2,7 @@ CC := gcc
 CFLAGS := -m32 -fno-stack-protector -fno-builtin -nostdinc -O -g -Wall -I. -c
 pcr: CFLAGS := -m32 -fno-stack-protector -fno-builtin -nostdinc -O -g -Wall -I. -c -D PCR
 AS := as
-SRCS := threads.c vga.c pic.c helper.c schedule.c
+SRCS := threads.c vga.c pic.c helper.c schedule.c mem.c file_ops.c
 ASM := swtch.s
 OBJS = $(SRCS:.c=.o)
 

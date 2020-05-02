@@ -17,7 +17,7 @@
 #define PTRS_PB  (BLK_SZ / PTR_SZ) /* Pointers per index block */
 
 
-void init_mem(unsigned long *base_addr);
+void init_mem();
 
 
 
