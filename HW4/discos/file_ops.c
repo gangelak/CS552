@@ -10,6 +10,7 @@ int exist_inodes(void);
 int update_parent(int parent_inode,char *filename, int action, uint32_t type, uint32_t mode);
 int allocate_block(void);
 int allocate_inode(uint32_t type, uint32_t permissions);
+int check_if_exists(char *name,int par_inode, int type);
 void show_bitmap(void);
 
 /*TODO*/
@@ -33,7 +34,7 @@ int rd_creat(char *pathname, mode_t mode){
 	int parent_inode;
 	//Check if we are trying to create the root directory
 	if (strcmp(pathname,root->filename) == 0){
-		print_s("Root directory already exists!!!");
+		print_s("creat: Root directory already exists!!!");
 		return ERROR;
 	}
 	
@@ -42,7 +43,7 @@ int rd_creat(char *pathname, mode_t mode){
 	res = exist_inodes();
 	
 	if (res < 0){
-		print_s("There are no available inodes...Try later, sorry\n");
+		print_s("creat: There are no available inodes...Try later, sorry\n");
 		return ERROR;
 	}
 	
@@ -54,7 +55,7 @@ int rd_creat(char *pathname, mode_t mode){
 	print_s("\n");
 
 	if (parent_inode < 0){
-		print_s("Invalid path...Aborting\n");
+		print_s("creat: Invalid path...Aborting\n");
 		return ERROR;
 	}
 
@@ -64,7 +65,7 @@ int rd_creat(char *pathname, mode_t mode){
 	print_s("Before updating the parent with the new entry\n");
 	res = update_parent(parent_inode,filename, CR, FL, mode);
 	if (res < 0){
-		print_s("Cannot create a new entry for this file...Aborting\n");
+		print_s("creat: Cannot create a new entry for this file...Aborting\n");
 		return ERROR;
 	}
 
@@ -81,7 +82,7 @@ int rd_mkdir(char *pathname){
 	char buf[16];
 	//Check if we are trying to create the root directory
 	if (strcmp(pathname,root->filename) == 0){
-		print_s("Root directory already exists!!!");
+		print_s("mkdir: Root directory already exists!!!");
 		return ERROR;
 	}
 
@@ -90,7 +91,7 @@ int rd_mkdir(char *pathname){
 	res = exist_inodes();
 	
 	if (res < 0){
-		print_s("There are no available inodes...Try later, sorry\n");
+		print_s("mkdir: There are no available inodes...Try later, sorry\n");
 		return ERROR;
 	}
 	
@@ -102,7 +103,7 @@ int rd_mkdir(char *pathname){
 	print_s("\n");
 
 	if (parent_inode < 0){
-		print_s("Invalid path...Aborting\n");
+		print_s("mkdir: Invalid path...Aborting\n");
 		return ERROR;
 	}
 
@@ -112,7 +113,7 @@ int rd_mkdir(char *pathname){
 	print_s("Before updating the parent with the new entry\n");
 	res = update_parent(parent_inode,filename, CR, DR, RW);
 	if (res < 0){
-		print_s("Cannot create a new entry for this directory...Aborting\n");
+		print_s("mkdir: Cannot create a new entry for this directory...Aborting\n");
 		return ERROR;
 	}
 
@@ -143,11 +144,58 @@ int rd_lseek(int fd, int offset){
 }
 
 int rd_unlink(char *pathname){
-;	
+	
+	
+	if (strcmp(pathname,root->filename) == 0){
+		print_s("unlink: You cannot remove the root directory\n");
+		return ERROR;
+	}
+
+	
+
+		
 }
 
 int rd_chmod(char *pathname, mode_t mode){
-;	
+	
+	int res = 0;
+
+	char filename[14];
+	int parent_inode, file_inode;
+	char buf[16];
+
+	if (strcmp(pathname,root->filename) == 0){
+		print_s("chmod: You cannot change the permissions of the root directory\n");
+		return ERROR;
+	}
+	
+	parent_inode = check_pathname(pathname,filename);
+	
+	itoa(buf,'d',parent_inode);
+	print_s("Parent inode is ");
+	print_s(buf);
+	print_s("\n");
+
+	if (parent_inode < 0){
+		print_s("chmod: Invalid path...Aborting\n");
+		return ERROR;
+	}
+
+	//Ok now we have the correct parent...Find the inode number of the file
+	//Check if the file is a directory or not
+	
+	print_s("Before updating the parent with the new entry\n");
+	file_inode = check_if_exists(filename,parent_inode,FL);
+	if (file_inode < 0 && fs->inode[file_inode].type == DR){
+		print_s("chmod: The file you requested does not exist\n");
+		return ERROR;
+	}
+	
+	/*Updating the mode*/
+	fs->inode[file_inode].perm = mode;
+
+	print_s("File mode updated\n");
+
 }
 
 int next_block(int block_num, block_t *cur_block, int par_inode){
