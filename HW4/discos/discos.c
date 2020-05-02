@@ -20,6 +20,9 @@ unsigned long end_addr[10];
 int mem_pointer[10];
 int cnt = 0;   // Memory Region Counter
 
+file_obj main_fdt[MAX_FILES + 1]; 		//FDT for the main thread - Max FDs = 1024 same as max files 
+
+
 pcb fifos_threads[MAX_THREADS];
 pcb dum_dum; 				//dummy thread doing nothing;
 
@@ -88,46 +91,51 @@ void init_pit(void)
 
 
 void kmain (multiboot_info_t* mbt, unsigned long magic) {
-	int avail_regs, indx;          // # of available memory regions
-	unsigned long avail_mem;
+	/*int avail_regs, indx;          // # of available memory regions*/
+	/*unsigned long avail_mem;*/
 
-	if (mbt->flags & 0b1000000){
-		mmap_entry_t* ent = (mmap_entry_t*) mbt->mmap_addr;
-		avail_regs = get_mem_regs(mbt,ent);
-	}
+	/*if (mbt->flags & 0b1000000){*/
+		/*mmap_entry_t* ent = (mmap_entry_t*) mbt->mmap_addr;*/
+		/*avail_regs = get_mem_regs(mbt,ent);*/
+	/*}*/
 	 
+	/*for (int i =0; i< avail_regs; i++){*/
+		/*//Just a checkup of available memory regions*/
+		/*[>itoa(buf,'x',base_addr[i]);<]*/
+		/*[>print_s("Mem base:");<]*/
+		/*[>print_s(buf);<]*/
+		/*[>print_s(" Mem end:");<]*/
+		/*[>itoa(buf,'x',end_addr[i]);<]*/
+		/*[>print_s(buf);<]*/
+		/*[>print_s("\n");<]*/
+		/*avail_mem = end_addr[i] - base_addr[i];*/
+
+		/*if (((avail_mem >> 20) & 0xfff) >= 2){*/
+			/*print_s("Found avail mem at ");*/
+			/*indx = i;*/
+			/*itoa(buf,'x',base_addr[i]);*/
+			/*print_s(buf);*/
+			/*print_s("\n");*/
+			/*break;*/
+		/*}*/
+	/*}*/
+	
 	terminal_initialize();
 
 	char buf[10];
 
-	for (int i =0; i< avail_regs; i++){
-		//Just a checkup of available memory regions
-		/*itoa(buf,'x',base_addr[i]);*/
-		/*print_s("Mem base:");*/
-		/*print_s(buf);*/
-		/*print_s(" Mem end:");*/
-		/*itoa(buf,'x',end_addr[i]);*/
-		/*print_s(buf);*/
-		/*print_s("\n");*/
-		avail_mem = end_addr[i] - base_addr[i];
 
-		if (((avail_mem >> 20) & 0xfff) >= 2){
-			print_s("Found avail mem at ");
-			indx = i;
-			itoa(buf,'x',base_addr[i]);
-			print_s(buf);
-			print_s("\n");
-			break;
-		}
-	}
+	init_mem();
 
-	init_mem(base_addr[indx]);
+	glob_fdt_ptr = main_fdt;
+
+	init_fdt();
 
 	rd_creat("/skata",RW);
 	
 	show_inode_info(0);
 	show_inode_info(1);
-
+	
 
 	asm volatile("hlt");
 

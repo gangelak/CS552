@@ -66,7 +66,8 @@ struct replenish{
 
 typedef struct file_object{
 	int flags;
-	void *ps_ptr;
+	int in_use;
+	void *pos_ptr;
 	void *inode_ptr;
 } file_obj;
 

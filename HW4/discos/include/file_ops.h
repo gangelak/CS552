@@ -27,3 +27,6 @@ int rd_unlink(char *pathname);
 int rd_cmmod(char *pathname, mode_t mode);
 
 void show_inode_info(int inode);
+void init_fdt(void);
+
+file_obj *glob_fdt_ptr;

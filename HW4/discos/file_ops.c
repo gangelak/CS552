@@ -10,13 +10,24 @@ int exist_inodes(void);
 int update_parent(int parent_inode,char *filename, int action, uint32_t type, uint32_t mode);
 int allocate_block(void);
 int allocate_inode(uint32_t type, uint32_t permissions);
-int check_if_exists(char *name,int par_inode, int type);
+int check_if_exists(char *name,int par_inode);
 void show_bitmap(void);
 
 /*TODO*/
 // Need one function to recurse through the pathnames
 // Need one function to recurse through the inodes
 // Need one strcmp function to compare string names
+
+
+/*Initialize the current global fdt pointer*/
+//Don't run anywhere else except when the table is
+//first created
+
+void init_fdt(void){
+	for (int i =0; i<= MAX_FILES; i++){
+		glob_fdt_ptr[i].in_use = FREE;
+	}
+}
 
 
 
@@ -49,8 +60,11 @@ int rd_creat(char *pathname, mode_t mode){
 	
 	parent_inode = check_pathname(pathname,filename);
 	
+	print_s("Filename is ");
+	print_s(filename);
+	
 	itoa(buf,'d',parent_inode);
-	print_s("Parent inode is ");
+	print_s("\nParent inode is ");
 	print_s(buf);
 	print_s("\n");
 
@@ -123,7 +137,62 @@ int rd_mkdir(char *pathname){
 }
 
 int rd_open(char *pathname, int flags){
-;	
+	
+	int res = 0;
+
+	char filename[14];
+	int parent_inode, file_inode;
+	char buf[16];
+
+	if (strcmp(pathname,root->filename) == 0){
+		print_s("open: Root directory is always open\n");
+		return ERROR;
+	}
+	
+	parent_inode = check_pathname(pathname,filename);
+	
+
+	
+	itoa(buf,'d',parent_inode);
+	print_s("\nParent inode is ");
+	print_s(buf);
+	print_s("\n");
+
+	if (parent_inode < 0){
+		print_s("open: Invalid path...Aborting\n");
+		return ERROR;
+	}
+
+	//Ok now we have the correct parent...Find the inode number of the file
+	//Check if the file is a directory or not
+	
+	print_s("Before updating the parent with the new entry\n");
+	
+	file_inode = check_if_exists(filename,parent_inode);
+	
+	if (file_inode < 0 && fs->inode[file_inode].type == DR){
+		print_s("open: The file you requested does not exist\n");
+		return ERROR;
+	}
+	
+	/* Check the permissions*/
+
+	// The permissions to open the file are not correct
+	if (flags > fs->inode[file_inode].perm){
+		print_s("open: Incorrect permissions\n");
+		return ERROR;
+	}
+	if(flags == RO && fs->inode[file_inode].perm == WR){
+		print_s("open: The file write only\n");
+		return ERROR;
+	}
+	if (flags == RW && fs->inode[file_inode].perm != RW){
+		print_s("open: The file cannot be opened as read write\n");
+		return ERROR;
+	}
+
+
+
 }
 
 int rd_close(int fd){
@@ -184,8 +253,8 @@ int rd_chmod(char *pathname, mode_t mode){
 	//Ok now we have the correct parent...Find the inode number of the file
 	//Check if the file is a directory or not
 	
-	print_s("Before updating the parent with the new entry\n");
-	file_inode = check_if_exists(filename,parent_inode,FL);
+	print_s("Before checking if the file exists\n");
+	file_inode = check_if_exists(filename,parent_inode);
 	if (file_inode < 0 && fs->inode[file_inode].type == DR){
 		print_s("chmod: The file you requested does not exist\n");
 		return ERROR;
@@ -228,7 +297,7 @@ int next_block(int block_num, block_t *cur_block, int par_inode){
 }
 
 // Check if the File/Dir with name exist under parent with inode par_inode
-int check_if_exists(char *name,int par_inode, int type){
+int check_if_exists(char *name,int par_inode){
 	
 	/*TODO*/
 	// Maybe add a check if the parent is full or not
@@ -253,7 +322,7 @@ int check_if_exists(char *name,int par_inode, int type){
 	while (block_num != -1){
 		for (int i = 0; i < 16; i++){
 			dir_t *entry;  					//Temporary entry struct to extract the inode num
-			entry = (dir_t *) (&cur_block + i * 16);
+			entry = (dir_t *) (cur_block + i * 16);
 			//The file/dir we are looking for exists in this block...Yay!
 			if (strcmp(entry->filename, name) == 0){
 				print_s("File found!\n");
@@ -267,7 +336,7 @@ int check_if_exists(char *name,int par_inode, int type){
 }
 
 
-int check_pathname(char *pathname, char *filename){
+int check_pathname(char *pathname, char filename[]){
 	char buf[16];
 
 	int par_inode = 0; 		// Start from the root inode
@@ -310,7 +379,7 @@ int check_pathname(char *pathname, char *filename){
 		if (name_finish == path_len){
 			print_s("Here1\n");
 			final = 1;
-			filename = temp_name;
+			strncpy(filename,temp_name,14);
 		}
 
 		//This is a directory name
@@ -324,7 +393,7 @@ int check_pathname(char *pathname, char *filename){
 		
 		print_s("Before check if exists\n");
 		//Check if the file exists and return its inode if it exists else ERROR
-		status = check_if_exists(temp_name,par_inode,type);
+		status = check_if_exists(temp_name,par_inode);
 		
 		//Case that the name requested does not exist yay
 		if (status == ERROR && final == 1){
