@@ -76,14 +76,48 @@ int rd_creat(char *pathname, mode_t mode){
 int rd_mkdir(char *pathname){
 	int res = 0;
 
+	char filename[14];
+	int parent_inode;
+	char buf[16];
 	//Check if we are trying to create the root directory
 	if (strcmp(pathname,root->filename) == 0){
 		print_s("Root directory already exists!!!");
 		return ERROR;
 	}
 
+	//Check if there are available inodes for our file
+	
+	res = exist_inodes();
+	
+	if (res < 0){
+		print_s("There are no available inodes...Try later, sorry\n");
+		return ERROR;
+	}
+	
+	parent_inode = check_pathname(pathname,filename);
+	
+	itoa(buf,'d',parent_inode);
+	print_s("Parent inode is ");
+	print_s(buf);
+	print_s("\n");
 
-	//res = check_pathname(pathname);
+	if (parent_inode < 0){
+		print_s("Invalid path...Aborting\n");
+		return ERROR;
+	}
+
+	//Ok now we have the correct parent...Allocate resources for the file
+	//Also update the parent entry
+	
+	print_s("Before updating the parent with the new entry\n");
+	res = update_parent(parent_inode,filename, CR, DR, RW);
+	if (res < 0){
+		print_s("Cannot create a new entry for this directory...Aborting\n");
+		return ERROR;
+	}
+
+	print_s("Parent updated\n");
+
 
 }
 
@@ -263,7 +297,7 @@ int check_pathname(char *pathname, char *filename){
 		}
 		// The file/dir that we requested already exists...Return ERROR
 		else if (status != ERROR && final == 1) {
-			print_s("The file that you requested already exists!\n");
+			print_s("The file/directory that you requested already exists!\n");
 			return ERROR;
 		}
 
