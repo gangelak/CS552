@@ -252,11 +252,11 @@ int check_if_exists(char *name,int par_inode, int type){
 
 	while (block_num != -1){
 		for (int i = 0; i < 16; i++){
+			dir_t *entry;  					//Temporary entry struct to extract the inode num
+			entry = (dir_t *) (&cur_block + i * 16);
 			//The file/dir we are looking for exists in this block...Yay!
-			if (strcmp(((char*)&cur_block[i * 16]), name) == 0){
+			if (strcmp(entry->filename, name) == 0){
 				print_s("File found!\n");
-				dir_t *entry;  					//Temporary entry struct to extract the inode num
-				entry = (dir_t*) &cur_block[i * 16];
 				return (int) entry->inode_num; 			//Return the inode number
 			}
 		}
