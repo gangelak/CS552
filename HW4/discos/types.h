@@ -67,8 +67,8 @@ struct replenish{
 typedef struct file_object{
 	int flags;
 	int in_use;
-	void *pos_ptr;
-	void *inode_ptr;
+	uint32_t pos_ptr; 	//basically bytes written/read from the start of the file
+	int inode;
 } file_obj;
 
 
