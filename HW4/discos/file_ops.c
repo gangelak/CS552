@@ -501,17 +501,20 @@ int check_if_exists(char name[],int par_inode){
 	//We have to search in the parent if the file exists or not
 	block_t *cur_block;
 	cur_block = (block_t*) fs->inode[par_inode].location[0]; 	//Start from parent's first block
-	int block_num = JUNK;      					//First block (will help with indirections)
+	int block_num = 0;      					//First block (will help with indirections)
 
 	while (block_num != -1){
 		for (int i = 0; i < 16; i++){
 			dir_t *entry;  					//Temporary entry struct to extract the inode num
+			//&(fs->inode[parent_inode].location[block_num])
+			cur_block = (block_t*) fs->inode[par_inode].location[block_num];        //Start from parent's first block
 			entry = (dir_t *) (&cur_block + i * 16);
 			//The file/dir we are looking for exists in this block...Yay!
-			print_s("Exists ");
-			print_s(entry->filename);
-			print_s("\n");
-			if (strcmp(entry->filename, name) == 0){
+//			char tmp[14] = "";
+//			strncpy(tmp, entry->filename, strlen(entry->filename));
+//			print_s(tmp);
+//			print_s("\n");
+			if (strncmp(entry->filename, name, strlen(name)) == 0){
 				print_s("File found!\n");
 				return (int) entry->inode_num; 			//Return the inode number
 			}
@@ -692,8 +695,9 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 			strncpy(temp_dir->filename,filename,14); 		// Security is everything :)
 			temp_dir->inode_num = inode_num;
 			fs->inode[parent_inode].size +=16;
-			print_s(temp_dir->filename);
-			print_s("\n");
+//			print_s("UPDATE_PARENT:\n");
+//			print_s(temp_dir->filename);
+//			print_s("\n");
 		}
 		else if (block_num <= 71){
 			block_t *indirect = (block_t*) fs->inode[parent_inode].location[8];

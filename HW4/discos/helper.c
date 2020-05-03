@@ -77,9 +77,16 @@ void memset(void *s, int c, size_t n)
 
 int strcmp(char string1[], char string2[] )
 {
-    for (int i = 0; ; i++)
+	size_t str1_len = strlen(string1);
+	size_t str2_len = strlen(string2);
+
+	if (str1_len != str2_len)
+		return -1;
+    for (int i = 0; i < str1_len; i++)
     {
-        if (string1[i] != string2[i])
+	    if ( string1[i] != string2[i] )
+		    return -1;
+/*        if (string1[i] != string2[i])
         {
             return string1[i] < string2[i] ? -1 : 1;
         }
@@ -88,9 +95,18 @@ int strcmp(char string1[], char string2[] )
         {
             return 0;
         }
-    }
+  */  }
+	    return 0;
 }
-
+int strncmp(char string1[], char string2[], int size)
+{
+	for ( int i =0 ; i < size; i++ )
+	{
+		if (string1[i] != string2[i])
+			return -1;
+	}
+	return 0;
+}
 //https://www.techiedelight.com/implement-strncpy-function-c/
 void strncpy(char* destination, const char* source, size_t num)
 {

@@ -131,14 +131,19 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 
 	init_fdt();
 
+	show_inode_info(0);
 
-	rd_creat("/skata",RW);
-	rd_creat("/skata",RW);
+	rd_creat("/test",RW);
 	
 	show_inode_info(0);
 	show_inode_info(1);
+	show_inode_info(2);
+	rd_creat("/test",RW);
 	
-
+	show_inode_info(0);
+	show_inode_info(1);
+	show_inode_info(2);
+	asm volatile("hlt");
 
 	/* Initialize 8259 PIC */
 	 /*init_pic();*/
