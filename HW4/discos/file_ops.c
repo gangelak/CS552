@@ -318,24 +318,40 @@ int check_if_exists(char *name,int par_inode){
 	block_t *cur_block;
 	cur_block = (block_t*) fs->inode[par_inode].location[0]; 	//Start from parent's first block
 	int block_num = 0;      					//First block (will help with indirections)
-
+	
+	char tmp[10] = "";
+	itoa(tmp,'d', par_inode);
+	print_s("the parent inode is ");
+	print_s(tmp);
+	print_s("\n");
 	while (block_num != -1){
 		for (int i = 0; i < 16; i++){
 			dir_t *entry;  					//Temporary entry struct to extract the inode num
 			//&(fs->inode[parent_inode].location[block_num])
 			cur_block = (block_t*) fs->inode[par_inode].location[block_num];        //Start from parent's first block
-			entry = (dir_t *) (&cur_block + i * 16);
+			entry = (dir_t *) (&(fs->inode[par_inode].location[block_num]) + i*16);
 			//The file/dir we are looking for exists in this block...Yay!
 //			char tmp[14] = "";
-//			strncpy(tmp, entry->filename, strlen(entry->filename));
+//			itoa(tmp,'d',entry->inode_num);
 //			print_s(tmp);
 //			print_s("\n");
+//			print_s(entry->filename);
+//			print_s("\n");
+			char tmp[14] = "";
+			itoa(tmp,'16',entry);
+			print_s(tmp);
+			print_s("\n");
 			if (strncmp(entry->filename, name, strlen(name)) == 0){
 				print_s("File found!\n");
 				return (int) entry->inode_num; 			//Return the inode number
 			}
 		}
 		block_num = next_block(block_num,cur_block,par_inode);
+//		char tmp[15];
+//		itoa(tmp,'d',block_num);
+//		print_s("the block num is");
+//		print_s(tmp);
+//		print_s("\n");
 	}
 
 	return ERROR;
@@ -365,27 +381,35 @@ int check_pathname(char *pathname, char filename[]){
 	print_s("After checks 1\n");
 	//Get the length of the path to know if we are at the end...
 
-	int name_finish = 1;
+	int name_finish = 0;
 	int final = 0 ; 		//Flag to check if we are at the last name or not
-
 	while (final != 1 && status != ERROR){
 		/* First get every directory in the path and check if they exist */
 		int type = 0; 			//type 0 = regular file  and 1 = directory
 		char temp_name[14];
 		int i = 0;
+		name_finish++;
 		while(pathname[name_finish] != '/' && pathname[name_finish] != '\0'){
 			temp_name[i] = pathname[name_finish];
 			name_finish++;
 			i++;
 		}
-		
+//		name_finish++;
+		print_s("name_finish is ");
+		char tmp[10];
+		itoa(tmp,'d', name_finish);
+		print_s(tmp);
+		print_s("\n");
+		print_s("parthname is ");
+		print_s(pathname);
+		print_s("\n");
 		print_s("Temp name is ");
 		print_s(temp_name);
 		print_s("\n");
 		if (name_finish == path_len){
 			print_s("Here1\n");
 			final = 1;
-			strncpy(filename,temp_name,14);
+			strncpy(filename,temp_name,strlen(temp_name));
 		}
 
 		//This is a directory name
@@ -396,7 +420,7 @@ int check_pathname(char *pathname, char filename[]){
 		}
 		else
 			type = 0; 		//No need for this type was already 0
-		
+
 		print_s("Before check if exists\n");
 		//Check if the file exists and return its inode if it exists else ERROR
 		status = check_if_exists(temp_name,par_inode);
@@ -450,6 +474,11 @@ int allocate_inode(uint32_t type, uint32_t permissions){
 			fs->inode[i].perm = permissions;
 			fs->superblock.free_inodes--; 				//Decrease available inodes
 			fs->inode[i].in_use = 1;
+//			char tmp[10];
+//			itoa(tmp,'d', ret);
+//			print_s("the allocated inode is ");
+//			print_s(tmp);
+//			print_s("\n");
 			return ret;
 		}
 	}
@@ -508,12 +537,27 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 		dir_t *temp_dir; 					//Temp pointer to update smth
 		if (block_num <= 7 ){
 			temp_dir = (dir_t*) (&(fs->inode[parent_inode].location[block_num]) + offset);
+			char temp[16] ;
+			itoa(temp, '16',temp_dir);
+			print_s("the address is ");
+			print_s(temp);
+			print_s("\n");
 			strncpy(temp_dir->filename,filename,14); 		// Security is everything :)
 			temp_dir->inode_num = inode_num;
 			fs->inode[parent_inode].size +=16;
-//			print_s("UPDATE_PARENT:\n");
-//			print_s(temp_dir->filename);
-//			print_s("\n");
+			print_s("UPDATE_PARENT:\n");
+			print_s(temp_dir->filename);
+			print_s("\n");
+			print_s("the inode number is ");
+			char tmp[14];
+			itoa(tmp,'d', temp_dir->inode_num);
+			print_s(tmp);
+			print_s("\n");
+			print_s("the offset is ");
+			itoa(tmp,'d', offset);
+			print_s(tmp);
+			print_s("\n");
+
 		}
 		else if (block_num <= 71){
 			block_t *indirect = (block_t*) fs->inode[parent_inode].location[8];
@@ -558,6 +602,31 @@ int exist_inodes(void){
 	
 }
 
+
+void show_dir_info(int inode)
+{
+	int block_num = 0;
+//	while (block_num != -1)
+//	{
+		block_t *cur_block;
+		cur_block = (block_t*) fs->inode[inode].location[block_num]; 	//Start from parent's first block
+		for (int i = 0; i < 16; i++)
+		{
+			dir_t *entry;  					//Temporary entry struct to extract the inode num
+			//&(fs->inode[parent_inode].location[block_num])
+			cur_block = (block_t*) fs->inode[inode].location[block_num];        //Start from parent's first block
+			entry = (dir_t *) (&cur_block + i * 16);
+			//The file/dir we are looking for exists in this block...Yay!
+			char tmp[14] = "";
+			itoa(tmp,'d',entry->inode_num);
+			print_s(tmp);
+			print_s("\n");
+			print_s(entry->filename);
+			print_s("\n");
+			}
+//		block_num = next_block(block_num,cur_block,inode);
+//	}
+}
 void show_inode_info(int inode){
 	char buf[16];
 	inode_t *inode_ptr = &fs->inode[inode];
@@ -575,6 +644,8 @@ void show_inode_info(int inode){
 		itoa(buf,'16',inode_ptr->location[i]);
 		print_s(buf);
 		print_s(" ");
+//		if ( i == 0 )
+//			show_dir_info(inode);
 	}
 	print_s("\nInode permissions: ");
 	itoa(buf,'d',inode_ptr->perm);

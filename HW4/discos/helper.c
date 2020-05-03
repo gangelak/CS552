@@ -127,8 +127,12 @@ void strncpy(char* destination, const char* source, size_t num)
     }
  
     // null terminate destination string
+    while(num != 0)
+    {
     *destination = '\0';
- 
+    destination++;
+    num--;
+    }
     // destination is returned by standard strncpy()
    // return ptr;
 }
