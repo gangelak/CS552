@@ -15,13 +15,15 @@ Before check if exists
 The path is valid and the file does not exist
 Parent inode is 0
 Before updating the parent with the new entry
+In find_block address is 1089768
+In update parent address is 1158832
 Allocating inode
 the address is 1158832
 UPDATE_PARENT:
 test
 the inode number is 1
 the offset is 0
-Parent updated
+mkdir: Parent updated
 
 Showing information for inode
 0
@@ -56,13 +58,15 @@ Before check if exists
 The path is valid and the file does not exist
 Parent inode is 1
 Before updating the parent with the new entry
+In find_block address is 1089768
+In update parent address is 1159088
 Allocating inode
 the address is 1159088
 UPDATE_PARENT:
 tmp
 the inode number is 2
 the offset is 0
-Parent updated
+mkdir: Parent updated
 
 Showing information for inode
 0
@@ -115,13 +119,15 @@ The path is valid and the file does not exist
 Filename is giannis
 Parent inode is 2
 Before updating the parent with the new entry
+In find_block address is 1089768
+In update parent address is 1159344
 Allocating inode
 the address is 1159344
 UPDATE_PARENT:
 giannis
 the inode number is 3
 the offset is 0
-Parent updated
+creat: Parent updated
 
 Showing information for inode
 0

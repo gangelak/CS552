@@ -12,7 +12,7 @@ int allocate_block(void);
 int allocate_inode(uint32_t type, uint32_t permissions);
 int check_if_exists(char *name,int par_inode);
 void show_bitmap(void);
-int find_block(int block_num, block_t* cur_block, int inode);
+int find_block(int block_num, block_t** cur_block, int inode);
 int exist_blocks(void);
 void deallocate_block(int indx);
 
@@ -287,7 +287,7 @@ int rd_read(int fd, char *address, int num_bytes){
 	last_blk_ofst = pos_ptr % 256; 		//Offset in the last block
 	
 	
-	res = find_block(cur_block,block_ptr,inode_num); //Find the current block;
+	res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
 	
 	if (res < 0){
 		print_s("read: Cannot find a location pointer for this block\n");
@@ -334,7 +334,7 @@ int rd_read(int fd, char *address, int num_bytes){
 			return ERROR;
 		
 		// This also stands as a check if we reached the maximum number of blocks for this file
-		res = find_block(i,block_ptr,inode_num);
+		res = find_block(i,&block_ptr,inode_num);
 		if (res < 0){
 			print_s("read: Cannot find a location pointer for this block\n");
 			return ERROR;
@@ -403,7 +403,7 @@ int rd_write(int fd, char *address, int num_bytes){
 	last_blk_ofst = pos_ptr % 256; 		//Offset in the last block
 	
 	
-	res = find_block(cur_block,block_ptr,inode_num); //Find the current block;
+	res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
 	
 	if (res < 0){
 		print_s("write: Cannot find a location pointer for this block\n");
@@ -454,7 +454,7 @@ int rd_write(int fd, char *address, int num_bytes){
 		// Find a free block and set the correct location pointer
 		int block_num = allocate_block();
 
-		res = find_block(i,block_ptr,inode_num);
+		res = find_block(i,&block_ptr,inode_num);
 		if (res < 0){
 			print_s("write: Cannot find a location pointer for this block\n");
 			return ERROR;
@@ -579,7 +579,7 @@ int rd_unlink(char *pathname){
 	block_t *blk_ptr;
 	// Set the pointer to the first block of the file
 	for (int i=0; i< block_nums; i++){
-		res = find_block(i,blk_ptr,file_inode);
+		res = find_block(i,&blk_ptr,file_inode);
 		if (res < 0){
 			print_s("unlink: Something went terribly wrong when unlinking the file\n");
 		}
@@ -634,7 +634,7 @@ int rd_chmod(char *pathname, mode_t mode){
 
 }
 
-int find_block(int block_num, block_t* cur_block, int inode){
+int find_block(int block_num, block_t** cur_block, int inode){
 	//We reached the blocks limit for a single inode 
 	if (block_num == MAX_INODE_BLOCKS){
 		print_s("We reached the max number of blocks for this inode...\n");
@@ -643,13 +643,18 @@ int find_block(int block_num, block_t* cur_block, int inode){
 	
 
 	if(block_num <= 7){
-		cur_block = (block_t*) fs->inode[inode].location[block_num];
+		*cur_block = (block_t*) fs->inode[inode].location[block_num];
+		char temp[16] ;
+		itoa(temp, 'd',cur_block);
+		print_s("In find_block address is ");
+		print_s(temp);
+		print_s("\n");
 		return 0;
 	}
 	//First indirection
 	else if (block_num <= 71){
 		block_t *indirect = (block_t*) fs->inode[inode].location[8];
-		cur_block = (block_t*) &indirect[block_num - 8];
+		*cur_block = (block_t*) &indirect[block_num - 8];
 		return 0;
 	}
 	//Second indirection
@@ -658,7 +663,7 @@ int find_block(int block_num, block_t* cur_block, int inode){
 		int ind_2 = (block_num - 72) % 64;
 		block_t *indirect_1 = fs->inode[inode].location[9];
 		block_t *indirect_2 = &indirect_1[ind_1];
-		cur_block = (block_t*) &indirect_2[ind_2];
+		*cur_block = (block_t*) &indirect_2[ind_2];
 		return 0;
 	}
 	
@@ -971,7 +976,7 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 			
 			int blk_indx = allocate_block();
 
-			res = find_block(block_num,cur_block,parent_inode);
+			res = find_block(block_num,&cur_block,parent_inode);
 			
 			if (res < 0){
 				print_s("Cannot allocate an additional pointer for the parent dir\n");
@@ -983,12 +988,20 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 		// We still have space in the last block of parent
 		else{
 			//Just return the pointer to the last block
-			res = find_block(block_num,cur_block,parent_inode);
+			res = find_block(block_num,&cur_block,parent_inode);
+			
+			char temp[16] ;
+			itoa(temp, 'd',cur_block);
+			print_s("In update parent address is ");
+			print_s(temp);
+			print_s("\n");
 			
 			if (res < 0){
 				print_s("Something went wrong when finding the current block pointer for the parent\n");
 				return ERROR;
 			}
+
+
 		}
 		
 		// Allocate a new inode for the new file
@@ -1007,7 +1020,7 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 		print_s("the address is ");
 		print_s(temp);
 		print_s("\n");
-		strncpy(entry->filename,filename,14); 		// Security is everything :)
+		strncpy(entry->filename,filename,strlen(filename)); 		// Security is everything :)
 		entry->inode_num = inode_num;
 		fs->inode[parent_inode].size +=16;
 		print_s("UPDATE_PARENT:\n");

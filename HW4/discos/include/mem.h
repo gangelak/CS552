@@ -35,7 +35,7 @@ typedef struct block{
 
 
 typedef struct directory{
-	int inode_num; 		//Index into the inode array
+	uint16_t inode_num; 		//Index into the inode array
 	char filename[14]; 		//Directory name
 }dir_t;
 
