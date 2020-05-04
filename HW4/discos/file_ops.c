@@ -1040,7 +1040,7 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 					return (int) entry->inode_num; 			//Return the inode number
 				}
 			}
-			
+			block_num++;		
 			status = find_block(block_num,&cur_block,parent_inode);
 		}
 	}
