@@ -80,6 +80,10 @@ void init_mem(){
 	for (int i= 0; i< 10; i++){
 		fs->inode[0].location[i] = 0;
 	}
+	
+	//Allocate block for root
+	allocate_block();
+
 	fs->inode[0].location[0] = &fs->d_blks[0]; 	//Initialize the first location pointer
 	fs->inode[0].perm = RW; 			//Root is read write
 	fs->inode[0].in_use = USED; 			//Mark the first inode as used

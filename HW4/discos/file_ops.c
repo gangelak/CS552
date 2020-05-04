@@ -275,7 +275,7 @@ int rd_read(int fd, char *address, int num_bytes){
 	res = find_block(cur_block,block_ptr,inode_num); //Find the current block;
 	
 	if (res < 0){
-		print_s("write: Cannot find a location pointer for this block\n");
+		print_s("read: Cannot find a location pointer for this block\n");
 		return ERROR;
 	}
 
@@ -321,7 +321,7 @@ int rd_read(int fd, char *address, int num_bytes){
 		// This also stands as a check if we reached the maximum number of blocks for this file
 		res = find_block(i,block_ptr,inode_num);
 		if (res < 0){
-			print_s("write: Cannot find a location pointer for this block\n");
+			print_s("read: Cannot find a location pointer for this block\n");
 			return ERROR;
 		}
 		
@@ -377,7 +377,7 @@ int rd_write(int fd, char *address, int num_bytes){
 	
 	/*Case of a directory*/
 	if (fs->inode[inode_num].type == DR){
-		print_s("You cannot write to a directory file\n");
+		print_s("write: You cannot write to a directory file\n");
 		return ERROR;
 	}
 
@@ -731,7 +731,8 @@ int check_if_exists(char name[],int par_inode){
 			dir_t *entry;  					//Temporary entry struct to extract the inode num
 			//&(fs->inode[parent_inode].location[block_num])
 			//cur_block = (block_t*) fs->inode[par_inode].location[block_num];        //Start from parent's first block
-			entry = (dir_t *) (&(fs->inode[par_inode].location[block_num]) + i*16);
+			entry = (dir_t *) (cur_block);
+			entry += i;
 			//The file/dir we are looking for exists in this block...Yay!
 //			char tmp[14] = "";
 //			itoa(tmp,'d',entry->inode_num);
@@ -787,7 +788,6 @@ int check_pathname(char *pathname, char filename[]){
 	int final = 0 ; 		//Flag to check if we are at the last name or not
 	while (final != 1 && status != ERROR){
 		/* First get every directory in the path and check if they exist */
-		int type = 0; 			//type 0 = regular file  and 1 = directory
 		char temp_name[14];
 		int i = 0;
 		name_finish++;
@@ -817,11 +817,8 @@ int check_pathname(char *pathname, char filename[]){
 		//This is a directory name
 		if (pathname[name_finish] == '/'){
 			print_s("Here2\n");
-			type = 1;
 			temp_name[i] = '\0'; 		//Null terminator for name
 		}
-		else
-			type = 0; 		//No need for this type was already 0
 
 		print_s("Before check if exists\n");
 		//Check if the file exists and return its inode if it exists else ERROR
@@ -952,15 +949,40 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 		//number we find which location pointer to use
 		int block_num = fs->inode[parent_inode].size / 256; 	//Last used block number
 		int offset = fs->inode[parent_inode].size % 256;  	//Offset in the last block number
+		int indx = offset / 16;
 		// We are in the first direct pointers Yay!!!
 		
+		/*TODO*/
+		//Update parent with the new block if needed
+
+		// We have to allocate a new block for the parent
+		/*if (offset + 16 > 256 ){*/
+			/*block_num++;*/
+			/*offset = 0;*/
+
+		/*}*/
+		/*//Check if there is an available block*/
+		/*if(!exist_blocks())*/
+			/*return ERROR;*/
+		
+		 /*Find a free block and set the correct location pointer*/
+		/*int block_num = allocate_block();*/
+
+		/*res = find_block(i,block_ptr,inode_num);*/
+		/*if (res < 0){*/
+			/*print_s("write: Cannot find a location pointer for this block\n");*/
+			/*return ERROR;*/
+		/*}*/
+		
+		/*block_ptr = &fs->d_blks[block_num];*/
+
 		int inode_num;
 		print_s("Allocating inode\n");
 		inode_num = allocate_inode(type, perm);
 		
 		dir_t *temp_dir; 					//Temp pointer to update smth
 		if (block_num <= 7 ){
-			temp_dir = (dir_t*) (&(fs->inode[parent_inode].location[block_num]) + offset);
+			temp_dir = (dir_t*) (fs->inode[parent_inode].location[block_num] + indx);
 			char temp[16] ;
 			itoa(temp, '16',temp_dir);
 			print_s("the address is ");
