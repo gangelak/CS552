@@ -50,7 +50,7 @@ File found!
 Traversing the path
 name_finish is 9
 parthname is /test/tmp
-Temp name is tmpt
+Temp name is tmp
 Here1
 Before check if exists
 The path is valid and the file does not exist
@@ -59,7 +59,7 @@ Before updating the parent with the new entry
 Allocating inode
 the address is 1159088
 UPDATE_PARENT:
-tmpt
+tmp
 the inode number is 2
 the offset is 0
 Parent updated
@@ -99,7 +99,7 @@ File found!
 Traversing the path
 name_finish is 9
 parthname is /test/tmp/giannis
-Temp name is tmpt
+Temp name is tmp
 Here2
 Before check if exists
 the parent inode is 1
@@ -108,17 +108,17 @@ File found!
 Traversing the path
 name_finish is 17
 parthname is /test/tmp/giannis
-Temp name is giannis	
+Temp name is giannis
 Here1
 Before check if exists
 The path is valid and the file does not exist
-Filename is giannis	
+Filename is giannis
 Parent inode is 2
 Before updating the parent with the new entry
 Allocating inode
 the address is 1159344
 UPDATE_PARENT:
-giannis	
+giannis
 the inode number is 3
 the offset is 0
 Parent updated
