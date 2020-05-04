@@ -796,6 +796,7 @@ int check_pathname(char *pathname, char filename[]){
 			name_finish++;
 			i++;
 		}
+		temp_name[i] = '\0';
 //		name_finish++;
 		print_s("name_finish is ");
 		char tmp[10];
