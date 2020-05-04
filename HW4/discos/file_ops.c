@@ -319,7 +319,7 @@ int rd_read(int fd, char *address, int num_bytes){
 			return ERROR;
 		
 		// This also stands as a check if we reached the maximum number of blocks for this file
-		res = find_block(cur_block,block_ptr,inode_num);
+		res = find_block(i,block_ptr,inode_num);
 		if (res < 0){
 			print_s("write: Cannot find a location pointer for this block\n");
 			return ERROR;
@@ -439,7 +439,7 @@ int rd_write(int fd, char *address, int num_bytes){
 		// Find a free block and set the correct location pointer
 		int block_num = allocate_block();
 
-		res = find_block(cur_block,block_ptr,inode_num);
+		res = find_block(i,block_ptr,inode_num);
 		if (res < 0){
 			print_s("write: Cannot find a location pointer for this block\n");
 			return ERROR;
