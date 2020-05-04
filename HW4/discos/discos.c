@@ -131,25 +131,24 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 
 	init_fdt();
 
-	show_inode_info(0);
-
-	rd_mkdir("/test");
 	
-	show_inode_info(0);
-	show_inode_info(1);
-
-	rd_mkdir("/test/tmp");
 	
-	show_inode_info(0);
-	show_inode_info(1);
-	show_inode_info(2);
+	
+        rd_mkdir("/test");
+        rd_mkdir("/test/tmp");
+        rd_creat("/test/tmp/giannis", RW);
 
-	rd_creat("/test/tmp/giannis", RW);
+	char tmp[]="123456789";
+        int fd = rd_open("/test/tmp/giannis", RW);
+        rd_write(fd, tmp, strlen(tmp));
+        char temp[9] = "";
+        memset(temp, '\0', 9);
+        rd_read(fd, temp, strlen(tmp));
+        print_s("THE CONTENT IS: ");
+        print_s(temp);
+        print_s("\n");
 
-	show_inode_info(0);
-	show_inode_info(1);
-	show_inode_info(2);
-	show_inode_info(3);
+	
 	asm volatile("hlt");
 
 	/* Initialize 8259 PIC */
