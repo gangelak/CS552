@@ -54,7 +54,8 @@ typedef struct index_node{
 	block_t *location[10]; 		//Block pointers (1st 8 are direct data block pts - 9nth single indirect - 10nth double indirect)
 	uint32_t perm; 			//Permissions for the files (RO,WR,RW)
 	uint8_t in_use;
-	uint8_t pad[11];
+	uint8_t opened;
+	uint8_t pad[10];
 }inode_t;
 
 

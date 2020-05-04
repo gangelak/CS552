@@ -14,6 +14,7 @@ int check_if_exists(char *name,int par_inode);
 void show_bitmap(void);
 int find_block(int block_num, block_t* cur_block, int inode);
 int exist_blocks(void);
+void deallocate_block(int indx);
 
 
 /*TODO*/
@@ -201,6 +202,7 @@ int rd_open(char *pathname, int flags){
 			glob_fdt_ptr[i].flags = flags;
 			glob_fdt_ptr[i].pos_ptr = 0;
 			glob_fdt_ptr[i].inode = file_inode;
+			fs->inode[file_inode].opened++;
 			
 			// Return the index to the fdt
 			return i;
@@ -213,11 +215,15 @@ int rd_open(char *pathname, int flags){
 }
 
 int rd_close(int fd){
-	
+	int inode_num;
+
 	if (glob_fdt_ptr[fd].in_use == FREE){
 		print_s("The file your are trying to close does not exist\n");
 		return ERROR;
 	}
+	
+	inode_num = glob_fdt_ptr[fd].inode;
+	fs->inode[inode_num].opened--;
 
 	glob_fdt_ptr[fd].in_use = FREE;
 	glob_fdt_ptr[fd].flags = JUNK;
@@ -228,16 +234,116 @@ int rd_close(int fd){
 }
 
 int rd_read(int fd, char *address, int num_bytes){
+	
+	int res;
+	int num_of_blocks; 				//num of blocks to write
+	int extra_bytes; 				//Bytes of the last block
+	int inode_num; 					//Inode number for the file
+	uint32_t pos_ptr; 				//Position to start in the file
+	int flags; 					//File permissions
+	int cur_block; 					//Current block to start writing from
+	int last_blk_ofst; 				//Offset in the cur block
+	block_t *block_ptr;
+
+	/*FD does not exist*/
 	if (glob_fdt_ptr[fd].in_use == FREE){
-		print_s("The file your are trying to read from does not exist\n");
+		print_s("read: The file you are trying to write to does not exist\n");
+		return ERROR;
+	}
+	
+	/*Read only file*/
+	flags = glob_fdt_ptr[fd].flags;
+
+	if (flags == WR ){
+		print_s("read: The file is opened as writeonly\n");
 		return ERROR;
 	}
 	
 	/*Case of a directory*/
-	/*if (fs->inode[inode_num].type == DR){*/
-		/*print_s("You cannot read from a directory file\n");*/
-		/*return ERROR;*/
-	/*}*/
+	if (fs->inode[inode_num].type == DR){
+		print_s("read: You cannot read a directory file\n");
+		return ERROR;
+	}
+
+	inode_num = glob_fdt_ptr[fd].inode;
+	pos_ptr = glob_fdt_ptr[fd].pos_ptr;
+	
+	cur_block = pos_ptr / 256; 		//Number of blocks already written
+	last_blk_ofst = pos_ptr % 256; 		//Offset in the last block
+	
+	
+	res = find_block(cur_block,block_ptr,inode_num); //Find the current block;
+	
+	if (res < 0){
+		print_s("write: Cannot find a location pointer for this block\n");
+		return ERROR;
+	}
+
+
+	/*Current byte in the block that we are able to write to*/
+	char *cur_byte = (char*) (block_ptr) + last_blk_ofst;
+	
+	int bytes_read = 0;
+	while (bytes_read < num_bytes && last_blk_ofst < 256){
+		address[bytes_read] = *cur_byte;
+		cur_byte++;
+		bytes_read++;
+		last_blk_ofst++;
+	}
+	
+
+	//We've written everything in the last block
+	if (bytes_read == num_bytes){
+		glob_fdt_ptr[fd].pos_ptr += bytes_read;
+		return bytes_read;
+	}
+	//More bytes left to write to the file
+	else{
+		last_blk_ofst = 0;
+		cur_block++;
+	}
+	
+	num_bytes -= bytes_read;
+
+	num_of_blocks = num_bytes / 256;
+	extra_bytes  = num_bytes % 256;
+	
+	/*First fill the last block*/
+	
+	/*Start writing from the current block*/
+	/*We are going to be writing at byte granularity*/
+
+	for (int i = cur_block; i < cur_block + num_of_blocks; i++){
+		//Check if there is an available block
+		if(!exist_blocks())
+			return ERROR;
+		
+		// This also stands as a check if we reached the maximum number of blocks for this file
+		res = find_block(cur_block,block_ptr,inode_num);
+		if (res < 0){
+			print_s("write: Cannot find a location pointer for this block\n");
+			return ERROR;
+		}
+		
+		char *byte_in_blk = (char*) block_ptr; 	 		//We need to read in byte granularity
+	
+		//We are in the last block...Read what is left
+		if (i == num_of_blocks - 1){
+			for (int j=0; j < extra_bytes; j++){
+				address[bytes_read] = byte_in_blk[j];
+				glob_fdt_ptr[fd].pos_ptr++;
+				bytes_read++;
+			}
+		}
+		else{
+		 	for(int j=0; j< 256; j++){
+				address[bytes_read] = byte_in_blk[j];
+				bytes_read++;
+			}
+		}
+	}
+
+	return bytes_read;
 
 
 }
@@ -303,8 +409,12 @@ int rd_write(int fd, char *address, int num_bytes){
 	
 
 	//We've written everything in the last block
-	if (bytes_written == num_bytes)
+	if (bytes_written == num_bytes){
+		//Update the size of the file
+		glob_fdt_ptr[fd].pos_ptr += bytes_written;
+		fs->inode[inode_num].size += bytes_written;
 		return bytes_written;
+	}
 	//More bytes left to write to the file
 	else{
 		last_blk_ofst = 0;
@@ -343,16 +453,22 @@ int rd_write(int fd, char *address, int num_bytes){
 			for (int j=0; j < extra_bytes; j++){
 				byte_in_blk[j] = address[bytes_written];
 				bytes_written++;
+				glob_fdt_ptr[fd].pos_ptr++;
+				fs->inode[inode_num].size++;
 			}
 		}
 		else{
 		 	for(int j=0; j< 256; j++){
 				byte_in_blk[j] = address[bytes_written];
 				bytes_written++;
+				glob_fdt_ptr[fd].pos_ptr++;
+				fs->inode[inode_num].size++;
 			}
 		}
-	}
 
+		//Update the size of the file
+	}
+	
 	return bytes_written;
 
 
@@ -361,20 +477,122 @@ int rd_write(int fd, char *address, int num_bytes){
 
 int rd_lseek(int fd, int offset){
 	
+	int inode_num; 					//Inode number for the file
+	int file_size;
+
+	/*FD does not exist*/
 	if (glob_fdt_ptr[fd].in_use == FREE){
-		print_s("The file your are trying to seek to does not exist\n");
+		print_s("lseek: The file you are trying to write to does not exist\n");
 		return ERROR;
 	}
+	
+	/*Case of a directory*/
+	if (fs->inode[inode_num].type == DR){
+		print_s("lseek: You cannot seek to a directory file\n");
+		return ERROR;
+	}
+	
 
+	inode_num = glob_fdt_ptr[fd].inode;
+	
+	file_size = fs->inode[inode_num].size;
+	
+	if (offset > file_size){
+		glob_fdt_ptr[fd].pos_ptr = file_size;
+	}
+	else{
+		glob_fdt_ptr[fd].pos_ptr = offset;
+	}
+
+	return 0;
 
 }
 
 int rd_unlink(char *pathname){
 	
+	char buf[16];
+
+	int res = 0;
+	char filename[14];
+	int parent_inode;
+	int type, opened,size;
+	int file_inode;
+
+	//Check if we are trying to create the root directory
 	if (strcmp(pathname,root->filename) == 0){
-		print_s("unlink: You cannot remove the root directory\n");
+		print_s("unlink: You cannot unlink root directory!!!");
 		return ERROR;
 	}
+	
+	//Check if there are available inodes for our file
+
+	parent_inode = check_pathname(pathname,filename);
+	
+	print_s("Filename is ");
+	print_s(filename);
+	
+	itoa(buf,'d',parent_inode);
+	print_s("\nParent inode is ");
+	print_s(buf);
+	print_s("\n");
+
+	if (parent_inode < 0){
+		print_s("unlink: Invalid path...Aborting\n");
+		return ERROR;
+	}
+
+	//Ok now we have the correct parent...Find the inode
+	
+	print_s("Before checking if the file exists\n");
+	file_inode = check_if_exists(filename,parent_inode);
+	
+	type = fs->inode[file_inode].type;
+	opened = fs->inode[file_inode].opened;
+	size = fs->inode[file_inode].size;
+
+	if (opened > 0 || (type == DR && size != 0)){
+		print_s("unlink: Cannot delete file or directory\n");
+		return ERROR;
+	}
+	
+	/*First update the parent directory*/
+	print_s("Before updating the parent\n");
+
+	res = update_parent(parent_inode,filename, DL, DR, JUNK);
+	
+	if (res < 0){
+		print_s("creat: Cannot create a new entry for this file...Aborting\n");
+		return ERROR;
+	}
+	
+	int block_nums, blk_indx;
+	
+	//Number of blocks currently allocated for the file
+	block_nums = fs->inode[file_inode].size / 256;
+
+	/*Now delete the inode and all its data*/
+	block_t *blk_ptr;
+	// Set the pointer to the first block of the file
+	for (int i=0; i< block_nums; i++){
+		res = find_block(i,blk_ptr,file_inode);
+		if (res < 0){
+			print_s("unlink: Something went terribly wrong when unlinking the file\n");
+		}
+		
+		blk_indx = (blk_ptr - &fs->d_blks[0]) / 256;
+		deallocate_block(blk_indx);
+
+	}
+	
+	/*Now delete the inode*/
+	fs->inode[file_inode].in_use = 0;
+	fs->inode[file_inode].size = 0;
+	fs->inode[file_inode].perm = JUNK;
+	fs->inode[file_inode].opened = 0;
+	
+	fs->superblock.free_inodes++;
+
+	print_s("File deleted\n");
 }
 
 int rd_chmod(char *pathname, mode_t mode){
@@ -507,7 +725,7 @@ int check_if_exists(char name[],int par_inode){
 		for (int i = 0; i < 16; i++){
 			dir_t *entry;  					//Temporary entry struct to extract the inode num
 			//&(fs->inode[parent_inode].location[block_num])
-			cur_block = (block_t*) fs->inode[par_inode].location[block_num];        //Start from parent's first block
+			//cur_block = (block_t*) fs->inode[par_inode].location[block_num];        //Start from parent's first block
 			entry = (dir_t *) (&cur_block + i * 16);
 			//The file/dir we are looking for exists in this block...Yay!
 //			char tmp[14] = "";
@@ -640,6 +858,28 @@ int allocate_inode(uint32_t type, uint32_t permissions){
 	return ret;
 }
 
+void deallocate_block(int indx){
+	int actual_blk;
+	int btmp_indx;
+	int bit_indx;
+	uint8_t *bmap_ptr;
+
+	actual_blk = indx + 261;
+	
+	btmp_indx = actual_blk / 8;
+	bit_indx = actual_blk % 8;
+	
+	bmap_ptr = &fs->bitmap[btmp_indx];
+	*bmap_ptr ^= (0x80 >> bit_indx);
+
+	fs->superblock.block_num++;
+	
+	return;
+
+}
+
+
+
 int allocate_block(void){
 	int block_num ;
 	uint8_t *bmap_ptr;
@@ -719,6 +959,37 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 
 		}
 	}
+	// We want to delete the entry
+	else if (action == DL){
+		//The search is similar to the check_if_exists
+		block_t *cur_block;
+		cur_block = (block_t*) fs->inode[parent_inode].location[0]; 	//Start from parent's first block
+		int block_num = 0;      					//First block (will help with indirections)
+
+		while (block_num != -1){
+			for (int i = 0; i < 16; i++){
+				dir_t *entry;  					//Temporary entry struct to extract the inode num
+				//&(fs->inode[parent_inode].location[block_num])
+				cur_block = (block_t*) fs->inode[par_inode].location[block_num];        //Start from parent's first block
+				entry = (dir_t *) (&cur_block + i * 16);
+				//The file/dir we are looking for exists in this block...Yay!
+	//			char tmp[14] = "";
+	//			strncpy(tmp, entry->filename, strlen(entry->filename));
+	//			print_s(tmp);
+	//			print_s("\n");
+				if (strncmp(entry->filename, name, strlen(name)) == 0){
+					print_s("File found!\n");
+					entry->inode_num = JUNK;
+					for (int j = 0; j<14; j++)
+						entry->filename[j] = ;
+
+					fs->inode[parent_inode].size -= 16;
+					return 0		 			//Return the inode number
+				}
+			}
+			block_num = next_block(block_num,cur_block,par_inode);
+			}
+		}
 }
 
 
