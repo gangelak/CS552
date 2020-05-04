@@ -1014,24 +1014,24 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 			for (int i = 0; i < 16; i++){
 				dir_t *entry;  					//Temporary entry struct to extract the inode num
 				//&(fs->inode[parent_inode].location[block_num])
-				cur_block = (block_t*) fs->inode[par_inode].location[block_num];        //Start from parent's first block
+				//cur_block = (block_t*) fs->inode[par_inode].location[block_num];        //Start from parent's first block
 				entry = (dir_t *) (&cur_block + i * 16);
 				//The file/dir we are looking for exists in this block...Yay!
 	//			char tmp[14] = "";
 	//			strncpy(tmp, entry->filename, strlen(entry->filename));
 	//			print_s(tmp);
 	//			print_s("\n");
-				if (strncmp(entry->filename, name, strlen(name)) == 0){
+				if (strncmp(entry->filename, filename, strlen(filename)) == 0){
 					print_s("File found!\n");
 					entry->inode_num = JUNK;
 					for (int j = 0; j<14; j++)
-						entry->filename[j] = ;
+						entry->filename[j] = 0;
 
 					fs->inode[parent_inode].size -= 16;
-					return 0		 			//Return the inode number
+					return 0;		 			//Return the inode number
 				}
 			}
-			block_num = next_block(block_num,cur_block,par_inode);
+			block_num = next_block(block_num,cur_block,parent_inode);
 			}
 		}
 }
