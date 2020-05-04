@@ -671,35 +671,6 @@ int find_block(int block_num, block_t** cur_block, int inode){
 }
 
 
-int next_block(int block_num, block_t *cur_block, int par_inode){
-	//We reached the blocks limit for a single inode 
-	if (block_num == MAX_INODE_BLOCKS){
-		print_s("We reached the max number of blocks for this inode...\n");
-		return ERROR;
-	}
-
-	block_num++;
-	if(block_num <= 7){
-		cur_block = (block_t*) fs->inode[par_inode].location[block_num];
-		return block_num;
-	}
-	//First indirection
-	else if (block_num <= 71){
-		block_t *indirect = (block_t*) fs->inode[par_inode].location[8];
-		cur_block = (block_t*) &indirect[block_num - 8];
-		return block_num;
-	}
-	//Second indirection
-	else if (block_num <= MAX_INODE_BLOCKS - 1){
-		int ind_1 = (block_num - 72) / 64;
-		int ind_2 = (block_num - 72) % 64;
-		block_t *indirect_1 = fs->inode[par_inode].location[9];
-		block_t *indirect_2 = &indirect_1[ind_1];
-		cur_block = (block_t*) &indirect_2[ind_2];
-		return block_num;
-	}
-}
-
 // Check if the File/Dir with name exist under parent with inode par_inode
 int check_if_exists(char name[],int par_inode){
 	
@@ -722,13 +693,14 @@ int check_if_exists(char name[],int par_inode){
 	block_t *cur_block;
 	cur_block = (block_t*) fs->inode[par_inode].location[0]; 	//Start from parent's first block
 	int block_num = 0;      					//First block (will help with indirections)
-	
+	int status = 0;
+
 	char tmp[10] = "";
 	itoa(tmp,'d', par_inode);
 	print_s("the parent inode is ");
 	print_s(tmp);
 	print_s("\n");
-	while (block_num != -1){
+	while (status != -1){
 		for (int i = 0; i < 16; i++){
 			dir_t *entry;  					//Temporary entry struct to extract the inode num
 			//&(fs->inode[parent_inode].location[block_num])
@@ -751,7 +723,8 @@ int check_if_exists(char name[],int par_inode){
 				return (int) entry->inode_num; 			//Return the inode number
 			}
 		}
-		block_num = next_block(block_num,cur_block,par_inode);
+		block_num++;
+		status = find_block(block_num,&cur_block,par_inode);
 //		char tmp[15];
 //		itoa(tmp,'d',block_num);
 //		print_s("the block num is");
@@ -1042,8 +1015,9 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 		block_t *cur_block;
 		cur_block = (block_t*) fs->inode[parent_inode].location[0]; 	//Start from parent's first block
 		int block_num = 0;      					//First block (will help with indirections)
+		int status = 0;
 
-		while (block_num != -1){
+		while (status != -1){
 			for (int i = 0; i < 16; i++){
 				dir_t *entry;  					//Temporary entry struct to extract the inode num
 				//&(fs->inode[parent_inode].location[block_num])
@@ -1067,7 +1041,7 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 				}
 			}
 			
-			block_num = next_block(block_num,cur_block,parent_inode);
+			status = find_block(block_num,&cur_block,parent_inode);
 		}
 	}
 }
