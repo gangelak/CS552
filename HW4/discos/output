@@ -1,25 +1,7 @@
 Address of block 0 1158736
-Before updating the parent with the new entry
-mkdir: Parent updated
-File found!
-Traversing the path
-Before updating the parent with the new entry
-mkdir: Parent updated
-File found!
-Traversing the path
-File found!
-Traversing the path
-File found!
-Traversing the path
-File found!
-Traversing the path
-File found!
-The file/directory that you requested already exists!
-Write time
 Num of bytes to write 
-1048576
-Read time
-HEREEEEEADFASFASDF
-THE CONTENT IS: Count is 1048576
-
-1048576Congrats
+2305
+Num of bytes to write 
+1067008
+write: No more available blocks to allocate
+write: File write STAGE2 error

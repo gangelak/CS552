@@ -31,8 +31,8 @@ int time= 0;
 #endif
 
 
-//#define TEST1
-//#define TEST2
+#define TEST1
+#define TEST2
 //#define TEST3
 //#define TEST4
 //#define TEST5
@@ -152,7 +152,7 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	print_s(buf);
 	print_s("\n");
 	
-	/* Some arbitrary data for our files */
+	/*[> Some arbitrary data for our files <]*/
 	memset (data1, '1', sizeof (data1));
 	memset (data2, '2', sizeof (data2));
 	memset (data3, '3', sizeof (data3));
@@ -162,62 +162,63 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 
 
 	
-        rd_mkdir("/test");
-	/*show_inode_info(0);*/
-	/*show_inode_info(1);*/
-        rd_mkdir("/test/tmp");
-	/*show_inode_info(1);*/
-	/*show_inode_info(2);*/
-        rd_creat("/test/tmp/giannis", RW);
-	/*show_inode_info(2);*/
-	/*show_inode_info(3);*/
+        /*rd_mkdir("/test");*/
+	/*[>show_inode_info(0);<]*/
+	/*[>show_inode_info(1);<]*/
+        /*rd_mkdir("/test/tmp");*/
+	/*[>show_inode_info(1);<]*/
+	/*[>show_inode_info(2);<]*/
+        /*rd_creat("/test/tmp/giannis", RW);*/
+	/*[>show_inode_info(2);<]*/
+	/*[>show_inode_info(3);<]*/
 
-	char tmp[]="123456789";
-	memset (data1, '1', sizeof (data1));
-        fd = rd_open("/test/tmp/giannis", RW);
+	/*char tmp[]="123456789";*/
+	/*memset (data1, '1', sizeof (data1));*/
+        /*fd = rd_open("/test/tmp/giannis", RW);*/
 	
-	itoa(buf,'d',glob_fdt_ptr[0].inode);
+	/*itoa(buf,'d',glob_fdt_ptr[0].inode);*/
 	
-	print_s("Write time\n");
-        rd_write(fd, data3, sizeof(data3));
+	/*print_s("Write time\n");*/
+        /*rd_write(fd, data3, sizeof(data3));*/
         
-        memset(addr, '\0', sizeof(addr));
+        /*memset(addr, '\0', sizeof(addr));*/
 	
-	rd_lseek(fd, 0);
-	print_s("Read time\n");
-	int size = rd_read(fd, addr, sizeof(data3));
+	/*rd_lseek(fd, 0);*/
+	/*print_s("Read time\n");*/
+	/*int size = rd_read(fd, addr, sizeof(data3));*/
         
-	print_s("THE CONTENT IS: ");
-	int count =0;
-	for (int i =0; i< size; i++){
-		if (addr[i] == '3'){
-			//terminal_putchar(addr[i]);
-			count++;
-		}
-		else 
-			break;
-	}
-	itoa(buf,'d',count);
-	print_s("Count is ");
-	print_s(buf);
-	print_s("\n");
-	/*print_s(addr);*/
+	/*print_s("THE CONTENT IS: ");*/
+	/*int count =0;*/
+	/*for (int i =0; i< size; i++){*/
+		/*if (addr[i] == '3'){*/
+			/*//terminal_putchar(addr[i]);*/
+			/*count++;*/
+		/*}*/
+		/*else */
+			/*break;*/
+	/*}*/
+	/*itoa(buf,'d',count);*/
+	/*print_s("Count is ");*/
+	/*print_s(buf);*/
 	/*print_s("\n");*/
-	char strsize[10];
-	itoa(strsize,'d',size);
-	print_s("\n");
-	print_s(strsize);
+	/*[>print_s(addr);<]*/
+	/*[>print_s("\n");<]*/
+	/*char strsize[10];*/
+	/*itoa(strsize,'d',size);*/
+	/*print_s("\n");*/
+	/*print_s(strsize);*/
 
 	
-
-
 
 #ifdef TEST1
 	  /* ****TEST 1: MAXIMUM file creation**** */
 	  /* Generate MAXIMUM regular files */
+	 pathname[0] = '/';
 	  for (i = 0; i < MAX_FILES; i++)
 	  { 
-		  sprintf(pathname, "/file", i);
+	//	  sprintf(pathname, "/file", i);
+		  itoa((pathname+1), 'd', i);
+		  /*print_s(pathname);*/
 		  retval = CREAT (pathname, RO);
 		  if (retval < 0) 
 		  {
@@ -225,19 +226,21 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 			  if (i != MAX_FILES)
 				  asm volatile("hlt");
 	      }
-	      memset (pathname, 0, 80);
+	      //show_inode_info(0);
+	      memset (pathname + 1, '\0', 79);
 	  }
 	  /* Delete all the files created */
 	  for (i = 0; i < MAX_FILES; i++) 
 	  { 
-		  sprintf (pathname, "/file", i);
+		  //sprintf (pathname, "/file", i);
+		 itoa((pathname+1), 'd', i);
 		 retval = UNLINK (pathname);	
 		  if (retval < 0) 
 		  {
 			  print_s("unlink: File delection error!\n");
 			  asm volatile("hlt");
 		  }
-		  memset (pathname, 0, 80);
+		  memset (pathname + 1, '\0', 79);
 	  }
 #endif // TEST1
 

@@ -120,6 +120,7 @@ int sprintf(char dest[], char str[], int dec)
 	{
 		dest[i] = temp[i-len];
 	}
+	dest[len+6] = '\0';
 	return 0;
 }
 //https://www.techiedelight.com/implement-strncpy-function-c/

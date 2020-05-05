@@ -90,12 +90,13 @@ void init_mem(){
 	//Initialize the block
 	dir_t * entry;
 
-	entry = (dir_t *) &fs->d_blks[0];
+	entry = (dir_t *) fs->inode[0].location[0];
 	//Initialize the block
 	for (int i =0; i< 16; i++){
 	   for (int j =0; j< 14; j++)
 		   entry->filename[j] = '\0';
 	   entry->inode_num = JUNK;
+	   entry++;
 	 }
 	
 	fs->inode[0].perm = RW; 			//Root is read write

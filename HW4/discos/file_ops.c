@@ -560,7 +560,8 @@ int rd_unlink(char *pathname){
 	res = update_parent(parent_inode,filename, DL, DR, JUNK);
 	
 	if (res < 0){
-		print_s("unlink: Cannot create a new entry for this file...Aborting\n");
+		print_s(filename);
+		print_s("unlink: Cannot delete the entry for this file...Aborting\n");
 		return ERROR;
 	}
 	
@@ -596,7 +597,7 @@ int rd_unlink(char *pathname){
 
 	fs->superblock.free_inodes++;
 
-	print_s("unlink: File deleted\n");
+	//print_s("unlink: File deleted\n");
 }
 
 int rd_chmod(char *pathname, mode_t mode){
@@ -750,7 +751,7 @@ int check_if_exists(char name[],int par_inode){
 			/*print_s(tmp);*/
 			/*print_s("\n");*/
 			if (strncmp(entry->filename, name, strlen(name)) == 0){
-				print_s("File found!\n");
+			//	print_s("File found!\n");
 				return (int) entry->inode_num; 			//Return the inode number
 			}
 		}
@@ -806,17 +807,17 @@ int check_pathname(char *pathname, int *parent_inode, char filename[]){
 		}
 		temp_name[i] = '\0';
 //		name_finish++;
-//		print_s("name_finish is ");
-//		char tmp[10];
-//		itoa(tmp,'d', name_finish);
-//		print_s(tmp);
-//		print_s("\n");
-//		print_s("parthname is ");
-//		print_s(pathname);
-//		print_s("\n");
-//		print_s("Temp name is ");
-//		print_s(temp_name);
-//		print_s("\n");
+		/*print_s("name_finish is ");*/
+		/*char tmp[10];*/
+		/*itoa(tmp,'d', name_finish);*/
+		/*print_s(tmp);*/
+		/*print_s("\n");*/
+		/*print_s("parthname is ");*/
+		/*print_s(pathname);*/
+		/*print_s("\n");*/
+		/*print_s("Temp name is ");*/
+		/*print_s(temp_name);*/
+		/*print_s("\n");*/
 		if (name_finish == path_len){
 //			print_s("Here1\n");
 			final = 1;
@@ -829,32 +830,32 @@ int check_pathname(char *pathname, int *parent_inode, char filename[]){
 			temp_name[i] = '\0'; 		//Null terminator for name
 		}
 
-//		print_s("Before check if exists\n");
+		/*print_s("Before check if exists\n");*/
 		//Check if the file exists and return its inode if it exists else ERROR
 		status = check_if_exists(temp_name,par_inode);
 		
 		//Case that the name requested does not exist yay
 		if (status == ERROR && final == 1){
-//			print_s("The path is valid and the file does not exist\n");
+	//		print_s("The path is valid and the file does not exist\n");
 			*parent_inode = par_inode;
 			return ERROR;
 			
 		}
 		// Case where the parent is a regural file
 		if (status != ERROR && final == 0){
-			print_s("Traversing the path\n");
+			//print_s("Traversing the path\n");
 			par_inode = status;
 			/*continuing*/
 		}
 		// This is a problem...A directory in the path does not exist
 		else if (status == ERROR && final == 0){
-			print_s("The path does not exist\n");
+			//print_s("The path does not exist\n");
 			*parent_inode = ERROR;
 			return ERROR;
 		}
 		// The file/dir that we requested already exists...Return ERROR
 		else if (status != ERROR && final == 1) {
-			print_s("The file/directory that you requested already exists!\n");
+			//print_s("The file/directory that you requested already exists!\n");
 			*parent_inode = par_inode;
 			return status; 				//This is actually the inode of the file
 		}
@@ -1201,10 +1202,15 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 		// We have to allocate a new block for the parent 
 		// Block 0 is always allocated
 		if (offset == 0 && block_num != 0 ){
-			print_s("HEREEEEEEE!!\n");
+			/*print_s("HEREEEEEEE!!\n");*/
 			
-			block_num++;
+			//block_num++;
 			offset = 0;
+			char temp[16] ;
+			/*itoa(temp, 'd',block_num);*/
+			/*print_s("Block number is ");*/
+			/*print_s(temp);*/
+			/*print_s("\n");*/
 			
 			res = allocate_block(block_num, parent_inode);
 			
@@ -1226,9 +1232,11 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 				for (int j =0; j< 14; j++)
 					entry->filename[j] = '\0';
 				entry->inode_num = JUNK;
+				entry++;
 			}
-			
-
+					
+			//Initialize the new block for the parent
+			//init_block(cur_block,parent_inode);
 //			char temp[16] ;
 //			itoa(temp, 'd',cur_block);
 //			print_s("In update parent address is ");
@@ -1272,7 +1280,7 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 		// We have space at one block for the parent
 		// We have to find which
 		else{
-			/*print_s("HEREEEEEEE222222!!\n");*/
+			//print_s("HEREEEEEEE222222!!\n");
 			
 			for (int i = 0; i <= block_num; i++){
 				res = find_block(i,&cur_block,parent_inode);
@@ -1281,6 +1289,7 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 					print_s("Something went wrong when finding the current block pointer for the parent\n");
 					return ERROR;
 				}
+				//print_s("HEREEEEEEE33333333!!\n");
 			
 				for (int i = 0; i < 16; i++){
 					
@@ -1296,6 +1305,7 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 						int inode_num;
 						/*print_s("Allocating inode\n");*/
 						inode_num = allocate_inode(type, perm);
+			//			print_s("HEREEEEEEE44444!!\n");
 						
 						if (inode_num < 0){
 							print_s("Not any available inodes for the new entry\n");
@@ -1308,6 +1318,7 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 						if (res < 0){
 							print_s("The new inode did not properly allocate a block\n");
 							return ERROR;
+			//			print_s("HEREEEEEEE55555!!\n");
 						}
 						//Init the block
 						init_block(temp_ptr,type);
@@ -1355,7 +1366,7 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 			}
 			block_indx++;
 			// Parent has no more blocks to search so exiting
-			if (block_indx >= par_blks){
+			if (cur_block == 0){
 				return ERROR;
 			}
 			status = find_block(block_indx,&cur_block,parent_inode);
