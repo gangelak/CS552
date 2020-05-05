@@ -56,7 +56,7 @@ void schedule ()
 //			print_s("Removing thread from the queue\n");
 			runqueue_remove(current->tid);
 			if (runqueue->next == 0){
-				print_s("All threads done...Bye!!\n");
+				print_s("\nAll threads done...Bye!!\n");
 				asm volatile("hlt");
 			}
 		}

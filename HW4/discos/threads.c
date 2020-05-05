@@ -203,11 +203,11 @@ void runqueue_add(pcb* t)
 	// first time it is NULL
 	if(runqueue->next == 0)
 	{
-		print_s("add to runqueue: first time\n");	
+//		print_s("add to runqueue: first time\n");	
 		runqueue->next = t;
 	}
 	else{
-		print_s("add to runqueue: not first time\n");
+//		print_s("add to runqueue: not first time\n");
 		// need to iterate through pcbs to find the last one
 		pcb* tmp = runqueue->next;
 		while(tmp->next != 0)

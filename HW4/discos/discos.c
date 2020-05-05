@@ -150,10 +150,6 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	
 	char buf[16];
 	
-	itoa(buf,'d',&fs->d_blks[0]);
-	print_s("Address of block 0 ");
-	print_s(buf);
-	print_s("\n");
 	
 	/*[> Some arbitrary data for our files <]*/
 	memset (data1, '1', sizeof (data1));
@@ -161,74 +157,15 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	memset (data3, '3', sizeof (data3));
 	int retval, i;
 	int fd;
-	int index_node_number;
-
-	/*show_bitmap();*/
-	/*rd_creat("/test",RW);*/
-	/*print_s("\n\n");*/
-	/*show_bitmap();*/
-	/*rd_unlink("/test");*/
-	/*print_s("\n\n");*/
-	/*show_bitmap();*/
-	
-        /*rd_mkdir("/test");*/
-	/*[>show_inode_info(0);<]*/
-	/*[>show_inode_info(1);<]*/
-        /*rd_mkdir("/test/tmp");*/
-	/*[>show_inode_info(1);<]*/
-	/*[>show_inode_info(2);<]*/
-        /*rd_creat("/test/tmp/giannis", RW);*/
-	/*[>show_inode_info(2);<]*/
-	/*[>show_inode_info(3);<]*/
-
-	/*char tmp[]="123456789";*/
-	/*memset (data1, '1', sizeof (data1));*/
-        /*fd = rd_open("/test/tmp/giannis", RW);*/
-	
-	/*itoa(buf,'d',glob_fdt_ptr[0].inode);*/
-	
-	/*print_s("Write time\n");*/
-        /*rd_write(fd, data3, sizeof(data3));*/
-        
-        /*memset(addr, '\0', sizeof(addr));*/
-	
-	/*rd_lseek(fd, 0);*/
-	/*print_s("Read time\n");*/
-	/*int size = rd_read(fd, addr, sizeof(data3));*/
-        
-	/*print_s("THE CONTENT IS: ");*/
-	/*int count =0;*/
-	/*for (int i =0; i< size; i++){*/
-		/*if (addr[i] == '3'){*/
-			/*//terminal_putchar(addr[i]);*/
-			/*count++;*/
-		/*}*/
-		/*else */
-			/*break;*/
-	/*}*/
-	/*itoa(buf,'d',count);*/
-	/*print_s("Count is ");*/
-	/*print_s(buf);*/
-	/*print_s("\n");*/
-	/*[>print_s(addr);<]*/
-	/*[>print_s("\n");<]*/
-	/*char strsize[10];*/
-	/*itoa(strsize,'d',size);*/
-	/*print_s("\n");*/
-	/*print_s(strsize);*/
-
 	
 
 #ifdef TEST1
 	  /* ****TEST 1: MAXIMUM file creation**** */
 	  /* Generate MAXIMUM regular files */
-	 /*show_bitmap();*/
 	 pathname[0] = '/';
 	  for (i = 0; i < MAX_FILES; i++)
 	  { 
-	//	  sprintf(pathname, "/file", i);
 		  itoa((pathname+1), 'd', i);
-		  /*print_s(pathname);*/
 		  retval = CREAT (pathname, RO);
 		  if (retval < 0) 
 		  {
@@ -236,15 +173,11 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 			  if (i != MAX_FILES)
 				  asm volatile("hlt");
 	      }
-	      //show_inode_info(0);
 	      memset (pathname + 1, '\0', 79);
 	  }
-	  /*print_s("\n\n");*/
-	  /*show_bitmap();*/
 	  /* Delete all the files created */
 	  for (i = 0; i < MAX_FILES; i++) 
 	  { 
-		  //sprintf (pathname, "/file", i);
 		 itoa((pathname+1), 'd', i);
 		 retval = UNLINK (pathname);	
 		  if (retval < 0) 
@@ -254,8 +187,9 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 		  }
 		  memset (pathname + 1, '\0', 79);
 	  }
-	  /*print_s("\n\n");*/
-	  /*show_bitmap();*/
+
+
+	  print_s("Passed TEST1\n");
 #endif // TEST1
 
 
@@ -301,6 +235,7 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 #endif // TEST_SINGLE_INDIRECT
 #endif // TEST2
 
+	  print_s("Passed TEST2\n");
 
 #ifdef TEST3
 	int counter = 0;
@@ -325,7 +260,6 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 		else 
 			break;
 	}
-//	addr[sizeof(data1)] = '\0';
 	
 	itoa(buf,'d',counter);
 	print_s("STAGE1 1s read ");
@@ -404,6 +338,7 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 
 
 #endif // TEST3
+	print_s("Passed TEST3\n");
 
 #ifdef TEST4
 	    retval =  OPEN ("/bigfile", RW); /* Open file to write to it */
@@ -436,6 +371,7 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 		print_s("unlink: /bigfile file deletion error\n");
 	}
 #endif // TEST4
+	print_s("Passed TEST4\n");
 
 #ifdef TEST5
 	/* ****TEST 5: Make directory including entries **** */
@@ -455,6 +391,7 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 		print_s("mkdir:Directory 3 creation error\n");
 	}
 #endif //TEST5
+	print_s("Passed TEST5\n");
 
 #ifdef TEST6
 
@@ -467,24 +404,8 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	schedule();
 
 #endif // TEST6
-	print_s("Congrats\n");
-	asm volatile("hlt");
-
-
-
-
-
-
-
-
-
-
-
-	asm volatile("hlt");
-
+	print_s("Passed TEST6\n");
 	
-
-
-	/*schedule();*/
+	asm volatile("hlt");
 	return ;
 }

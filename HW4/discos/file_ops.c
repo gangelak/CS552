@@ -153,7 +153,7 @@ int rd_mkdir(char *pathname){
 	//Ok now we have the correct parent...Allocate resources for the file
 	//Also update the parent entry
 	
-	print_s("Before updating the parent with the new entry\n");
+	//print_s("Before updating the parent with the new entry\n");
 	res = update_parent(parent_inode,filename, CR, DR, RW);
 	if (res < 0){
 		print_s("mkdir: Cannot create a new entry for this directory...Aborting\n");
@@ -343,7 +343,6 @@ int rd_read(int fd, char *address, int num_bytes){
 		cur_pos_ptr++;
 		
 		if (bytes_read + pos_ptr >= fl_size){
-			print_s("HEREEEEEADFASFASDF\n");
 			break;
 		}
 		
@@ -381,11 +380,6 @@ int rd_write(int fd, char *address, int num_bytes){
 	int blocks_alloc; 				//Blocks allocated by the file
 	int bytes_written = 0;
 	
-	
-	print_s("Num of bytes to write \n");
-	itoa(temp,'d',num_bytes);
-	print_s(temp);
-	print_s("\n");
 
 	/*FD does not exist*/
 	if (glob_fdt_ptr[fd].in_use == FREE){
@@ -424,10 +418,6 @@ int rd_write(int fd, char *address, int num_bytes){
 	cur_block = pos_ptr / 256; 		//Block index to start
 	cur_ofst = pos_ptr % 256; 		//Offset in that block
 	
-	itoa(temp,'d',cur_block);
-	print_s("Current block index ");
-	print_s(temp);
-	print_s("\n");
 	
 	// We are at the end of the file so we have to allocate new blocks
 	if (pos_ptr >= fl_size && fl_size < MAX_FILE_SIZE && pos_ptr != 0){
@@ -440,10 +430,6 @@ int rd_write(int fd, char *address, int num_bytes){
 		}
 		cur_ofst =0;
 		blocks_alloc++;
-		itoa(temp,'d',blocks_alloc);
-		print_s("Blocks allocated till now ");
-		print_s(temp);
-		print_s("\n");
 	}
 
 	res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;

@@ -2,12 +2,9 @@ Collaborators:
 Ioannis Angelakopoulos jaggel@bu.edu
 Rasoul Jahanshahi rasoulj@bu.edu
 
-fifos-2 and fifos-pcr are implemented in the same code. based on the flags sent during the compilation the features will be different.
 
-- run fifos-2:
-	./preemption.sh
-- run fifos-pcr:
-	./pcr.sh
+- run discos:
+	./run.sh
 
 resources:
 
@@ -23,3 +20,5 @@ set up gdt:
 set up serial port for qemu in vga.c:
 	https://wiki.osdev.org/Serial_Ports
 
+set up serial port for qemu in vga.c:
+	https://docs.oracle.com/cd/E19455-01/805-7228/6j6q7uf0r/index.html
