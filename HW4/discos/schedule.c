@@ -69,7 +69,7 @@ void schedule ()
 //			print_s("Context switching to the next thread\n");
 #ifdef MEM
 		// switch file_desc
-		glob_fdt_ptr = current->file_desc;
+		glob_fdt_ptr = current->fdt;
 #endif
 		swtch(&prev_node->ctx, current->ctx);
 		// after thread-yield we have to go back

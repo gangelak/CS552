@@ -2,7 +2,7 @@
 #include "include/file_ops.h"
 #include "helper.h"
 #include "vga.h"
-
+#include "types.h"
 
 
 int check_pathname(char *pathname, int* par_inode, char *filename);
@@ -15,6 +15,10 @@ int find_block(int block_num, block_t** cur_block, int inode);
 int exist_blocks(void);
 void deallocate_block(int indx);
 void init_block(block_t* cur_block, int type);
+
+
+extern int threads;
+
 
 /*TODO*/
 // Need one function to recurse through the pathnames
@@ -99,9 +103,10 @@ int rd_creat(char *pathname, mode_t mode){
 		return ERROR;
 	}
 
-#ifdef threads
-	asm volatile("sti");
-#endif
+
+	if ( threads == 1 )
+		asm volatile("sti");
+
 //	print_s("creat: Parent updated\n");
 
 }
@@ -163,9 +168,11 @@ int rd_mkdir(char *pathname){
 
 	print_s("mkdir: Parent updated\n");
 
-#ifdef threads
-	asm volatile("sti");
-#endif
+	if ( threads == 1 )
+	{	
+		asm volatile("sti");
+	}
+	
 	return 0;
 }
 
@@ -235,9 +242,9 @@ int rd_open(char *pathname, int flags){
 	
 	print_s("Non available file descriptors for the file\n");
 	
-#ifdef threads
-	asm volatile("sti");
-#endif
+	if ( threads == 1 )
+		asm volatile("sti");
+
 	return ERROR;
 }
 
@@ -258,9 +265,9 @@ int rd_close(int fd){
 	glob_fdt_ptr[fd].pos_ptr = 0;
 	glob_fdt_ptr[fd].inode = JUNK;
 
-#ifdef threads
-	asm volatile("sti");
-#endif
+	if ( threads == 1 )
+		asm volatile("sti");
+
 	return 0;
 }
 
@@ -356,9 +363,9 @@ int rd_read(int fd, char *address, int num_bytes){
 	}
 	glob_fdt_ptr[fd].pos_ptr = cur_pos_ptr;
 
-#ifdef threads
-	asm volatile("sti");
-#endif
+	if ( threads == 1 )
+		asm volatile("sti");
+
 	return bytes_read;
 }
 
@@ -531,9 +538,10 @@ int rd_write(int fd, char *address, int num_bytes){
 	/*print_s(temp);*/
 	/*print_s("\n");*/
 
-#ifdef threads
-	asm volatile("sti");
-#endif
+
+	if ( threads == 1 )
+		asm volatile("sti");
+
 	return bytes_written;
 
 }
@@ -569,9 +577,9 @@ int rd_lseek(int fd, int offset){
 		glob_fdt_ptr[fd].pos_ptr = offset;
 	}
 
-#ifdef threads
-	asm volatile("sti");
-#endif
+	if ( threads == 1 )
+		asm volatile("sti");
+
 	return 0;
 
 }
@@ -669,9 +677,9 @@ int rd_unlink(char *pathname){
 
 	fs->superblock.free_inodes++;
 
-#ifdef threads
-	asm volatile("sti");
-#endif
+	if ( threads == 1 )
+		asm volatile("sti");
+
 	//print_s("unlink: File deleted\n");
 }
 
@@ -707,9 +715,10 @@ int rd_chmod(char *pathname, mode_t mode){
 	fs->inode[file_inode].perm = mode;
 
 	print_s("chmod: File mode updated\n");
-#ifdef threads
-	asm volatile("sti");
-#endif
+
+	if ( threads == 1 )
+		asm volatile("sti");
+
 
 }
 

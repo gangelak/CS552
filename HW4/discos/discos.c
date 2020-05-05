@@ -23,6 +23,8 @@ int cnt = 0;   // Memory Region Counter
 file_obj main_fdt[MAX_FILES + 1]; 		//FDT for the main thread - Max FDs = 1024 same as max files 
 
 
+ int threads = 0;
+
 pcb fifos_threads[MAX_THREADS];
 pcb dum_dum; 				//dummy thread doing nothing;
 
@@ -457,8 +459,10 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 #endif //TEST5
 
 #ifdef TEST6
+
 	/* ****TEST 6: 2 process test**** */
-#define threads
+
+	threads = 1;
 	init_threads();
 	schedule();
 

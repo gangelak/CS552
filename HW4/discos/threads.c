@@ -15,9 +15,6 @@
 static bool pcb_in_use[MAX_THREADS];
 static uint32_t stacks[MAX_THREADS][1024];
  uint32_t dstack[1024]; 			//dummy stack for the dummy thread
-#ifdef MEM
-file_obj file_desc_pool[MAX_FILES+1]; 
-#endif
 
 #ifdef PCR
 extern int time;
@@ -133,7 +130,7 @@ void thread_func()
 			print_s("Thread");
 			print_s(name);
 			print_s(" creation: Failed creation error\n");
-			asm volatile("hlt");
+		//	asm volatile("hlt");
 		}
 		memset (pathname, '\0', 79);                 
 	}
@@ -221,12 +218,8 @@ void runqueue_add(pcb* t)
 		tmp->next = t;
 	}
 }
-#ifdef MEM
-int thread_create(void *stack, void *func, void *filedesc)
-#else
-int thread_create(void *stack, void *func)
-#endif
 
+int thread_create(void *stack, void *func)
 {
 	int new_pcb = -1;
 	
@@ -291,16 +284,10 @@ void init_threads(void){
 	runqueue->next = 0; // set up runqueue
 	current = 0; // set up current running to null
 	int i;
-#ifdef MEM	
-	for (i = 0; i < MAX_THREADS; i++){
-		thread_create(&(stacks[i][1023]), thread_func, &(file_desc_pool[i]));
-	}
-#else
 	for (i = 0; i < MAX_THREADS; i++){
 		thread_create(&(stacks[i][1023]), thread_func);
 	}
 
-#endif
 	/* Initialize the dummy thread */
 	void *stk = &dstack[1023];
 
