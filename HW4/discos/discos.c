@@ -140,6 +140,9 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 			/*break;*/
 		/*}*/
 	/*}*/
+
+	init_pic();
+	init_pit();
 	terminal_initialize();
 	init_mem();
 	glob_fdt_ptr = main_fdt;
@@ -455,9 +458,7 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 
 #ifdef TEST6
 	/* ****TEST 6: 2 process test**** */
-
-	init_pic();
-	init_pit();
+#define threads
 	init_threads();
 	schedule();
 

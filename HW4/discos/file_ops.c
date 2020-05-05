@@ -40,7 +40,10 @@ void init_fdt(void){
 // 	 Check if there are available inodes
 // 	 Check if there is at least one available block
 int rd_creat(char *pathname, mode_t mode){
-	
+
+
+	asm volatile("cli");
+
 	char buf[16];
 
 	int res = 0;
@@ -96,6 +99,9 @@ int rd_creat(char *pathname, mode_t mode){
 		return ERROR;
 	}
 
+#ifdef threads
+	asm volatile("sti");
+#endif
 //	print_s("creat: Parent updated\n");
 
 }
@@ -156,12 +162,15 @@ int rd_mkdir(char *pathname){
 	}
 
 	print_s("mkdir: Parent updated\n");
-	asm volatile("sti");
 
+#ifdef threads
+	asm volatile("sti");
+#endif
+	return 0;
 }
 
 int rd_open(char *pathname, int flags){
-	
+	asm volatile("cli");	
 	int res = 0;
 
 	char filename[14];
@@ -226,10 +235,14 @@ int rd_open(char *pathname, int flags){
 	
 	print_s("Non available file descriptors for the file\n");
 	
+#ifdef threads
+	asm volatile("sti");
+#endif
 	return ERROR;
 }
 
 int rd_close(int fd){
+	asm volatile("cli");
 	int inode_num;
 
 	if (glob_fdt_ptr[fd].in_use == FREE){
@@ -245,11 +258,15 @@ int rd_close(int fd){
 	glob_fdt_ptr[fd].pos_ptr = 0;
 	glob_fdt_ptr[fd].inode = JUNK;
 
+#ifdef threads
+	asm volatile("sti");
+#endif
 	return 0;
 }
 
 int rd_read(int fd, char *address, int num_bytes){
-	
+
+	asm volatile("cli");
 	int res;
 	int num_of_blocks; 				//num of blocks to write
 	int extra_bytes; 				//Bytes of the last block
@@ -339,12 +356,16 @@ int rd_read(int fd, char *address, int num_bytes){
 	}
 	glob_fdt_ptr[fd].pos_ptr = cur_pos_ptr;
 
+#ifdef threads
+	asm volatile("sti");
+#endif
 	return bytes_read;
 }
 
 
 int rd_write(int fd, char *address, int num_bytes){
-	
+
+	asm volatile("cli");
 	int res;
 	int num_of_blocks; 				//num of blocks to write
 	int extra_bytes; 				//Bytes of the last block
@@ -510,13 +531,17 @@ int rd_write(int fd, char *address, int num_bytes){
 	/*print_s(temp);*/
 	/*print_s("\n");*/
 
+#ifdef threads
+	asm volatile("sti");
+#endif
 	return bytes_written;
 
 }
 
 
 int rd_lseek(int fd, int offset){
-	
+
+	asm volatile("cli");
 	int inode_num = glob_fdt_ptr[fd].inode; 					//Inode number for the file
 	int file_size;
 
@@ -544,12 +569,15 @@ int rd_lseek(int fd, int offset){
 		glob_fdt_ptr[fd].pos_ptr = offset;
 	}
 
+#ifdef threads
+	asm volatile("sti");
+#endif
 	return 0;
 
 }
 
 int rd_unlink(char *pathname){
-	
+	asm volatile("cli");	
 	char buf[16];
 
 	int res = 0;
@@ -641,11 +669,15 @@ int rd_unlink(char *pathname){
 
 	fs->superblock.free_inodes++;
 
+#ifdef threads
+	asm volatile("sti");
+#endif
 	//print_s("unlink: File deleted\n");
 }
 
 int rd_chmod(char *pathname, mode_t mode){
-	
+
+	asm volatile("cli");
 	int res = 0;
 
 	char filename[14];
@@ -675,6 +707,9 @@ int rd_chmod(char *pathname, mode_t mode){
 	fs->inode[file_inode].perm = mode;
 
 	print_s("chmod: File mode updated\n");
+#ifdef threads
+	asm volatile("sti");
+#endif
 
 }
 
