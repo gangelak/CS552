@@ -61,7 +61,7 @@ int time= 0;
 static char pathname[80];
 
 static char data1[BLK_SZ*DIRECT + 257]; /* Largest data directly accessible */
-static char data2[8* 256 + 60 * 256];     /* Single indirect data size */
+static char data2[8*256 + 64*256 + 256*64*64];     /* Single indirect data size */
 static char data3[PTRS_PB*PTRS_PB*BLK_SZ]; /* Double indirect data size */
 static char addr[PTRS_PB*PTRS_PB*BLK_SZ+1]; /* Scratchpad memory */
 
@@ -176,17 +176,36 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	memset (data1, '1', sizeof (data1));
         fd = rd_open("/test/tmp/giannis", RW);
 	
+	itoa(buf,'d',glob_fdt_ptr[0].inode);
+	print_s("Inode before write is ");
+	print_s(buf);
+	print_s("\n");
+	
 	print_s("Write time\n");
-        rd_write(fd, data2, strlen(data2));
+        rd_write(fd, data3, sizeof(data3));
+	itoa(buf,'d',glob_fdt_ptr[0].inode);
+	print_s("Inode after write is ");
+	print_s(buf);
+	print_s("\n");
         
-	char temp[sizeof(data2) + 1] = "";
-        memset(temp, '\0', strlen(data2)+1);
+        memset(addr, '\0', sizeof(addr));
+	
+	itoa(buf,'d',glob_fdt_ptr[0].inode);
+	print_s("Inode before seek is ");
+	print_s(buf);
+	print_s("\n");
 	
 	rd_lseek(fd, 0);
 	print_s("Read time\n");
-	int size = rd_read(fd, temp, sizeof(data2));
-        print_s("THE CONTENT IS: ");
-        print_s(temp);
+	int size = rd_read(fd, addr, sizeof(data3));
+	
+	itoa(buf,'d',glob_fdt_ptr[0].inode);
+	print_s("Inode after read is ");
+	print_s(buf);
+	print_s("\n");
+        
+	print_s("THE CONTENT IS: ");
+        print_s(addr);
         print_s("\n");
 	char strsize[10];
 	itoa(strsize,'d',size);
