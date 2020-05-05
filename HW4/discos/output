@@ -28,12 +28,24 @@ Before updating the parent with the new entry
 mkdir: Parent updated
 Before updating the parent with the new entry
 mkdir: Parent updated
+add to runqueue: first time
+add to runqueue: not first time
+Executing Thread <0>
+Executing Thread <1>
 
 Showing information for inode
-1
+0
 Inode type: 1
-Inode size: 32
-Inode location pointers: 1441360 0 0 0 0 0 0 0 0 0 
+Inode size: 9504
+Inode location pointers: 1162832 1445968 1450320 1454672 1459024 1466960 1475664 1484368 2525008 0 
 Inode permissions: 2
 Inode is used: 1
-Congrats
+Done <0>!
+Showing information for inode
+0
+Inode type: 1
+Inode size: 9616
+Inode location pointers: 1162832 1445968 1450320 1454672 1459024 1466960 1475664 1484368 2525008 0 
+Inode permissions: 2
+Inode is used: 1
+Done <1>!All threads done...Bye!!

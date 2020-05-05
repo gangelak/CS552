@@ -33,6 +33,7 @@ void schedule ()
 	
 	if ( current == 0 ) // we haven't chosen one yet or nothing in the queue anymore
 	{
+//		print_s("First time scheduling\n");
 		prev_node = &dum_dum;
 		current = runqueue->next; // the one that is going to run now
 	}
@@ -62,15 +63,15 @@ void schedule ()
 		
 
 	}
+#ifdef MEM
+		// switch file_desc
+		glob_fdt_ptr = &current->fdt;
+#endif
 	
 	asm volatile("sti");
 	if (current !=0 && prev_node->tid != current->tid ){
 
 //			print_s("Context switching to the next thread\n");
-#ifdef MEM
-		// switch file_desc
-		glob_fdt_ptr = current->fdt;
-#endif
 		swtch(&prev_node->ctx, current->ctx);
 		// after thread-yield we have to go back
 	}

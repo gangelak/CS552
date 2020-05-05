@@ -109,6 +109,8 @@ void do_nothing(){
 
 void thread_func() 
 {
+
+	print_s("Executing Thread <");
 	int i;
 	int j = 0;
 	int cnt = current->tid + 100;
@@ -116,9 +118,8 @@ void thread_func()
 	char counter[50];
 	itoa(name,'d',current->tid);
 
-	/*print_s("Executing Thread <");*/
-	/*print_s(name);*/
-	/*print_s(">\n");*/
+	print_s(name);
+	print_s(">\n");
 	char pathname[80];
 	for (i = 0; i < 300; i++)
 	{
@@ -202,11 +203,11 @@ void runqueue_add(pcb* t)
 	// first time it is NULL
 	if(runqueue->next == 0)
 	{
-//		print_s("add to runqueue: first time\n");	
+		print_s("add to runqueue: first time\n");	
 		runqueue->next = t;
 	}
 	else{
-//		print_s("add to runqueue: not first time\n");
+		print_s("add to runqueue: not first time\n");
 		// need to iterate through pcbs to find the last one
 		pcb* tmp = runqueue->next;
 		while(tmp->next != 0)
@@ -226,7 +227,7 @@ int thread_create(void *stack, void *func)
 	uint16_t ds=0x10, es = 0x10, fs = 0x10, gs = 0x10;
 
 	new_pcb = get_pcb();
-	if (new_pcb == -1){
+     	if (new_pcb == -1){
 		print_s("No PCB available!\n");
 		return -1;
 	}
@@ -272,7 +273,10 @@ int thread_create(void *stack, void *func)
 #endif
 
 #ifdef MEM
-	fifos_threads[new_pcb].file_desc = (file_obj*)file_desc_pool; 
+	for (int i =0; i< 1024; i++){
+		fifos_threads[new_pcb].fdt[i].in_use = FREE; 
+	}
+
 #endif
 	// add to the run queue
 	runqueue_add(&fifos_threads[new_pcb]);

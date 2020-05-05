@@ -80,13 +80,6 @@ int rd_creat(char *pathname, mode_t mode){
 		
 	}
 
-//	print_s("Filename is ");
-//	print_s(filename);
-	
-	/*itoa(buf,'d',parent_inode);*/
-//	print_s("\nParent inode is ");
-///	print_s(buf);
-//	print_s("\n");
 
 	if (parent_inode < 0){
 		print_s("creat: Invalid path...Aborting\n");
@@ -104,8 +97,9 @@ int rd_creat(char *pathname, mode_t mode){
 	}
 
 
-	if ( threads == 1 )
+	if ( threads == 1 ){
 		asm volatile("sti");
+	}
 
 //	print_s("creat: Parent updated\n");
 
