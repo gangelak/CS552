@@ -125,7 +125,8 @@ void thread_func()
 	char pathname[80];
 	for (i = 0; i < 300; i++)
 	{
-		sprintf(pathname, "file_p_",i);
+		pathname[0] = '/';
+		itoa((pathname+1),'d', (1+current->tid)*300 + i ) ;
 		int retval = CREAT (pathname, RO);
 		if (retval < 0)
 		{
@@ -134,9 +135,9 @@ void thread_func()
 			print_s(" creation: Failed creation error\n");
 			asm volatile("hlt");
 		}
-		memset (pathname, 0, 80);                 
+		memset (pathname, '\0', 79);                 
 	}
-
+	show_inode_info(0);
 	print_s ("Done <");
 	print_s(name);
 	print_s(">!");

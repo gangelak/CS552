@@ -36,7 +36,7 @@ int time= 0;
 #define TEST3
 #define TEST4
 #define TEST5
-//#define TEST6
+#define TEST6
 
 
 

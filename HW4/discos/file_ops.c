@@ -102,6 +102,7 @@ int rd_creat(char *pathname, mode_t mode){
 
 
 int rd_mkdir(char *pathname){
+	asm volatile("cli");
 	int res = 0;
 
 	char filename[14];
@@ -155,7 +156,7 @@ int rd_mkdir(char *pathname){
 	}
 
 	print_s("mkdir: Parent updated\n");
-
+	asm volatile("sti");
 
 }
 
