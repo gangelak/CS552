@@ -385,7 +385,7 @@ int rd_write(int fd, char *address, int num_bytes){
 	cur_ofst = pos_ptr % 256; 		//Offset in that block
 	
 	// We are at the end of the file so we have to allocate new blocks
-	if (pos_ptr >= fl_size && fl_size < MAX_FILE_SIZE){
+	if (pos_ptr >= fl_size && fl_size < MAX_FILE_SIZE && pos_ptr != 0){
 		cur_block++;
 		res = allocate_block(cur_block,inode_num);
 
@@ -399,6 +399,11 @@ int rd_write(int fd, char *address, int num_bytes){
 
 	res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
 	
+	print_s("In write Current block is \n");
+	itoa(temp,'d',block_ptr);
+	print_s(temp);
+	print_s("\n");
+
 	init_block(block_ptr, fs->inode[inode_num].type); // Init the block
 
 	if (res < 0){
