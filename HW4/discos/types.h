@@ -35,7 +35,7 @@ typedef uint64 uint64_t;
 #define MAX_THREADS 3
 #define MAX_REPLS 40
 #else
-#define MAX_THREADS 5
+#define MAX_THREADS 2 
 #endif
 
 
@@ -97,7 +97,7 @@ struct proc_crtl_block{
 #endif
 
 #ifdef MEM
-	struct file_obj;
+	struct file_obj *file_desc;
 #endif
 
 };
