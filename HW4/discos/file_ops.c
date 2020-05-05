@@ -324,6 +324,7 @@ int rd_read(int fd, char *address, int num_bytes){
 		cur_pos_ptr++;
 		
 		if (bytes_read + pos_ptr >= fl_size){
+			print_s("HEREEEEEADFASFASDF\n");
 			break;
 		}
 		
@@ -447,7 +448,7 @@ int rd_write(int fd, char *address, int num_bytes){
 				/*print_s("Bytes written up to this point ");*/
 				/*print_s(temp);*/
 				/*print_s("\n");*/
-				/*cur_block++;*/
+				cur_block++;
 				/*print_s("Allocating new block\n");*/
 				/*itoa(temp,'d',cur_block);*/
 				/*print_s("New block index \n");*/

@@ -163,50 +163,46 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 
 	
         rd_mkdir("/test");
-	show_inode_info(0);
-	show_inode_info(1);
+	/*show_inode_info(0);*/
+	/*show_inode_info(1);*/
         rd_mkdir("/test/tmp");
-	show_inode_info(1);
-	show_inode_info(2);
+	/*show_inode_info(1);*/
+	/*show_inode_info(2);*/
         rd_creat("/test/tmp/giannis", RW);
-	show_inode_info(2);
-	show_inode_info(3);
+	/*show_inode_info(2);*/
+	/*show_inode_info(3);*/
 
 	char tmp[]="123456789";
 	memset (data1, '1', sizeof (data1));
         fd = rd_open("/test/tmp/giannis", RW);
 	
 	itoa(buf,'d',glob_fdt_ptr[0].inode);
-	print_s("Inode before write is ");
-	print_s(buf);
-	print_s("\n");
 	
 	print_s("Write time\n");
         rd_write(fd, data3, sizeof(data3));
-	itoa(buf,'d',glob_fdt_ptr[0].inode);
-	print_s("Inode after write is ");
-	print_s(buf);
-	print_s("\n");
         
         memset(addr, '\0', sizeof(addr));
-	
-	itoa(buf,'d',glob_fdt_ptr[0].inode);
-	print_s("Inode before seek is ");
-	print_s(buf);
-	print_s("\n");
 	
 	rd_lseek(fd, 0);
 	print_s("Read time\n");
 	int size = rd_read(fd, addr, sizeof(data3));
-	
-	itoa(buf,'d',glob_fdt_ptr[0].inode);
-	print_s("Inode after read is ");
-	print_s(buf);
-	print_s("\n");
         
 	print_s("THE CONTENT IS: ");
-        print_s(addr);
-        print_s("\n");
+	int count =0;
+	for (int i =0; i< size; i++){
+		if (addr[i] == '3'){
+			//terminal_putchar(addr[i]);
+			count++;
+		}
+		else 
+			break;
+	}
+	itoa(buf,'d',count);
+	print_s("Count is ");
+	print_s(buf);
+	print_s("\n");
+	/*print_s(addr);*/
+	/*print_s("\n");*/
 	char strsize[10];
 	itoa(strsize,'d',size);
 	print_s("\n");

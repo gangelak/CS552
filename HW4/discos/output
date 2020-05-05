@@ -1,76 +1,25 @@
-Address of block 0 1162832
+Address of block 0 1158736
 Before updating the parent with the new entry
 mkdir: Parent updated
-
-Showing information for inode
-0
-Inode type: 1
-Inode size: 16
-Inode location pointers: 1162832 0 0 0 0 0 0 0 0 0 
-Inode permissions: 2
-Inode is used: 1
-
-Showing information for inode
-1
-Inode type: 1
-Inode size: 0
-Inode location pointers: 1163088 0 0 0 0 0 0 0 0 0 
-Inode permissions: 2
-Inode is used: 1
 File found!
 Traversing the path
 Before updating the parent with the new entry
 mkdir: Parent updated
-
-Showing information for inode
-1
-Inode type: 1
-Inode size: 16
-Inode location pointers: 1163088 0 0 0 0 0 0 0 0 0 
-Inode permissions: 2
-Inode is used: 1
-
-Showing information for inode
-2
-Inode type: 1
-Inode size: 0
-Inode location pointers: 1163344 0 0 0 0 0 0 0 0 0 
-Inode permissions: 2
-Inode is used: 1
 File found!
 Traversing the path
 File found!
 Traversing the path
-
-Showing information for inode
-2
-Inode type: 1
-Inode size: 16
-Inode location pointers: 1163344 0 0 0 0 0 0 0 0 0 
-Inode permissions: 2
-Inode is used: 1
-
-Showing information for inode
-3
-Inode type: 2
-Inode size: 0
-Inode location pointers: 1163600 0 0 0 0 0 0 0 0 0 
-Inode permissions: 2
-Inode is used: 1
 File found!
 Traversing the path
 File found!
 Traversing the path
 File found!
 The file/directory that you requested already exists!
-Inode before write is 3
 Write time
 Num of bytes to write 
 1048576
-Inode after write is 3
-Inode before seek is 3
 Read time
-Inode after read is 3
-THE CONTENT IS: 3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
+HEREEEEEADFASFASDF
+THE CONTENT IS: Count is 1048576
 
 1048576Congrats
