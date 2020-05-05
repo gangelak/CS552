@@ -24,11 +24,12 @@ int rd_read(int fd, char *address, int num_bytes);
 int rd_write(int fd, char *address, int num_bytes);
 int rd_lseek(int fd, int offset);
 int rd_unlink(char *pathname);
-int rd_cmmod(char *pathname, mode_t mode);
+int rd_chmod(char *pathname, mode_t mode);
 
 void show_inode_info(int inode);
 void init_fdt(void);
 void show_fd_object(int fd);
 int allocate_block(int block_num, int inode);
+void show_bitmap(void);
 
 file_obj *glob_fdt_ptr;

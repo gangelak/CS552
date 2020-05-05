@@ -33,9 +33,9 @@ int time= 0;
 
 #define TEST1
 #define TEST2
-//#define TEST3
-//#define TEST4
-//#define TEST5
+#define TEST3
+#define TEST4
+#define TEST5
 //#define TEST6
 
 
@@ -60,8 +60,8 @@ int time= 0;
 
 static char pathname[80];
 
-static char data1[BLK_SZ*DIRECT + 257]; /* Largest data directly accessible */
-static char data2[8*256 + 64*256 + 256*64*64];     /* Single indirect data size */
+static char data1[BLK_SZ*DIRECT]; /* Largest data directly accessible */
+static char data2[PTRS_PB*BLK_SZ];     /* Single indirect data size */
 static char data3[PTRS_PB*PTRS_PB*BLK_SZ]; /* Double indirect data size */
 static char addr[PTRS_PB*PTRS_PB*BLK_SZ+1]; /* Scratchpad memory */
 
@@ -160,7 +160,13 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	int fd;
 	int index_node_number;
 
-
+	/*show_bitmap();*/
+	/*rd_creat("/test",RW);*/
+	/*print_s("\n\n");*/
+	/*show_bitmap();*/
+	/*rd_unlink("/test");*/
+	/*print_s("\n\n");*/
+	/*show_bitmap();*/
 	
         /*rd_mkdir("/test");*/
 	/*[>show_inode_info(0);<]*/
@@ -213,6 +219,7 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 #ifdef TEST1
 	  /* ****TEST 1: MAXIMUM file creation**** */
 	  /* Generate MAXIMUM regular files */
+	 /*show_bitmap();*/
 	 pathname[0] = '/';
 	  for (i = 0; i < MAX_FILES; i++)
 	  { 
@@ -229,6 +236,8 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	      //show_inode_info(0);
 	      memset (pathname + 1, '\0', 79);
 	  }
+	  /*print_s("\n\n");*/
+	  /*show_bitmap();*/
 	  /* Delete all the files created */
 	  for (i = 0; i < MAX_FILES; i++) 
 	  { 
@@ -242,6 +251,8 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 		  }
 		  memset (pathname + 1, '\0', 79);
 	  }
+	  /*print_s("\n\n");*/
+	  /*show_bitmap();*/
 #endif // TEST1
 
 
@@ -275,7 +286,7 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 		    print_s("write: File write STAGE2 error\n");
 		    asm volatile("hlt");
 	    }
-#ifdef TEST_DOUBLE_INDIRECTT
+#ifdef TEST_DOUBLE_INDIRECT
 	    /* Try writing to all double-indirect data blocks */
 	    retval = WRITE (fd, data3, sizeof(data3));
 	    if (retval < 0) 
@@ -288,11 +299,9 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 #endif // TEST2
 
 
-
-
-
-
 #ifdef TEST3
+	int counter = 0;
+	memset(addr, '\0', sizeof(addr));
 	/* ****TEST 3: Seek and Read file test**** */
 	retval = LSEEK (fd, 0);/* Go back to the beginning of your file */
 	if (retval < 0) {
@@ -306,6 +315,25 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 		print_s("read: File read STAGE1 error\n");
 		asm volatile("hlt");
 	}
+	
+	for (int i =0; i< sizeof(data1); i++){
+		if (addr[i] == '1')
+			counter++;
+		else 
+			break;
+	}
+//	addr[sizeof(data1)] = '\0';
+	
+	itoa(buf,'d',counter);
+	print_s("STAGE1 1s read ");
+	print_s(buf);
+	print_s("\n");
+	
+	itoa(buf,'d',sizeof(data1));
+	print_s("STAGE1 data1 size ");
+	print_s(buf);
+	print_s("\n");
+
 	/* Should be all 1s here... */
 #ifdef TEST_SINGLE_INDIRECT
 	/* Try reading from all single-indirect data blocks */
@@ -315,6 +343,24 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 		print_s("read: File read STAGE2 error\n");
 		asm volatile("hlt");
 	}
+	
+	counter =0 ;
+	for (int i =0; i< sizeof(data2); i++){
+		if (addr[i] == '2')
+			counter++;
+		else 
+			break;
+	}
+	
+	itoa(buf,'d',counter);
+	print_s("STAGE2 2s read ");
+	print_s(buf);
+	print_s("\n");
+	
+	itoa(buf,'d',sizeof(data2));
+	print_s("STAGE2 data2 size ");
+	print_s(buf);
+	print_s("\n");
 	
 	/* Should be all 2s here... */
 #ifdef TEST_DOUBLE_INDIRECT
@@ -334,10 +380,37 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 		print_s("close: File close error\n");
 		asm volatile("hlt");
 	}
+	
+	counter =0 ;
+	for (int i =0; i< sizeof(data3); i++){
+		if (addr[i] == '3')
+			counter++;
+		else 
+			break;
+	}
+	
+	itoa(buf,'d',counter);
+	print_s("STAGE3 3s read ");
+	print_s(buf);
+	print_s("\n");
+	
+	itoa(buf,'d',sizeof(data3));
+	print_s("STAGE3 data3 size ");
+	print_s(buf);
+	print_s("\n");
+
+
 #endif // TEST3
 
 #ifdef TEST4
-	  /* ****TEST 4: Check permissions**** */
+	    retval =  OPEN ("/bigfile", RW); /* Open file to write to it */
+	    if (retval < 0) {
+		    print_s("open: File open error!\n");
+		    asm volatile("hlt");
+	    }
+	    fd = retval;/* Assign valid fd */
+	  
+	    /* ****TEST 4: Check permissions**** */
 	  retval = CHMOD("/bigfile", RO); // Change bigfile to read-only
 	  if (retval < 0) {
 		  print_s("chmod: Failed to change mode\n");
@@ -347,6 +420,13 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	if (retval < 0) {
 		print_s("chmod: Tried to write to read-only file\n");	    
 	}
+	
+	retval = CLOSE(fd);
+	if (retval < 0) {
+		print_s("close: File close error\n");
+		asm volatile("hlt");
+	}
+	
 	retval = UNLINK ("/bigfile");
 	if (retval < 0) 
 	{

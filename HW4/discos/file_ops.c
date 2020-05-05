@@ -401,9 +401,14 @@ int rd_write(int fd, char *address, int num_bytes){
 	cur_block = pos_ptr / 256; 		//Block index to start
 	cur_ofst = pos_ptr % 256; 		//Offset in that block
 	
+	itoa(temp,'d',cur_block);
+	print_s("Current block index ");
+	print_s(temp);
+	print_s("\n");
+	
 	// We are at the end of the file so we have to allocate new blocks
 	if (pos_ptr >= fl_size && fl_size < MAX_FILE_SIZE && pos_ptr != 0){
-		cur_block++;
+		//cur_block++;
 		res = allocate_block(cur_block,inode_num);
 
 		if(res < 0){
@@ -412,6 +417,10 @@ int rd_write(int fd, char *address, int num_bytes){
 		}
 		cur_ofst =0;
 		blocks_alloc++;
+		itoa(temp,'d',blocks_alloc);
+		print_s("Blocks allocated till now ");
+		print_s(temp);
+		print_s("\n");
 	}
 
 	res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
@@ -455,12 +464,28 @@ int rd_write(int fd, char *address, int num_bytes){
 				/*print_s(temp);*/
 				/*print_s("\n");*/
 				res = allocate_block(cur_block,inode_num);
+				
 
 				if(res < 0){
+					/*itoa(temp,'d',blocks_alloc);*/
+					/*print_s("Blocks allocated till now ");*/
+					/*print_s(temp);*/
+					/*print_s("\n");*/
+					
+					/*itoa(temp,'d',bytes_written);*/
+					/*print_s("Bytes written till now ");*/
+					/*print_s(temp);*/
+					/*print_s("\n");*/
+					
 					print_s("write: No more available blocks to allocate\n");
 					return ERROR;
 				}
 				res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
+				
+				/*itoa(temp,'d',block_ptr);*/
+				/*print_s("Current block pointer ");*/
+				/*print_s(temp);*/
+				/*print_s("\n");*/
 				
 				init_block(block_ptr, fs->inode[inode_num].type);
 
@@ -478,6 +503,11 @@ int rd_write(int fd, char *address, int num_bytes){
 	}
 
 	glob_fdt_ptr[fd].pos_ptr = pos_ptr;
+	
+	/*itoa(Vtemp,'d',blocks_alloc);*/
+	/*print_s("Blocks allocated till now ");*/
+	/*print_s(temp);*/
+	/*print_s("\n");*/
 
 	return bytes_written;
 
@@ -568,22 +598,35 @@ int rd_unlink(char *pathname){
 	int block_nums, blk_indx;
 	
 	//Number of blocks currently allocated for the file
-	block_nums = fs->inode[file_inode].size / 256 + 1;
+	block_nums = fs->inode[file_inode].size / 256 ;
+	
 
 	/*Now delete the inode and all its data*/
 	block_t *blk_ptr;
+	
+	/*print_s("Deleting inode ");*/
+	/*itoa(buf,'d',file_inode);*/
+	/*print_s(buf);*/
+	/*print_s("\n");*/
 	// Set the pointer to the first block of the file
 	for (int i=0; i< block_nums; i++){
 		res = find_block(i,&blk_ptr,file_inode);
 		if (res < 0){
-			print_s("unlink: Something went terribly wrong when unlinking the file\n");
+			print_s("\nunlink: Something went terribly wrong when unlinking the file\n");
+			return ERROR;
 		}
 		
-		blk_indx = (blk_ptr - &fs->d_blks[0]) / 256;
+
+		blk_indx = (blk_ptr - &fs->d_blks[0]);
+		/*print_s("Block index to be deleted ");*/
+		/*itoa(buf,'d',blk_indx);*/
+		/*print_s(buf);*/
+		/*print_s("\n");*/
 		deallocate_block(blk_indx);
 
 	}
 	
+
 	/*Now delete the inode*/
 	fs->inode[file_inode].in_use = FREE;
 	fs->inode[file_inode].type = 0;
@@ -932,11 +975,24 @@ void deallocate_block(int indx){
 	int btmp_indx;
 	int bit_indx;
 	uint8_t *bmap_ptr;
-
+	
+	char buf[16];
 	actual_blk = indx + 261;
+	/*itoa(buf,'d',actual_blk);*/
+	/*print_s("Block ");*/
+	/*print_s(buf);*/
+	/*print_s("\n");*/
 	
 	btmp_indx = actual_blk / 8;
+	/*itoa(buf,'d',btmp_indx);*/
+	/*print_s("Block index ");*/
+	/*print_s(buf);*/
+	/*print_s("\n");*/
 	bit_indx = actual_blk % 8;
+	/*itoa(buf,'d',bit_indx);*/
+	/*print_s("Bit index ");*/
+	/*print_s(buf);*/
+	/*print_s("\n");*/
 	
 	bmap_ptr = &fs->bitmap[btmp_indx];
 	*bmap_ptr ^= (0x80 >> bit_indx);
@@ -1038,7 +1094,7 @@ int allocate_block(int block_num, int inode){
 			/*print_s("The start address of blk_pointers is ");*/
 			/*print_s(buf);*/
 			/*print_s("\n");*/
-			*(blk_pointers + block_num - 8) = fs->d_blks[blk_indx];
+			/**(blk_pointers + block_num - 8) = fs->d_blks[blk_indx];*/
 			/*itoa(buf,'d',(blk_pointers + block_num -8));*/
 			/*print_s("The new blocks address is ");*/
 			/*print_s(buf);*/
