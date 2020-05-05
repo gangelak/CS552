@@ -1,11 +1,3 @@
-
-Showing information for inode
-0
-Inode type: 1
-Inode size: 0
-Inode location pointers: 1158832 0 0 0 0 0 0 0 0 0 
-Inode permissions: 2
-Inode is used: 1
 After checks 1
 name_finish is 5
 parthname is /test
@@ -15,148 +7,51 @@ Before check if exists
 The path is valid and the file does not exist
 Parent inode is 0
 Before updating the parent with the new entry
-In find_block address is 1089768
-In update parent address is 1158832
-Allocating inode
-the address is 1158832
-UPDATE_PARENT:
-test
-the inode number is 1
-the offset is 0
-mkdir: Parent updated
-
-Showing information for inode
-0
-Inode type: 1
-Inode size: 16
-Inode location pointers: 1158832 0 0 0 0 0 0 0 0 0 
-Inode permissions: 2
-Inode is used: 1
-
-Showing information for inode
-1
-Inode type: 1
-Inode size: 0
-Inode location pointers: 1159088 0 0 0 0 0 0 0 0 0 
-Inode permissions: 2
-Inode is used: 1
+mkdir: Cannot create a new entry for this directory...Aborting
 After checks 1
 name_finish is 5
 parthname is /test/tmp
 Temp name is test
 Here2
 Before check if exists
-the parent inode is 0
-1158832
-File found!
-Traversing the path
-name_finish is 9
-parthname is /test/tmp
-Temp name is tmp
-Here1
-Before check if exists
-The path is valid and the file does not exist
-Parent inode is 1
-Before updating the parent with the new entry
-In find_block address is 1089768
-In update parent address is 1159088
-Allocating inode
-the address is 1159088
-UPDATE_PARENT:
-tmp
-the inode number is 2
-the offset is 0
-mkdir: Parent updated
-
-Showing information for inode
-0
-Inode type: 1
-Inode size: 16
-Inode location pointers: 1158832 0 0 0 0 0 0 0 0 0 
-Inode permissions: 2
-Inode is used: 1
-
-Showing information for inode
-1
-Inode type: 1
-Inode size: 16
-Inode location pointers: 1159088 0 0 0 0 0 0 0 0 0 
-Inode permissions: 2
-Inode is used: 1
-
-Showing information for inode
-2
-Inode type: 1
-Inode size: 0
-Inode location pointers: 1159344 0 0 0 0 0 0 0 0 0 
-Inode permissions: 2
-Inode is used: 1
+The path does not exist
+mkdir: Invalid path
 After checks 1
 name_finish is 5
 parthname is /test/tmp/giannis
 Temp name is test
 Here2
 Before check if exists
-the parent inode is 0
-1158832
-File found!
-Traversing the path
-name_finish is 9
+The path does not exist
+creat: Invalid path
+After checks 1
+name_finish is 5
 parthname is /test/tmp/giannis
-Temp name is tmp
+Temp name is test
 Here2
 Before check if exists
-the parent inode is 1
-1159088
-File found!
-Traversing the path
-name_finish is 17
-parthname is /test/tmp/giannis
-Temp name is giannis
-Here1
-Before check if exists
-The path is valid and the file does not exist
-Filename is giannis
-Parent inode is 2
-Before updating the parent with the new entry
-In find_block address is 1089768
-In update parent address is 1159344
-Allocating inode
-the address is 1159344
-UPDATE_PARENT:
-giannis
-the inode number is 3
-the offset is 0
-creat: Parent updated
-
-Showing information for inode
-0
-Inode type: 1
-Inode size: 16
-Inode location pointers: 1158832 0 0 0 0 0 0 0 0 0 
-Inode permissions: 2
-Inode is used: 1
-
-Showing information for inode
-1
-Inode type: 1
-Inode size: 16
-Inode location pointers: 1159088 0 0 0 0 0 0 0 0 0 
-Inode permissions: 2
-Inode is used: 1
-
-Showing information for inode
-2
-Inode type: 1
-Inode size: 16
-Inode location pointers: 1159344 0 0 0 0 0 0 0 0 0 
-Inode permissions: 2
-Inode is used: 1
+The path does not exist
+open: Invalid path
+File descriptor -1
+In use 0
+Flags 0
+Position pointer 0
 
 Showing information for inode
 3
-Inode type: 2
-Inode size: 0
-Inode location pointers: 1159600 0 0 0 0 0 0 0 0 0 
-Inode permissions: 2
-Inode is used: 1
+Inode type: 2000
+Inode size: 2000
+Inode location pointers: 0 0 0 0 0 0 0 0 0 0 
+Inode permissions: 2000
+Inode is used: 0
+write: The file you are trying to write to does not exist
+
+Showing information for inode
+3
+Inode type: 2000
+Inode size: 2000
+Inode location pointers: 0 0 0 0 0 0 0 0 0 0 
+Inode permissions: 2000
+Inode is used: 0
+read: The file you are trying to write to does not exist
+THE CONTENT IS: 

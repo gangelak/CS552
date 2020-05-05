@@ -8,7 +8,6 @@
 int check_pathname(char *pathname, int* par_inode, char *filename);
 int exist_inodes(void);
 int update_parent(int parent_inode,char *filename, int action, uint32_t type, uint32_t mode);
-int allocate_block(void);
 int allocate_inode(uint32_t type, uint32_t permissions);
 int check_if_exists(char *name,int par_inode);
 void show_bitmap(void);
@@ -259,6 +258,10 @@ int rd_read(int fd, char *address, int num_bytes){
 	int cur_block; 					//Current block to start writing from
 	int last_blk_ofst; 				//Offset in the cur block
 	block_t *block_ptr;
+	char temp[16];
+	int fl_size; 					//Size of file
+	int cur_pos_ptr; 				//Cur pos in the file
+	int bytes_read = 0; 				
 
 	/*FD does not exist*/
 	if (glob_fdt_ptr[fd].in_use == FREE){
@@ -282,85 +285,49 @@ int rd_read(int fd, char *address, int num_bytes){
 	}
 
 	pos_ptr = glob_fdt_ptr[fd].pos_ptr;
+	cur_pos_ptr = pos_ptr;
+	fl_size = fs->inode[inode_num].size;
 	
 	cur_block = pos_ptr / 256; 		//Number of blocks already written
 	last_blk_ofst = pos_ptr % 256; 		//Offset in the last block
 	
 	
+	if (pos_ptr == fl_size){
+		print_s("read: We are at the end of the file...use lseek first\n");
+		return 0;
+	}
+
 	res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
 	
 	if (res < 0){
 		print_s("read: Cannot find a location pointer for this block\n");
 		return ERROR;
 	}
-
-
-	/*Current byte in the block that we are able to write to*/
-	char *cur_byte = (char*) (block_ptr) + last_blk_ofst;
 	
-	int bytes_read = 0;
-	while (bytes_read < num_bytes && last_blk_ofst < 256){
+	char *cur_byte = ((char*) (block_ptr)) + last_blk_ofst;
+	
+	while(bytes_read < num_bytes){
+		
 		address[bytes_read] = *cur_byte;
-		cur_byte++;
 		bytes_read++;
-		last_blk_ofst++;
-	}
-	
-
-	//We've written everything in the last block
-	if (bytes_read == num_bytes){
-		glob_fdt_ptr[fd].pos_ptr += bytes_read;
-		return bytes_read;
-	}
-	//More bytes left to write to the file
-	else{
-		last_blk_ofst = 0;
-		cur_block++;
-	}
-	
-	num_bytes -= bytes_read;
-
-	num_of_blocks = num_bytes / 256;
-	extra_bytes  = num_bytes % 256;
-	
-	/*First fill the last block*/
-	
-	/*Start writing from the current block*/
-	/*We are going to be writing at byte granularity*/
-
-	for (int i = cur_block; i < cur_block + num_of_blocks; i++){
-		//Check if there is an available block
-		if(!exist_blocks())
-			return ERROR;
+		cur_byte++;
+		cur_pos_ptr++;
 		
-		// This also stands as a check if we reached the maximum number of blocks for this file
-		res = find_block(i,&block_ptr,inode_num);
-		if (res < 0){
-			print_s("read: Cannot find a location pointer for this block\n");
-			return ERROR;
+		if (bytes_read + pos_ptr >= fl_size){
+			break;
 		}
 		
-		char *byte_in_blk = (char*) block_ptr; 	 		//We need to read in byte granularity
-	
-		//We are in the last block...Read what is left
-		if (i == num_of_blocks - 1){
-			for (int j=0; j < extra_bytes; j++){
-				address[bytes_read] = byte_in_blk[j];
-				glob_fdt_ptr[fd].pos_ptr++;
-				bytes_read++;
-			}
+		// We need to go to the next block
+		if (cur_pos_ptr % 256 == 0){
+			cur_block++;
+			res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
+			cur_byte = (char*) (block_ptr);
 		}
-		else{
-		 	for(int j=0; j< 256; j++){
-				address[bytes_read] = byte_in_blk[j];
-				bytes_read++;
-			}
-		}
+
 	}
+	glob_fdt_ptr[fd].pos_ptr = cur_pos_ptr;
 
 	return bytes_read;
-
-
 }
 
 
@@ -373,8 +340,12 @@ int rd_write(int fd, char *address, int num_bytes){
 	uint32_t pos_ptr; 				//Position to start in the file
 	int flags; 					//File permissions
 	int cur_block; 					//Current block to start writing from
-	int last_blk_ofst; 				//Offset in the cur block
+	int cur_ofst; 				//Offset in the cur block
 	block_t *block_ptr;
+	char temp[16];
+	int fl_size; 					//Size of the file
+	int blocks_alloc; 				//Blocks allocated by the file
+	int bytes_written = 0;
 
 	/*FD does not exist*/
 	if (glob_fdt_ptr[fd].in_use == FREE){
@@ -396,15 +367,38 @@ int rd_write(int fd, char *address, int num_bytes){
 		print_s("write: You cannot write to a directory file\n");
 		return ERROR;
 	}
+	
+	/*Get the size of the file*/
+	fl_size = fs->inode[inode_num].size;
 
+	if (fl_size == MAX_FILE_SIZE){
+		print_s("write: File has max size\n");
+		return ERROR;
+	}
+
+	blocks_alloc = fl_size / 256 + 1; 	//Will be needed to see if we have to allocate a new block or not
+
+	// Find the block where the write is going to begin based on the pos pointer
 	pos_ptr = glob_fdt_ptr[fd].pos_ptr;
 	
-	cur_block = pos_ptr / 256; 		//Number of blocks already written
-	last_blk_ofst = pos_ptr % 256; 		//Offset in the last block
+	cur_block = pos_ptr / 256; 		//Block index to start
+	cur_ofst = pos_ptr % 256; 		//Offset in that block
 	
-	
+	// We are at the end of the file so we have to allocate new blocks
+	if (pos_ptr >= fl_size && fl_size < MAX_FILE_SIZE){
+		cur_block++;
+		res = allocate_block(cur_block,inode_num);
+
+		if(res < 0){
+			print_s("write: No more available blocks to allocate\n");
+			return ERROR;
+		}
+		cur_ofst =0;
+		blocks_alloc++;
+	}
+
 	res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
-	
+
 	if (res < 0){
 		print_s("write: Cannot find a location pointer for this block\n");
 		return ERROR;
@@ -412,80 +406,39 @@ int rd_write(int fd, char *address, int num_bytes){
 
 
 	/*Current byte in the block that we are able to write to*/
-	char *cur_byte = (char*) (block_ptr) + last_blk_ofst;
-	
-	int bytes_written = 0;
-	while (bytes_written < num_bytes && last_blk_ofst < 256){
+	char *cur_byte = ((char*) (block_ptr)) + cur_ofst;
+
+	while(bytes_written < num_bytes && fs->inode[inode_num].size < MAX_FILE_SIZE){
 		*cur_byte = address[bytes_written];
-		cur_byte++;
 		bytes_written++;
-		last_blk_ofst++;
-	}
-	
+		cur_byte++;
+		pos_ptr++;
+		fs->inode[inode_num].size++;
+		//We are at the end of the last block so we need to allocate a new one
+		if (pos_ptr / 256 + 1 > blocks_alloc){
+			cur_block++;
+			res = allocate_block(cur_block,inode_num);
 
-	//We've written everything in the last block
-	if (bytes_written == num_bytes){
-		//Update the size of the file
-		glob_fdt_ptr[fd].pos_ptr += bytes_written;
-		fs->inode[inode_num].size += bytes_written;
-		return bytes_written;
-	}
-	//More bytes left to write to the file
-	else{
-		last_blk_ofst = 0;
-		cur_block++;
-	}
-	
-	num_bytes -= bytes_written;
-
-	num_of_blocks = num_bytes / 256;
-	extra_bytes  = num_bytes % 256;
-	
-	/*First fill the last block*/
-	
-	/*Start writing from the current block*/
-	/*We are going to be writing at byte granularity*/
-
-	for (int i = cur_block; i < cur_block + num_of_blocks; i++){
-		//Check if there is an available block
-		if(!exist_blocks())
-			return ERROR;
-		
-		// Find a free block and set the correct location pointer
-		int block_num = allocate_block();
-
-		res = find_block(i,&block_ptr,inode_num);
-		if (res < 0){
-			print_s("write: Cannot find a location pointer for this block\n");
-			return ERROR;
-		}
-		
-		block_ptr = &fs->d_blks[block_num];
-		char *byte_in_blk = (char*) block_ptr; 	 		//We need to write in byte granularity
-	
-		//We are in the last block...Write what is left
-		if (i == num_of_blocks - 1){
-			for (int j=0; j < extra_bytes; j++){
-				byte_in_blk[j] = address[bytes_written];
-				bytes_written++;
-				glob_fdt_ptr[fd].pos_ptr++;
-				fs->inode[inode_num].size++;
+			if(res < 0){
+				print_s("write: No more available blocks to allocate\n");
+				return ERROR;
 			}
+			res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
+			
+			blocks_alloc++;
+			cur_byte = (char*) block_ptr;
 		}
-		else{
-		 	for(int j=0; j< 256; j++){
-				byte_in_blk[j] = address[bytes_written];
-				bytes_written++;
-				glob_fdt_ptr[fd].pos_ptr++;
-				fs->inode[inode_num].size++;
-			}
+		// We have to go to the next block
+		else if (pos_ptr % 256 == 0){
+			cur_block++;
+			res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
+			cur_byte = (char*) block_ptr;
 		}
-
-		//Update the size of the file
 	}
-	
+
+	glob_fdt_ptr[fd].pos_ptr = pos_ptr;
+
 	return bytes_written;
-
 
 }
 
@@ -495,6 +448,8 @@ int rd_lseek(int fd, int offset){
 	int inode_num = glob_fdt_ptr[fd].inode; 					//Inode number for the file
 	int file_size;
 
+	inode_num = glob_fdt_ptr[fd].inode;
+	
 	/*FD does not exist*/
 	if (glob_fdt_ptr[fd].in_use == FREE){
 		print_s("lseek: The file you are trying to write to does not exist\n");
@@ -507,8 +462,6 @@ int rd_lseek(int fd, int offset){
 		return ERROR;
 	}
 	
-
-	inode_num = glob_fdt_ptr[fd].inode;
 	
 	file_size = fs->inode[inode_num].size;
 	
@@ -573,7 +526,7 @@ int rd_unlink(char *pathname){
 	int block_nums, blk_indx;
 	
 	//Number of blocks currently allocated for the file
-	block_nums = fs->inode[file_inode].size / 256;
+	block_nums = fs->inode[file_inode].size / 256 + 1;
 
 	/*Now delete the inode and all its data*/
 	block_t *blk_ptr;
@@ -590,11 +543,16 @@ int rd_unlink(char *pathname){
 	}
 	
 	/*Now delete the inode*/
-	fs->inode[file_inode].in_use = 0;
+	fs->inode[file_inode].in_use = FREE;
+	fs->inode[file_inode].type = 0;
 	fs->inode[file_inode].size = 0;
 	fs->inode[file_inode].perm = JUNK;
 	fs->inode[file_inode].opened = 0;
 	
+	for (int i =0; i< 10; i++){
+		fs->inode[file_inode].location[i] = 0;
+	}
+
 	fs->superblock.free_inodes++;
 
 	print_s("unlink: File deleted\n");
@@ -644,26 +602,33 @@ int find_block(int block_num, block_t** cur_block, int inode){
 
 	if(block_num <= 7){
 		*cur_block = (block_t*) fs->inode[inode].location[block_num];
-//		char temp[16] ;
-//		itoa(temp, 'd',*cur_block);
-//		print_s("In find_block address is ");
-///		print_s(temp);
-//		print_s("\n");
+		char temp[16] ;
+		itoa(temp, 'd',inode);
+		print_s("Inode ");
+		print_s(temp);
+		itoa(temp, 'd',*cur_block);
+		print_s("\nIn find_block address is ");
+		print_s(temp);
+		print_s("\n");
+
 		return 0;
 	}
 	//First indirection
 	else if (block_num <= 71){
-		block_t *indirect = (block_t*) fs->inode[inode].location[8];
-		*cur_block = (block_t*) &indirect[block_num - 8];
+		block_t *indirect[64];
+		*indirect = fs->inode[inode].location[8];
+		*cur_block = (block_t*) indirect[block_num - 8];
 		return 0;
 	}
 	//Second indirection
 	else if (block_num <= MAX_INODE_BLOCKS - 1){
 		int ind_1 = (block_num - 72) / 64;
 		int ind_2 = (block_num - 72) % 64;
-		block_t *indirect_1 = fs->inode[inode].location[9];
-		block_t *indirect_2 = &indirect_1[ind_1];
-		*cur_block = (block_t*) &indirect_2[ind_2];
+		block_t *indirect_1[64];
+		*indirect_1 = fs->inode[inode].location[9];
+		block_t *indirect_2[64];
+		*indirect_2 = indirect_1[ind_1];
+		*cur_block = (block_t*) indirect_2[ind_2];
 		return 0;
 	}
 	
@@ -838,22 +803,23 @@ int check_pathname(char *pathname, int *parent_inode, char filename[]){
 int allocate_inode(uint32_t type, uint32_t permissions){
 	/*Loop through the inode array to see if there are free inodes*/
 	int ret = ERROR;
-	int blk_num;
+	int status;
 	for (int i = 1; i <= MAX_FILES; i++){
 		if (fs->inode[i].in_use == 0){
 			ret = i;
-			blk_num = allocate_block();
+			status = allocate_block(0,i);
 
-			if (blk_num < 0){
+			if (status < 0){
 				print_s("There is no block available...Aborting\n");
 				return ERROR;
 			}
+
 			fs->inode[i].type = type;
 			fs->inode[i].size = 0;
-			fs->inode[i].location[0] = &fs->d_blks[blk_num];
 			fs->inode[i].perm = permissions;
 			fs->superblock.free_inodes--; 				//Decrease available inodes
 			fs->inode[i].in_use = 1;
+			fs->inode[i].opened = 0;
 //			char tmp[10];
 //			itoa(tmp,'d', ret);
 //			print_s("the allocated inode is ");
@@ -886,8 +852,8 @@ void deallocate_block(int indx){
 }
 
 
-
-int allocate_block(void){
+int get_available_block(){
+	
 	int block_num ;
 	uint8_t *bmap_ptr;
 	int bit;
@@ -896,6 +862,8 @@ int allocate_block(void){
 	//in the bitmap cause there are some unmapped blocks in that byte
 	//
 	//show_bitmap();
+	if (!exist_blocks)
+		return ERROR;
 
 	for (int i = 32; i< BITMAP_SIZE; i++){
 		for (int j =0; j< 8; j++){
@@ -913,6 +881,165 @@ int allocate_block(void){
 		}
 	}
 	return ERROR;
+
+}
+
+
+int allocate_block(int block_num, int inode){
+	// No need to do anything if there are not any blocks
+	if(!exist_blocks())
+		return ERROR;
+	
+	int blk_indx;
+	// No indirection
+	if (block_num < 8){
+		blk_indx = get_available_block();
+		fs->inode[inode].location[block_num] = &fs->d_blks[blk_indx];
+	}
+	// First indirection
+	else if (block_num < 72){
+		block_t *blk_pointers[64]; 			//256 bytes
+		// First indirection init
+		if (block_num == 8){
+			int ind_1 = get_available_block(); 		//One block for indirection
+			if (ind_1 < 0){
+				print_s("Not available blocks for IND1\n");
+				return ERROR;
+			}
+
+			blk_indx = get_available_block(); 		//One block for data
+			if(blk_indx < 0){
+				print_s("No more blocks for IND1 data\n");
+				deallocate_block(ind_1);
+				return ERROR;
+			}
+
+			
+			*blk_pointers = &fs->d_blks[ind_1];
+			for (int i = 0; i< 64; i++){
+				blk_pointers[i] = JUNK;
+			}
+
+			blk_pointers[0] = &fs->d_blks[blk_indx];
+			fs->inode[inode].location[8] = &fs->d_blks[ind_1];
+			
+		}
+		else{
+			blk_indx = get_available_block(); 		//One block for data
+			if(blk_indx < 0){
+				print_s("No more blocks for IND1 data\n");
+				return ERROR;
+			}
+			
+			*blk_pointers = fs->inode[inode].location[8];
+			blk_pointers[block_num - 8] = &fs->d_blks[blk_indx];
+		}
+		//Check if the actual number of blocks is > 63 // We already allocated the first block
+
+	}
+	// Second indirection
+	else if(block_num < MAX_INODE_BLOCKS){
+		int ind1 = (block_num - 72) / 64;
+		int ind2 = (block_num - 72) % 64;
+		block_t *blk_pointers[64]; 			//256 bytes
+		block_t *blk_pointers2[64]; 			//256 bytes
+		
+		// Nothing has been done for indirection 2, bith ind_1 and ind_2 = 0 block 72
+		if(ind1 == 0 && ind2 == 0){
+			int ind_1 = get_available_block(); 		//One block for indirection
+			if (ind_1 < 0){
+				print_s("Not available blocks for IND1\n");
+				return ERROR;
+			}
+			
+			*blk_pointers = &fs->d_blks[ind_1];
+			for (int i = 0; i< 64; i++){
+				blk_pointers[i] = JUNK;
+			}
+			
+
+			int ind_2 = get_available_block();
+			if (ind_2 < 0){
+				print_s("Not available blocks for IND2\n");
+				deallocate_block(ind_1);
+				return ERROR;
+			}
+			
+			*blk_pointers2 = &fs->d_blks[ind_2];
+			for (int i = 0; i< 64; i++){
+				blk_pointers2[i] = JUNK;
+			}
+			
+			// Finally get a data block
+			blk_indx = get_available_block();
+			if (blk_indx < 0){
+				print_s("Not available blocks for IND2\n");
+				deallocate_block(ind_1);
+				deallocate_block(ind_2);
+				return ERROR;
+			}
+		
+			
+			// Update the first of the second indirect pointers to point to the data block
+			blk_pointers2[0] = &fs->d_blks[blk_indx];
+
+			//Finally set the last location pointer
+			
+			fs->inode[inode].location[9] = &fs->d_blks[ind_1];
+		}
+		// A new double indirection 
+		else if(ind2 == 0){
+			*blk_pointers = fs->inode[inode].location[9];
+			
+			int ind_2 = get_available_block();
+			if (ind_2 < 0){
+				print_s("Not available blocks for IND2\n");
+				return ERROR;
+			}
+			
+			*blk_pointers2 = &fs->d_blks[ind_2];
+			for (int i = 0; i< 64; i++){
+				blk_pointers2[i] = JUNK;
+			}
+			
+			// Finally get a data block
+			blk_indx = get_available_block();
+			if (blk_indx < 0){
+				print_s("Not available blocks for IND2\n");
+				deallocate_block(ind_2);
+				return ERROR;
+			}
+		
+			// Set the double indirection pointer
+			blk_pointers[ind1] = &fs->d_blks[ind_2];
+
+			// Update the first of the second indirect pointers to point to the data block
+			blk_pointers2[0] = &fs->d_blks[blk_indx];
+		}
+		// Just update a second indirection
+		else{
+			*blk_pointers = fs->inode[inode].location[9];
+			*blk_pointers2 = blk_pointers[ind2];
+			
+			blk_indx = get_available_block();
+			if (blk_indx < 0){
+				print_s("Not available blocks for IND2\n");
+				return ERROR;
+			}
+
+			// Update the first of the second indirect pointers to point to the data block
+			blk_pointers2[ind2] = &fs->d_blks[blk_indx];
+			
+		}
+
+
+	}
+	// We are way outside the boundaries
+	else{
+		return ERROR;
+	}
+
+	return 0;
 }
 
 //We got the parent inode and the filename
@@ -924,126 +1051,158 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 		return ERROR;
 	}
 	
+	dir_t *entry; 					//Temp pointer to update smth
+	
 	//If we want to create something, the search is smoother
 	if (action == CR){
 		//First we find how many blocks the parent has, then based on the block
 		//number we find which location pointer to use
 		int res;
-		int block_num = fs->inode[parent_inode].size / 256; 	//Last used block number
+		int block_num = fs->inode[parent_inode].size / 256; 	//Block number used
 		int offset = fs->inode[parent_inode].size % 256;  	//Offset in the last block number
-		int indx = offset / 16; 				//16 byte granularity
 		block_t *cur_block;
 
 
 		/*TODO*/
 		//Update parent with the new block if needed
 
-		// We have to allocate a new block for the parent
-		if (offset + 16 > 256 ){
+		// We have to allocate a new block for the parent 
+		// Block 0 is always allocated
+		if (offset == 0 && block_num != 0 ){
 			
-			if(!exist_blocks())
-				return ERROR;
 			
 			block_num++;
 			offset = 0;
 			
-			int blk_indx = allocate_block();
+			res = allocate_block(block_num, parent_inode);
+			
+			if (res < 0){
+				print_s("Not available blocks to store the new entry\n");
+				return ERROR;
+			}
 
 			res = find_block(block_num,&cur_block,parent_inode);
 			
 			if (res < 0){
-				print_s("Cannot allocate an additional pointer for the parent dir\n");
+				print_s("Find the block requested\n");
 				return ERROR;
 			}
 			
-			cur_block = &fs->d_blks[blk_indx];
-		}
-		// We still have space in the last block of parent
-		else{
-			//Just return the pointer to the last block
-			res = find_block(block_num,&cur_block,parent_inode);
+			entry = (dir_t *) (cur_block);
+			//Initialize the block
+			for (int i =0; i< 16; i++){
+				for (int j =0; j< 14; j++)
+					entry->filename[j] = '\0';
+				entry->inode_num = JUNK;
+			}
 			
+
 //			char temp[16] ;
 //			itoa(temp, 'd',cur_block);
 //			print_s("In update parent address is ");
 //			print_s(temp);
 //			print_s("\n");
+
+
 			
-			if (res < 0){
-				print_s("Something went wrong when finding the current block pointer for the parent\n");
+			// Set the entry to the beginning of the new block again
+			entry = (dir_t *) (cur_block);
+			
+
+			// Allocate a new inode for the new file
+			int inode_num;
+			print_s("Allocating inode\n");
+			inode_num = allocate_inode(type, perm);
+			
+			if (inode_num < 0){
+				print_s("Not any available inodes for the new entry\n");
+				deallocate_block(block_num);
 				return ERROR;
 			}
-
-
+			
+			strncpy(entry->filename,filename,strlen(filename)); 		// Security is everything :)
+			entry->inode_num = inode_num;
+			fs->inode[parent_inode].size +=16;
+			
+			return 0;
+			
 		}
+		// We have space at one block for the parent
+		// We have to find which
+		else{
+			
+			for (int i = 0; i<block_num; i++){
+				res = find_block(i,&cur_block,parent_inode);
+				
+				if (res < 0){
+					print_s("Something went wrong when finding the current block pointer for the parent\n");
+					return ERROR;
+				}
+			
+				for (int i = 0; i < 16; i++){
+					
+					entry = (dir_t *) (cur_block);
+					entry += i;
+					
+					// If a space is found the update the entry
+					if (entry->inode_num == JUNK){
+						
+						print_s("Entry space found!\n");
+						
+						// Allocate a new inode for the new file
+						int inode_num;
+						print_s("Allocating inode\n");
+						inode_num = allocate_inode(type, perm);
+						
+						if (inode_num < 0){
+							print_s("Not any available inodes for the new entry\n");
+							return ERROR;
+						}
+						
+						strncpy(entry->filename,filename,strlen(filename)); 	
+						entry->inode_num = inode_num;
+						fs->inode[parent_inode].size +=16;
+						return 0;
+					}
+				}
+
+			}
 		
-		// Allocate a new inode for the new file
-		int inode_num;
-//		print_s("Allocating inode\n");
-		inode_num = allocate_inode(type, perm);
-		
-		dir_t *entry; 					//Temp pointer to update smth
-		
-		//Set the entry to the start of the current block
-		entry = (dir_t *) (cur_block);
-		entry += indx;
-		
-		char temp[16] ;
-//		itoa(temp, '16',entry);
-//		print_s("the address is ");
-//		print_s(temp);
-//		print_s("\n");
-		strncpy(entry->filename,filename,strlen(filename)); 		// Security is everything :)
-		entry->inode_num = inode_num;
-		fs->inode[parent_inode].size +=16;
-//		print_s("UPDATE_PARENT:\n");
-///		print_s(entry->filename);
-//		print_s("\n");
-//		print_s("the inode number is ");
-///		char tmp[14];
-//		itoa(tmp,'d', entry->inode_num);
-//		print_s(tmp);
-//		print_s("\n");
-//		print_s("the offset is ");
-//		itoa(tmp,'d', offset);
-//		print_s(tmp);
-//		print_s("\n");
+		}
 	}
 	// We want to delete the entry
 	else if (action == DL){
 		//The search is similar to the check_if_exists
+		int par_blks = fs->inode[parent_inode].size / 256 + 1;
+
 		block_t *cur_block;
 		cur_block = (block_t*) fs->inode[parent_inode].location[0]; 	//Start from parent's first block
-		int block_num = 0;      					//First block (will help with indirections)
+		int block_indx = 0;      					//First block (will help with indirections)
 		int status = 0;
 
 		while (status != -1){
 			for (int i = 0; i < 16; i++){
-				dir_t *entry;  					//Temporary entry struct to extract the inode num
-				//&(fs->inode[parent_inode].location[block_num])
-				//cur_block = (block_t*) fs->inode[par_inode].location[block_num];        //Start from parent's first block
+				
 				entry = (dir_t *) (cur_block);
 				entry += i;
-				//The file/dir we are looking for exists in this block...Yay!
-	//			char tmp[14] = "";
-	//			itoa(tmp,'d',entry->inode_num);
-	//			print_s(tmp);
-	//			print_s("\n");
-	//			print_s(entry->filename);
-	//			print_s("\n");
-//				char tmp[14] = "";
-//				itoa(tmp,'16',entry);
-//				print_s(tmp);
-//				print_s("\n");
 				if (strncmp(entry->filename, filename, strlen(filename)) == 0){
-					print_s("File found!\n");
-					return (int) entry->inode_num; 			//Return the inode number
+					print_s("File to be deleted found!\n");
+					for (int j =0; j<14; j++){
+						entry->filename[j] = '\0';
+					}
+					entry->inode_num = JUNK;
+					return 0;
 				}
 			}
-			block_num++;		
-			status = find_block(block_num,&cur_block,parent_inode);
+			block_indx++;
+			// Parent has no more blocks to search so exiting
+			if (block_indx >= par_blks){
+				return ERROR;
+			}
+			status = find_block(block_indx,&cur_block,parent_inode);
 		}
 	}
+	return ERROR;
 }
 
 
@@ -1120,6 +1279,24 @@ void show_inode_info(int inode){
 	print_s(buf);
 	print_s("\n");
 
+}
+
+void show_fd_object(int fd){
+	char buf[16];
+	
+	itoa(buf,'d',fd);
+	print_s("File descriptor ");
+	print_s(buf);
+	itoa(buf,'d',glob_fdt_ptr[fd].in_use);
+	print_s("\nIn use ");
+	print_s(buf);
+	itoa(buf,'d',glob_fdt_ptr[fd].flags);
+	print_s("\nFlags ");
+	print_s(buf);
+	itoa(buf,'d',glob_fdt_ptr[fd].pos_ptr);
+	print_s("\nPosition pointer ");
+	print_s(buf);
+	print_s("\n");
 }
 
 

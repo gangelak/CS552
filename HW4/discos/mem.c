@@ -50,10 +50,6 @@ void init_mem(){
 
 	/* Set the partition to point to the start of our free memory*/
 	fs = &FS;
-	//int size = my_sizeof(fs);
-	/*itoa(buf,'x',(int)fs);*/
-	/*print_s(buf);*/
-	/*print_s("\n");*/
 
 	/* Start initializing the different fields of the partition*/
 	
@@ -81,11 +77,29 @@ void init_mem(){
 		fs->inode[0].location[i] = 0;
 	}
 	
+	int res;
 	//Allocate block for root
-	allocate_block();
+	res = allocate_block(0,0);
+	if (res < 0){
+		print_s("Could not allocate a block for root...Major problem\n");
+		return -1;
+	}
 
 	fs->inode[0].location[0] = &fs->d_blks[0]; 	//Initialize the first location pointer
+	
+	//Initialize the block
+	dir_t * entry;
+
+	entry = (dir_t *) &fs->d_blks[0];
+	//Initialize the block
+	for (int i =0; i< 16; i++){
+	   for (int j =0; j< 14; j++)
+		   entry->filename[j] = '\0';
+	   entry->inode_num = JUNK;
+	 }
+	
 	fs->inode[0].perm = RW; 			//Root is read write
 	fs->inode[0].in_use = USED; 			//Mark the first inode as used
+	fs->inode[0].opened = 0; 			//Mark the first inode as used
 
 }
