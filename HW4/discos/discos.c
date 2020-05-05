@@ -144,7 +144,8 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	init_mem();
 	glob_fdt_ptr = main_fdt;
 	init_fdt();
-
+	
+	char buf[16];
 	
 	itoa(buf,'d',&fs->d_blks[0]);
 	print_s("Address of block 0 ");

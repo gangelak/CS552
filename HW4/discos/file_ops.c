@@ -14,7 +14,7 @@ void show_bitmap(void);
 int find_block(int block_num, block_t** cur_block, int inode);
 int exist_blocks(void);
 void deallocate_block(int indx);
-
+void init_block(block_t* cur_block, int type);
 
 /*TODO*/
 // Need one function to recurse through the pathnames
@@ -398,6 +398,8 @@ int rd_write(int fd, char *address, int num_bytes){
 	}
 
 	res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
+	
+	init_block(block_ptr, fs->inode[inode_num].type); // Init the block
 
 	if (res < 0){
 		print_s("write: Cannot find a location pointer for this block\n");
@@ -425,6 +427,8 @@ int rd_write(int fd, char *address, int num_bytes){
 			}
 			res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
 			
+			init_block(block_ptr, fs->inode[inode_num].type);
+
 			blocks_alloc++;
 			cur_byte = (char*) block_ptr;
 		}
@@ -673,16 +677,18 @@ int check_if_exists(char name[],int par_inode){
 			entry = (dir_t *) (cur_block);
 			entry += i;
 			//The file/dir we are looking for exists in this block...Yay!
-//			char tmp[14] = "";
-//			itoa(tmp,'d',entry->inode_num);
-//			print_s(tmp);
-//			print_s("\n");
-//			print_s(entry->filename);
-//			print_s("\n");
-//			char tmp[14] = "";
-//			itoa(tmp,'16',entry);
-//			print_s(tmp);
-//			print_s("\n");
+			char tmp[14] = "";
+			print_s("ENTRY INODE NUM ");
+			itoa(tmp,'d',entry->inode_num);
+			print_s(tmp);
+			print_s("\n");
+			print_s("ENTRY_FILENAME ");
+			print_s(entry->filename);
+			print_s("\n");
+			print_s("ENTRY_ADDRESS ");
+			itoa(tmp,'16',entry);
+			print_s(tmp);
+			print_s("\n");
 			if (strncmp(entry->filename, name, strlen(name)) == 0){
 				print_s("File found!\n");
 				return (int) entry->inode_num; 			//Return the inode number
@@ -800,6 +806,33 @@ int check_pathname(char *pathname, int *parent_inode, char filename[]){
 	
 }
 
+
+void init_block(block_t* cur_block, int type){
+	if (type == DR){
+		dir_t *entry;
+		entry = (dir_t*) cur_block;
+
+		for (int i =0; i<16; i++){
+			entry->inode_num = JUNK;
+			for (int j=0; j< 14; j++){
+				entry->filename[j] = '\0';
+			}
+			entry++;
+		}
+	}
+	else{
+		char* byte;
+		byte = (char*) cur_block;
+
+		for (int i=0 ; i< 256; i++){
+			*byte = '\0';
+		}
+		byte++;
+	}
+
+}
+
+
 int allocate_inode(uint32_t type, uint32_t permissions){
 	/*Loop through the inode array to see if there are free inodes*/
 	int ret = ERROR;
@@ -815,6 +848,8 @@ int allocate_inode(uint32_t type, uint32_t permissions){
 			}
 
 			fs->inode[i].type = type;
+			
+
 			fs->inode[i].size = 0;
 			fs->inode[i].perm = permissions;
 			fs->superblock.free_inodes--; 				//Decrease available inodes
@@ -825,7 +860,7 @@ int allocate_inode(uint32_t type, uint32_t permissions){
 //			print_s("the allocated inode is ");
 //			print_s(tmp);
 //			print_s("\n");
-			return 0;
+			return ret;
 		}
 	}
 	return ret;
@@ -1084,7 +1119,7 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 			res = find_block(block_num,&cur_block,parent_inode);
 			
 			if (res < 0){
-				print_s("Find the block requested\n");
+				print_s("Did not find the block requested\n");
 				return ERROR;
 			}
 			
@@ -1120,6 +1155,16 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 				return ERROR;
 			}
 			
+			// Its a mess but we need to init the new block
+			block_t* temp_ptr;
+			res = find_block(0,&temp_ptr,inode_num);
+			if (res < 0){
+				print_s("The new inode did not properly allocate a block\n");
+				return ERROR;
+			}
+			//Init the block
+			init_block(temp_ptr,type);
+			
 			strncpy(entry->filename,filename,strlen(filename)); 		// Security is everything :)
 			entry->inode_num = inode_num;
 			fs->inode[parent_inode].size +=16;
@@ -1147,7 +1192,7 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 					
 					// If a space is found the update the entry
 					if (entry->inode_num == JUNK){
-						
+						char buf[16];
 						print_s("Entry space found!\n");
 						
 						// Allocate a new inode for the new file
@@ -1159,6 +1204,22 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 							print_s("Not any available inodes for the new entry\n");
 							return ERROR;
 						}
+						
+						// Its a mess but we need to init the new block
+						block_t* temp_ptr;
+						res = find_block(0,&temp_ptr,inode_num);
+						if (res < 0){
+							print_s("The new inode did not properly allocate a block\n");
+							return ERROR;
+						}
+						//Init the block
+						init_block(temp_ptr,type);
+
+						print_s("INODE NUMVER ALLOCATED ");
+						itoa(buf,'d',inode_num);
+						print_s(buf);
+						print_s("\n");
+
 						
 						strncpy(entry->filename,filename,strlen(filename)); 	
 						entry->inode_num = inode_num;
