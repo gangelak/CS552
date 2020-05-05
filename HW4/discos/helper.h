@@ -17,7 +17,7 @@ typedef struct multiboot_memory_map {
 
 typedef multiboot_memmap_t mmap_entry_t;
 
-
+int sprintf(char dest[], char str[], int dec);
 void itoa (char *, int, int );
 
 void msleep(int );

@@ -31,6 +31,39 @@ int time= 0;
 #endif
 
 
+//#define TEST1
+//#define TEST2
+//#define TEST3
+//#define TEST4
+//#define TEST5
+//#define TEST6
+
+
+
+#define CREAT   rd_creat
+#define OPEN    rd_open
+#define WRITE   rd_write
+#define READ    rd_read
+#define UNLINK  rd_unlink
+#define MKDIR   rd_mkdir
+#define CLOSE   rd_close
+#define LSEEK   rd_lseek
+#define CHMOD   rd_chmod
+
+#define TEST_SINGLE_INDIRECT
+#define TEST_DOUBLE_INDIRECT
+
+#define BLK_SZ 256/* Block size 		*/
+#define DIRECT 8/* Direct pointers in location attribute */
+#define PTR_SZ 4/* 32-bit [relative] addressing */
+#define PTRS_PB  (BLK_SZ / PTR_SZ) /* Pointers per index block */
+
+static char pathname[80];
+
+static char data1[DIRECT*BLK_SZ]; /* Largest data directly accessible */
+static char data2[PTRS_PB*BLK_SZ];     /* Single indirect data size */
+static char data3[PTRS_PB*PTRS_PB*BLK_SZ]; /* Double indirect data size */
+static char addr[PTRS_PB*PTRS_PB*BLK_SZ+1]; /* Scratchpad memory */
 
 /*
  * 	We assume that the total memory is below 4GB
@@ -49,21 +82,14 @@ unsigned long get_mem_regs(multiboot_info_t* mbt, mmap_entry_t* ent){
 			mem_pointer[cnt] = ent->base_low;
 			cnt++;
 		/*}*/
-
 		ent = (mmap_entry_t*) ((unsigned int) ent + ent->size + sizeof(ent->size));
 	}
-
-	
 	cnt--;
 	return cnt; 
 }
-
-
-
 /*
 	Custom malloc implementation
 */
-
 void *my_malloc(int size){
 	int j;
 	unsigned long temp;
@@ -75,20 +101,15 @@ void *my_malloc(int size){
 			return (void*)temp;
 		}
 	}
-
 	return 0;
 }
-
-
 
 void init_pit(void)
 {
   outb(0x34, 0x43); //00 11 010 0 to command port 0x43
-
   outb((PIT_FREQ / 100) & 0xFF, 0x40); //counter 0 low byte written to channel 0 data port 0x40
   outb((PIT_FREQ / 100) >> 8, 0x40); //counter 0 high byte
 }
-
 
 void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	/*int avail_regs, indx;          // # of available memory regions*/
@@ -119,16 +140,9 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 			/*break;*/
 		/*}*/
 	/*}*/
-	
 	terminal_initialize();
-
-	char buf[10];
-
-
 	init_mem();
-
 	glob_fdt_ptr = main_fdt;
-
 	init_fdt();
 
 	
@@ -137,6 +151,15 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	print_s(buf);
 	print_s("\n");
 	
+	/* Some arbitrary data for our files */
+	memset (data1, '1', sizeof (data1));
+	memset (data2, '2', sizeof (data2));
+	memset (data3, '3', sizeof (data3));
+	int retval, i;
+	int fd;
+	int index_node_number;
+
+
 	
         rd_mkdir("/test");
 	show_inode_info(0);
@@ -149,35 +172,210 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	show_inode_info(3);
 
 	char tmp[]="123456789";
-        int fd = rd_open("/test/tmp/giannis", RW);
-	show_fd_object(fd);
-	show_inode_info(3);
+	memset (data1, '1', sizeof (data1));
+        fd = rd_open("/test/tmp/giannis", RW);
 
-        rd_write(fd, tmp, strlen(tmp));
-	show_inode_info(3);
+        rd_write(fd, data1, strlen(data1));
         
-	char temp[9] = "";
-        memset(temp, '\0', 9);
-        rd_read(fd, temp, strlen(tmp));
+	char temp[sizeof(data1)] = "";
+        memset(temp, '\0', strlen(data1));
+	
+	rd_lseek(fd, 0);
+	int size = rd_read(fd, temp, sizeof(data1));
         print_s("THE CONTENT IS: ");
         print_s(temp);
         print_s("\n");
+	char strsize[10];
+	itoa(strsize,'d',size);
+	print_s("\n");
+	print_s(strsize);
 
 	
+
+
+
+#ifdef TEST1
+	  /* ****TEST 1: MAXIMUM file creation**** */
+	  /* Generate MAXIMUM regular files */
+	  for (i = 0; i < MAX_FILES; i++)
+	  { 
+		  sprintf(pathname, "/file", i);
+		  retval = CREAT (pathname, RO);
+		  if (retval < 0) 
+		  {
+			  print_s("creat: File creation error!\n");
+			  if (i != MAX_FILES)
+				  asm volatile("hlt");
+	      }
+	      memset (pathname, 0, 80);
+	  }
+	  /* Delete all the files created */
+	  for (i = 0; i < MAX_FILES; i++) 
+	  { 
+		  sprintf (pathname, "/file", i);
+		 retval = UNLINK (pathname);	
+		  if (retval < 0) 
+		  {
+			  print_s("unlink: File delection error!\n");
+			  asm volatile("hlt");
+		  }
+		  memset (pathname, 0, 80);
+	  }
+#endif // TEST1
+
+
+#ifdef TEST2
+	    /* ****TEST 2: LARGEST file size**** */
+	    /* Generate one LARGEST file */
+	    retval = CREAT ("/bigfile", RW);
+	    if (retval < 0) 
+	    {
+		    print_s("creat: File creation error!\n");
+		    asm volatile("hlt");
+	    }
+	    retval =  OPEN ("/bigfile", RW); /* Open file to write to it */
+	    if (retval < 0) {
+		    print_s("open: File open error!\n");
+		    asm volatile("hlt");
+	    }
+	    fd = retval;/* Assign valid fd */
+	    /* Try writing to all direct data blocks */
+	    retval = WRITE (fd, data1, sizeof(data1));
+	    if (retval < 0) 
+	    {
+		    print_s("write: File write STAGE1 error\n");
+		    asm volatile("hlt");
+	    }
+#ifdef TEST_SINGLE_INDIRECT
+	/* Try writing to all single-indirect data blocks */
+	    retval = WRITE (fd, data2, sizeof(data2));
+	    if (retval < 0) 
+	    {
+		    print_s("write: File write STAGE2 error\n");
+		    asm volatile("hlt");
+	    }
+#ifdef TEST_DOUBLE_INDIRECTT
+	    /* Try writing to all double-indirect data blocks */
+	    retval = WRITE (fd, data3, sizeof(data3));
+	    if (retval < 0) 
+	    {
+		    print_s("write: File write STAGE3 error\n");
+		    asm volatile("hlt");
+	    }
+#endif // TEST_DOUBLE_INDIRECT
+#endif // TEST_SINGLE_INDIRECT
+#endif // TEST2
+
+
+
+
+
+
+#ifdef TEST3
+	/* ****TEST 3: Seek and Read file test**** */
+	retval = LSEEK (fd, 0);/* Go back to the beginning of your file */
+	if (retval < 0) {
+		print_s("lseek: File seek error\n");
+		asm volatile("hlt");
+	}
+
+	/* Try retvalading from all direct data blocks */
+	retval = READ (fd, addr, sizeof(data1));
+	if (retval < 0) {
+		print_s("read: File read STAGE1 error\n");
+		asm volatile("hlt");
+	}
+	/* Should be all 1s here... */
+#ifdef TEST_SINGLE_INDIRECT
+	/* Try reading from all single-indirect data blocks */
+	retval = READ (fd, addr, sizeof(data2));
+	if (retval < 0) 
+	{
+		print_s("read: File read STAGE2 error\n");
+		asm volatile("hlt");
+	}
+	
+	/* Should be all 2s here... */
+#ifdef TEST_DOUBLE_INDIRECT
+	/* Try reading from all double-indirect data blocks */
+	retval = READ (fd, addr, sizeof(data3));
+	if (retval < 0) 
+	{
+		print_s("read: File read STAGE3 error\n");
+		asm volatile("hlt"); 
+	}
+	/* Should be all 3s here... */
+#endif // TEST_DOUBLE_INDIRECT
+#endif // TEST_SINGLE_INDIRECT
+	/* Close the bigfile */
+	retval = CLOSE(fd);
+	if (retval < 0) {
+		print_s("close: File close error\n");
+		asm volatile("hlt");
+	}
+#endif // TEST3
+
+#ifdef TEST4
+	  /* ****TEST 4: Check permissions**** */
+	  retval = CHMOD("/bigfile", RO); // Change bigfile to read-only
+	  if (retval < 0) {
+		  print_s("chmod: Failed to change mode\n");
+	  }
+	 /* Now try to write to bigfile again, but with read-only permissions! */
+	retval = WRITE (fd, data1, sizeof(data1));
+	if (retval < 0) {
+		print_s("chmod: Tried to write to read-only file\n");	    
+	}
+	retval = UNLINK ("/bigfile");
+	if (retval < 0) 
+	{
+		print_s("unlink: /bigfile file deletion error\n");
+	}
+#endif // TEST4
+
+#ifdef TEST5
+	/* ****TEST 5: Make directory including entries **** */
+	retval = MKDIR ("/dir1");
+	if (retval < 0) 
+	{
+		print_s("mkdir: Directory 1 creation error\n");
+	}
+	retval = MKDIR ("/dir1/dir2");
+	if (retval < 0) 
+	{
+		print_s("mkdir: Directory 2 creation error\n");
+	}
+	retval = MKDIR ("/dir1/dir3");
+	if (retval < 0) 
+	{
+		print_s("mkdir:Directory 3 creation error\n");
+	}
+#endif //TEST5
+
+#ifdef TEST6
+	/* ****TEST 6: 2 process test**** */
+
+	init_pic();
+	init_pit();
+	init_threads();
+	schedule();
+
+#endif // TEST6
+	print_s("Congrats\n");
 	asm volatile("hlt");
 
-	/* Initialize 8259 PIC */
-	 /*init_pic();*/
 
-	/* Initialize 8254 PIT */
-	 /*init_pit();*/
 
-	/* Initialize file system */
-	//init_mem();
 
-	/* Creating autostarting threads */
-//	print_s("Creating Threads!!!\n");
-	/*init_threads();*/
+
+
+
+
+
+
+
+	asm volatile("hlt");
+
 	
 
 

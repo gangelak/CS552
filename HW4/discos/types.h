@@ -35,7 +35,7 @@ typedef uint64 uint64_t;
 #define MAX_THREADS 3
 #define MAX_REPLS 40
 #else
-#define MAX_THREADS 5
+#define MAX_THREADS 2 
 #endif
 
 

@@ -3,6 +3,7 @@
 #include "vga.h"
 #include "schedule.h"
 #include "helper.h"
+#include "include/file_ops.h"
 
 extern pcb fifos_threads[MAX_THREADS];
 extern pcb * runqueue;
@@ -66,6 +67,10 @@ void schedule ()
 	if (current !=0 && prev_node->tid != current->tid ){
 
 //			print_s("Context switching to the next thread\n");
+#ifdef MEM
+		// switch file_desc
+		glob_fdt_ptr = current->file_desc;
+#endif
 		swtch(&prev_node->ctx, current->ctx);
 		// after thread-yield we have to go back
 	}

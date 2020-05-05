@@ -107,6 +107,21 @@ int strncmp(char string1[], char string2[], int size)
 	}
 	return 0;
 }
+int sprintf(char dest[], char str[], int dec)
+{
+	int len = strlen(str);
+	for (int i =0 ; i < len; i++)
+	{
+		dest[i] = str[i];
+	}
+	char temp[6];
+	itoa(temp, 'd', dec);
+	for ( int i = len; i < len +6; i++ )
+	{
+		dest[i] = temp[i-len];
+	}
+	return 0;
+}
 //https://www.techiedelight.com/implement-strncpy-function-c/
 void strncpy(char destination[], char source[], size_t num)
 {

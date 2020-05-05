@@ -8,17 +8,21 @@
 #include "vga.h"
 #include "schedule.h"
 #include "pic.h"
+#include "include/mem.h"
+#include "include/file_ops.h"
+#define CREAT   rd_creat
 
 static bool pcb_in_use[MAX_THREADS];
 static uint32_t stacks[MAX_THREADS][1024];
-static uint32_t dstack[1024]; 			//dummy stack for the dummy thread
-
+ uint32_t dstack[1024]; 			//dummy stack for the dummy thread
+#ifdef MEM
+file_obj file_desc_pool[MAX_FILES+1]; 
+#endif
 
 #ifdef PCR
 extern int time;
 rpl repl_pool[MAX_REPLS];
 #endif
-
 extern pcb fifos_threads[MAX_THREADS];
 extern pcb dum_dum;
 
@@ -118,28 +122,21 @@ void thread_func()
 	/*print_s("Executing Thread <");*/
 	/*print_s(name);*/
 	/*print_s(">\n");*/
-
-	
-	while (1) 
+	char pathname[80];
+	for (i = 0; i < 300; i++)
 	{
-		for ( i = 0 ; i < (10 + current->tid) ; i++ )
+		sprintf(pathname, "file_p_",i);
+		int retval = CREAT (pathname, RO);
+		if (retval < 0)
 		{
-			print_s ("<");
-			print_s (name);
-			print_s(",");
-			itoa(counter,'d',cnt);
-			print_s(counter);
-			print_s (">");
-			cnt++;
-			sleep();
+			print_s("Thread");
+			print_s(name);
+			print_s(" creation: Failed creation error\n");
+			asm volatile("hlt");
 		}
-#ifndef PCR
-		thread_yield();
-#endif
-		if (++j == 3)
-			break;
-  	}
-	
+		memset (pathname, 0, 80);                 
+	}
+
 	print_s ("Done <");
 	print_s(name);
 	print_s(">!");
@@ -223,8 +220,13 @@ void runqueue_add(pcb* t)
 		tmp->next = t;
 	}
 }
+#ifdef MEM
+int thread_create(void *stack, void *func, void *filedesc)
+#else
+int thread_create(void *stack, void *func)
+#endif
 
-int thread_create(void *stack, void *func){
+{
 	int new_pcb = -1;
 	
 	uint16_t ds=0x10, es = 0x10, fs = 0x10, gs = 0x10;
@@ -267,7 +269,6 @@ int thread_create(void *stack, void *func){
 
 	/* Fake an initial context for the new thread */
 	fifos_threads[new_pcb].sp = (uint32_t) (((uint32_t *) stack));
-	
 #ifdef PCR
 
 	fifos_threads[new_pcb].ci = new_pcb + 1;
@@ -276,6 +277,9 @@ int thread_create(void *stack, void *func){
 	fifos_threads[new_pcb].rpl_list = 0;
 #endif
 
+#ifdef MEM
+	fifos_threads[new_pcb].file_desc = (file_obj*)file_desc_pool; 
+#endif
 	// add to the run queue
 	runqueue_add(&fifos_threads[new_pcb]);
 	return 0;
@@ -286,11 +290,16 @@ void init_threads(void){
 	runqueue->next = 0; // set up runqueue
 	current = 0; // set up current running to null
 	int i;
-	
+#ifdef MEM	
+	for (i = 0; i < MAX_THREADS; i++){
+		thread_create(&(stacks[i][1023]), thread_func, &(file_desc_pool[i]));
+	}
+#else
 	for (i = 0; i < MAX_THREADS; i++){
 		thread_create(&(stacks[i][1023]), thread_func);
 	}
-	
+
+#endif
 	/* Initialize the dummy thread */
 	void *stk = &dstack[1023];
 
