@@ -89,7 +89,7 @@ int rd_creat(char *pathname, mode_t mode){
 	//Ok now we have the correct parent...Allocate resources for the file
 	//Also update the parent entry
 	
-//	print_s("Before updating the parent with the new entry\n");
+
 	res = update_parent(parent_inode,filename, CR, FL, mode);
 	if (res < 0){
 		print_s("creat: Cannot create a new entry for this file...Aborting\n");
@@ -101,7 +101,7 @@ int rd_creat(char *pathname, mode_t mode){
 		asm volatile("sti");
 	}
 
-//	print_s("creat: Parent updated\n");
+
 
 }
 
@@ -140,10 +140,6 @@ int rd_mkdir(char *pathname){
 		
 	}
 	
-	/*itoa(buf,'d',parent_inode);*/
-	/*print_s("Parent inode is ");*/
-	/*print_s(buf);*/
-	/*print_s("\n");*/
 
 	if (parent_inode < 0){
 		print_s("mkdir: Invalid path...Aborting\n");
@@ -153,7 +149,7 @@ int rd_mkdir(char *pathname){
 	//Ok now we have the correct parent...Allocate resources for the file
 	//Also update the parent entry
 	
-	//print_s("Before updating the parent with the new entry\n");
+
 	res = update_parent(parent_inode,filename, CR, DR, RW);
 	if (res < 0){
 		print_s("mkdir: Cannot create a new entry for this directory...Aborting\n");
@@ -191,10 +187,6 @@ int rd_open(char *pathname, int flags){
 		
 	}
 	
-	/*itoa(buf,'d',parent_inode);*/
-	/*print_s("\nParent inode is ");*/
-	/*print_s(buf);*/
-	/*print_s("\n");*/
 
 	if (parent_inode < 0){
 		print_s("open: Invalid path...Aborting\n");
@@ -282,10 +274,6 @@ int rd_read(int fd, char *address, int num_bytes){
 	int cur_pos_ptr; 				//Cur pos in the file
 	int bytes_read = 0; 				
 
-	/*print_s("File descriptor \n");*/
-	/*itoa(temp,'d',fd);*/
-	/*print_s(temp);*/
-	/*print_s("\n");*/
 	
 	/*FD does not exist*/
 	if (glob_fdt_ptr[fd].in_use == FREE){
@@ -296,11 +284,6 @@ int rd_read(int fd, char *address, int num_bytes){
 	/*Read only file*/
 	flags = glob_fdt_ptr[fd].flags;
 	inode_num = glob_fdt_ptr[fd].inode;
-	
-	/*print_s("Inode \n");*/
-	/*itoa(temp,'d',inode_num);*/
-	/*print_s(temp);*/
-	/*print_s("\n");*/
 
 	if (flags == WR || fs->inode[inode_num].perm == WR){
 		print_s("read: The file is opened as writeonly\n");
@@ -439,10 +422,6 @@ int rd_write(int fd, char *address, int num_bytes){
 		return ERROR;
 	}
 	
-	/*print_s("In write Current block is \n");*/
-	/*itoa(temp,'d',block_ptr);*/
-	/*print_s(temp);*/
-	/*print_s("\n");*/
 
 	init_block(block_ptr, fs->inode[inode_num].type); // Init the block
 
@@ -462,39 +441,16 @@ int rd_write(int fd, char *address, int num_bytes){
 		//We are at the end of the last block so we need to allocate a new one
 		if (pos_ptr % 256 ==0){
 			if (pos_ptr / 256 + 1 > blocks_alloc){
-				itoa(temp,'d',bytes_written);
-				/*print_s("Bytes written up to this point ");*/
-				/*print_s(temp);*/
-				/*print_s("\n");*/
 				cur_block++;
-				/*print_s("Allocating new block\n");*/
-				/*itoa(temp,'d',cur_block);*/
-				/*print_s("New block index \n");*/
-				/*print_s(temp);*/
-				/*print_s("\n");*/
 				res = allocate_block(cur_block,inode_num);
 				
 
 				if(res < 0){
-					/*itoa(temp,'d',blocks_alloc);*/
-					/*print_s("Blocks allocated till now ");*/
-					/*print_s(temp);*/
-					/*print_s("\n");*/
-					
-					/*itoa(temp,'d',bytes_written);*/
-					/*print_s("Bytes written till now ");*/
-					/*print_s(temp);*/
-					/*print_s("\n");*/
-					
 					print_s("write: No more available blocks to allocate\n");
 					return ERROR;
 				}
 				res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
 				
-				/*itoa(temp,'d',block_ptr);*/
-				/*print_s("Current block pointer ");*/
-				/*print_s(temp);*/
-				/*print_s("\n");*/
 				
 				init_block(block_ptr, fs->inode[inode_num].type);
 
@@ -503,7 +459,6 @@ int rd_write(int fd, char *address, int num_bytes){
 			}
 			// Else just go to the next block
 			else{
-				/*print_s("Going to the next block\n");*/
 				cur_block++;
 				res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
 				cur_byte = (char*) block_ptr;
@@ -513,12 +468,6 @@ int rd_write(int fd, char *address, int num_bytes){
 
 	glob_fdt_ptr[fd].pos_ptr = pos_ptr;
 	
-	/*itoa(Vtemp,'d',blocks_alloc);*/
-	/*print_s("Blocks allocated till now ");*/
-	/*print_s(temp);*/
-	/*print_s("\n");*/
-
-
 	if ( threads == 1 )
 		asm volatile("sti");
 
@@ -602,7 +551,6 @@ int rd_unlink(char *pathname){
 	}
 	
 	/*First update the parent directory*/
-//	print_s("Before updating the parent\n");
 
 	res = update_parent(parent_inode,filename, DL, DR, JUNK);
 	
@@ -621,10 +569,6 @@ int rd_unlink(char *pathname){
 	/*Now delete the inode and all its data*/
 	block_t *blk_ptr;
 	
-	/*print_s("Deleting inode ");*/
-	/*itoa(buf,'d',file_inode);*/
-	/*print_s(buf);*/
-	/*print_s("\n");*/
 	// Set the pointer to the first block of the file
 	for (int i=0; i< block_nums; i++){
 		res = find_block(i,&blk_ptr,file_inode);
@@ -635,10 +579,6 @@ int rd_unlink(char *pathname){
 		
 
 		blk_indx = (blk_ptr - &fs->d_blks[0]);
-		/*print_s("Block index to be deleted ");*/
-		/*itoa(buf,'d',blk_indx);*/
-		/*print_s(buf);*/
-		/*print_s("\n");*/
 		deallocate_block(blk_indx);
 
 	}
@@ -660,7 +600,6 @@ int rd_unlink(char *pathname){
 	if ( threads == 1 )
 		asm volatile("sti");
 
-	//print_s("unlink: File deleted\n");
 }
 
 int rd_chmod(char *pathname, mode_t mode){
@@ -686,11 +625,6 @@ int rd_chmod(char *pathname, mode_t mode){
 		
 	}
 	
-	/*itoa(buf,'d',parent_inode);*/
-	/*print_s("Parent inode is ");*/
-	/*print_s(buf);*/
-	/*print_s("\n");*/
-
 	/*Updating the mode*/
 	fs->inode[file_inode].perm = mode;
 
@@ -713,16 +647,6 @@ int find_block(int block_num, block_t** cur_block, int inode){
 
 	if(block_num <= 7){
 		*cur_block = (block_t*) fs->inode[inode].location[block_num];
-		/*itoa(temp, 'd',inode);*/
-		/*print_s("Inode ");*/
-		/*print_s(temp);*/
-		/*itoa(temp, 'd',block_num);*/
-		/*print_s("\nBlock num ");*/
-		/*print_s(temp);*/
-		/*itoa(temp, 'd',*cur_block);*/
-		/*print_s("\nIn find_block address is ");*/
-		/*print_s(temp);*/
-		/*print_s("\n");*/
 
 		return 0;
 	}
@@ -731,16 +655,6 @@ int find_block(int block_num, block_t** cur_block, int inode){
 		block_t *indirect;
 		indirect = fs->inode[inode].location[8];
 		*cur_block =  (block_t*) (indirect + block_num - 8);
-		/*itoa(temp, 'd',inode);*/
-		/*print_s("Indirect 1 Inode ");*/
-		/*print_s(temp);*/
-		/*itoa(temp, 'd',block_num);*/
-		/*print_s("\nBlock num ");*/
-		/*print_s(temp);*/
-		/*itoa(temp, 'd',*cur_block);*/
-		/*print_s("\nIn find_block address is ");*/
-		/*print_s(temp);*/
-		/*print_s("\n");*/
 		return 0;
 	}
 	//Second indirection
@@ -752,16 +666,6 @@ int find_block(int block_num, block_t** cur_block, int inode){
 		block_t *indirect_2;
 		indirect_2 = indirect_1 + ind_1;
 		*cur_block = (block_t*) (indirect_2 + ind_2);
-		/*print_s("Inode ");*/
-		/*print_s("Indirect 2 Inode ");*/
-		/*print_s(temp);*/
-		/*itoa(temp, 'd',block_num);*/
-		/*print_s("\nBlock num ");*/
-		/*print_s(temp);*/
-		/*itoa(temp, 'd',*cur_block);*/
-		/*print_s("\nIn find_block address is ");*/
-		/*print_s(temp);*/
-		/*print_s("\n");*/
 		return 0;
 	}
 	
@@ -793,31 +697,11 @@ int check_if_exists(char name[],int par_inode){
 	int block_num = 0;      					//First block (will help with indirections)
 	int status = 0;
 
-//	char tmp[10] = "";
-//	itoa(tmp,'d', par_inode);
-//	print_s("the parent inode is ");
-//	print_s(tmp);
-//	print_s("\n");
 	while (status != -1){
 		for (int i = 0; i < 16; i++){
 			dir_t *entry;  					//Temporary entry struct to extract the inode num
-			//&(fs->inode[parent_inode].location[block_num])
-			//cur_block = (block_t*) fs->inode[par_inode].location[block_num];        //Start from parent's first block
 			entry = (dir_t *) (cur_block);
 			entry += i;
-			//The file/dir we are looking for exists in this block...Yay!
-			char tmp[14] = "";
-			/*print_s("ENTRY INODE NUM ");*/
-			/*itoa(tmp,'d',entry->inode_num);*/
-			/*print_s(tmp);*/
-			/*print_s("\n");*/
-			/*print_s("ENTRY_FILENAME ");*/
-			/*print_s(entry->filename);*/
-			/*print_s("\n");*/
-			/*print_s("ENTRY_ADDRESS ");*/
-			/*itoa(tmp,'16',entry);*/
-			/*print_s(tmp);*/
-			/*print_s("\n");*/
 			if (strncmp(entry->filename, name, strlen(name)) == 0){
 			//	print_s("File found!\n");
 				return (int) entry->inode_num; 			//Return the inode number
@@ -825,11 +709,6 @@ int check_if_exists(char name[],int par_inode){
 		}
 		block_num++;
 		status = find_block(block_num,&cur_block,par_inode);
-//		char tmp[15];
-//		itoa(tmp,'d',block_num);
-//		print_s("the block num is");
-//		print_s(tmp);
-//		print_s("\n");
 	}
 
 	return ERROR;
@@ -874,27 +753,13 @@ int check_pathname(char *pathname, int *parent_inode, char filename[]){
 			i++;
 		}
 		temp_name[i] = '\0';
-//		name_finish++;
-		/*print_s("name_finish is ");*/
-		/*char tmp[10];*/
-		/*itoa(tmp,'d', name_finish);*/
-		/*print_s(tmp);*/
-		/*print_s("\n");*/
-		/*print_s("parthname is ");*/
-		/*print_s(pathname);*/
-		/*print_s("\n");*/
-		/*print_s("Temp name is ");*/
-		/*print_s(temp_name);*/
-		/*print_s("\n");*/
 		if (name_finish == path_len){
-//			print_s("Here1\n");
 			final = 1;
 			strncpy(filename,temp_name,strlen(temp_name));
 		}
 
 		//This is a directory name
 		if (pathname[name_finish] == '/'){
-//			print_s("Here2\n");
 			temp_name[i] = '\0'; 		//Null terminator for name
 		}
 
@@ -984,11 +849,6 @@ int allocate_inode(uint32_t type, uint32_t permissions){
 			fs->superblock.free_inodes--; 				//Decrease available inodes
 			fs->inode[i].in_use = 1;
 			fs->inode[i].opened = 0;
-//			char tmp[10];
-//			itoa(tmp,'d', ret);
-//			print_s("the allocated inode is ");
-//			print_s(tmp);
-//			print_s("\n");
 			return ret;
 		}
 	}
@@ -1003,21 +863,9 @@ void deallocate_block(int indx){
 	
 	char buf[16];
 	actual_blk = indx + 261;
-	/*itoa(buf,'d',actual_blk);*/
-	/*print_s("Block ");*/
-	/*print_s(buf);*/
-	/*print_s("\n");*/
 	
 	btmp_indx = actual_blk / 8;
-	/*itoa(buf,'d',btmp_indx);*/
-	/*print_s("Block index ");*/
-	/*print_s(buf);*/
-	/*print_s("\n");*/
 	bit_indx = actual_blk % 8;
-	/*itoa(buf,'d',bit_indx);*/
-	/*print_s("Bit index ");*/
-	/*print_s(buf);*/
-	/*print_s("\n");*/
 	
 	bmap_ptr = &fs->bitmap[btmp_indx];
 	*bmap_ptr ^= (0x80 >> bit_indx);
@@ -1095,13 +943,6 @@ int allocate_block(int block_num, int inode){
 
 			
 			blk_pointers =  &fs->d_blks[ind_1];
-			/*for (int i = 0; i< 64; i++){*/
-				/**(blk_pointers + i) = 0;*/
-				/*itoa(buf,'d',&blk_pointers[i]);*/
-				/*print_s("The blk_pointer indx addr is ");*/
-				/*print_s(buf);*/
-				/*print_s("\n");*/
-			/*}*/
 
 			*(blk_pointers+0) = fs->d_blks[blk_indx];
 			fs->inode[inode].location[8] = &fs->d_blks[ind_1];
@@ -1115,15 +956,6 @@ int allocate_block(int block_num, int inode){
 			}
 			
 			blk_pointers = fs->inode[inode].location[8];
-			/*itoa(buf,'d',blk_pointers);*/
-			/*print_s("The start address of blk_pointers is ");*/
-			/*print_s(buf);*/
-			/*print_s("\n");*/
-			/**(blk_pointers + block_num - 8) = fs->d_blks[blk_indx];*/
-			/*itoa(buf,'d',(blk_pointers + block_num -8));*/
-			/*print_s("The new blocks address is ");*/
-			/*print_s(buf);*/
-			/*print_s("\n");*/
 		}
 		//Check if the actual number of blocks is > 63 // We already allocated the first block
 
@@ -1146,9 +978,6 @@ int allocate_block(int block_num, int inode){
 			}
 			
 			blk_pointers = &fs->d_blks[ind_1];
-			/*for (int i = 0; i< 64; i++){*/
-				/*blk_pointers[i] = JUNK;*/
-			/*}*/
 			
 
 			int ind_2 = get_available_block();
@@ -1159,9 +988,6 @@ int allocate_block(int block_num, int inode){
 			}
 			
 			blk_pointers2 = &fs->d_blks[ind_2];
-			/*for (int i = 0; i< 64; i++){*/
-				/*blk_pointers2[i] = JUNK;*/
-			/*}*/
 			
 			// Finally get a data block
 			blk_indx = get_available_block();
@@ -1176,20 +1002,12 @@ int allocate_block(int block_num, int inode){
 			// Update the first of the second indirect pointers to point to the data block
 			*(blk_pointers2 + 0) = fs->d_blks[blk_indx];
 			
-			/*itoa(buf,'d',(blk_pointers2 + 0));*/
-			
-			/*print_s("The new ind2 blocks address is ");*/
-			/*print_s(buf);*/
-			/*print_s("\n");*/
-
 			//Finally set the last location pointer
 			
 			fs->inode[inode].location[9] = &fs->d_blks[ind_1];
 		}
 		// A new double indirection 
 		else if(ind2 == 0){
-			
-			
 
 			blk_pointers = fs->inode[inode].location[9];
 			
@@ -1200,9 +1018,6 @@ int allocate_block(int block_num, int inode){
 			}
 			
 			blk_pointers2 = &fs->d_blks[ind_2];
-			/*for (int i = 0; i< 64; i++){*/
-				/*blk_pointers2[i] = JUNK;*/
-			/*}*/
 			
 			// Finally get a data block
 			blk_indx = get_available_block();
@@ -1218,11 +1033,6 @@ int allocate_block(int block_num, int inode){
 			// Update the first of the second indirect pointers to point to the data block
 			*(blk_pointers2 + 0) = fs->d_blks[blk_indx];
 			
-			/*itoa(buf,'d',(blk_pointers2 + 0));*/
-			
-			/*print_s("The new ind2 blocks address is ");*/
-			/*print_s(buf);*/
-			/*print_s("\n");*/
 		}
 		// Just update a second indirection
 		else{
@@ -1237,12 +1047,6 @@ int allocate_block(int block_num, int inode){
 
 			// Update the first of the second indirect pointers to point to the data block
 			*(blk_pointers2 + ind2) = fs->d_blks[blk_indx];
-			
-			/*itoa(buf,'d',(blk_pointers2 + ind2));*/
-			
-			/*print_s("The new ind2 blocks address is ");*/
-			/*print_s(buf);*/
-			/*print_s("\n");*/
 			
 		}
 
@@ -1283,15 +1087,9 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 		// We have to allocate a new block for the parent 
 		// Block 0 is always allocated
 		if (offset == 0 && block_num != 0 ){
-			/*print_s("HEREEEEEEE!!\n");*/
 			
-			//block_num++;
 			offset = 0;
 			char temp[16] ;
-			/*itoa(temp, 'd',block_num);*/
-			/*print_s("Block number is ");*/
-			/*print_s(temp);*/
-			/*print_s("\n");*/
 			
 			res = allocate_block(block_num, parent_inode);
 			
@@ -1318,11 +1116,6 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 					
 			//Initialize the new block for the parent
 			//init_block(cur_block,parent_inode);
-//			char temp[16] ;
-//			itoa(temp, 'd',cur_block);
-//			print_s("In update parent address is ");
-//			print_s(temp);
-//			print_s("\n");
 
 
 			
@@ -1361,7 +1154,6 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 		// We have space at one block for the parent
 		// We have to find which
 		else{
-			//print_s("HEREEEEEEE222222!!\n");
 			
 			for (int i = 0; i <= block_num; i++){
 				res = find_block(i,&cur_block,parent_inode);
@@ -1370,7 +1162,6 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 					print_s("Something went wrong when finding the current block pointer for the parent\n");
 					return ERROR;
 				}
-				//print_s("HEREEEEEEE33333333!!\n");
 			
 				for (int i = 0; i < 16; i++){
 					
@@ -1386,7 +1177,6 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 						int inode_num;
 						/*print_s("Allocating inode\n");*/
 						inode_num = allocate_inode(type, perm);
-			//			print_s("HEREEEEEEE44444!!\n");
 						
 						if (inode_num < 0){
 							print_s("Not any available inodes for the new entry\n");
@@ -1399,15 +1189,9 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 						if (res < 0){
 							print_s("The new inode did not properly allocate a block\n");
 							return ERROR;
-			//			print_s("HEREEEEEEE55555!!\n");
 						}
 						//Init the block
 						init_block(temp_ptr,type);
-
-						/*print_s("INODE NUMVER ALLOCATED ");*/
-						/*itoa(buf,'d',inode_num);*/
-						/*print_s(buf);*/
-						/*print_s("\n");*/
 
 						strncpy(entry->filename,filename,strlen(filename)); 	
 						entry->inode_num = inode_num;
@@ -1481,14 +1265,11 @@ int exist_inodes(void){
 void show_dir_info(int inode)
 {
 	int block_num = 0;
-//	while (block_num != -1)
-//	{
 		block_t *cur_block;
 		cur_block = (block_t*) fs->inode[inode].location[block_num]; 	//Start from parent's first block
 		for (int i = 0; i < 16; i++)
 		{
 			dir_t *entry;  					//Temporary entry struct to extract the inode num
-			//&(fs->inode[parent_inode].location[block_num])
 			cur_block = (block_t*) fs->inode[inode].location[block_num];        //Start from parent's first block
 			entry = (dir_t *) (&cur_block + i * 16);
 			//The file/dir we are looking for exists in this block...Yay!
@@ -1499,8 +1280,6 @@ void show_dir_info(int inode)
 			print_s(entry->filename);
 			print_s("\n");
 			}
-//		block_num = next_block(block_num,cur_block,inode);
-//	}
 }
 void show_inode_info(int inode){
 	char buf[16];
@@ -1519,8 +1298,6 @@ void show_inode_info(int inode){
 		itoa(buf,'16',inode_ptr->location[i]);
 		print_s(buf);
 		print_s(" ");
-//		if ( i == 0 )
-//			show_dir_info(inode);
 	}
 	print_s("\nInode permissions: ");
 	itoa(buf,'d',inode_ptr->perm);
