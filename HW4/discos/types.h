@@ -97,7 +97,7 @@ struct proc_crtl_block{
 #endif
 
 #ifdef MEM
-	struct file_obj;
+	file_obj fdt[1024];
 #endif
 
 };

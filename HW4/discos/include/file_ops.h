@@ -28,5 +28,7 @@ int rd_cmmod(char *pathname, mode_t mode);
 
 void show_inode_info(int inode);
 void init_fdt(void);
+void show_fd_object(int fd);
+int allocate_block(int block_num, int inode);
 
 file_obj *glob_fdt_ptr;

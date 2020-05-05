@@ -140,8 +140,13 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 
 	char tmp[]="123456789";
         int fd = rd_open("/test/tmp/giannis", RW);
+	show_fd_object(fd);
+	show_inode_info(3);
+
         rd_write(fd, tmp, strlen(tmp));
-        char temp[9] = "";
+	show_inode_info(3);
+        
+	char temp[9] = "";
         memset(temp, '\0', 9);
         rd_read(fd, temp, strlen(tmp));
         print_s("THE CONTENT IS: ");
