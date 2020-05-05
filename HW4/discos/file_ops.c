@@ -824,7 +824,7 @@ int allocate_inode(uint32_t type, uint32_t permissions){
 //			print_s("the allocated inode is ");
 //			print_s(tmp);
 //			print_s("\n");
-			return ret;
+			return 0;
 		}
 	}
 	return ret;
@@ -1068,7 +1068,7 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 		// We have to allocate a new block for the parent 
 		// Block 0 is always allocated
 		if (offset == 0 && block_num != 0 ){
-			
+			print_s("HEREEEEEEE!!\n");
 			
 			block_num++;
 			offset = 0;
@@ -1121,8 +1121,9 @@ int update_parent(int parent_inode, char* filename, int action, uint32_t type, u
 		// We have space at one block for the parent
 		// We have to find which
 		else{
+			print_s("HEREEEEEEE222222!!\n");
 			
-			for (int i = 0; i<block_num; i++){
+			for (int i = 0; i <= block_num; i++){
 				res = find_block(i,&cur_block,parent_inode);
 				
 				if (res < 0){
