@@ -399,6 +399,11 @@ int rd_write(int fd, char *address, int num_bytes){
 
 	res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
 	
+	if (res < 0){
+		print_s("write: Cannot find a location pointer for this block\n");
+		return ERROR;
+	}
+	
 	print_s("In write Current block is \n");
 	itoa(temp,'d',block_ptr);
 	print_s(temp);
@@ -406,10 +411,6 @@ int rd_write(int fd, char *address, int num_bytes){
 
 	init_block(block_ptr, fs->inode[inode_num].type); // Init the block
 
-	if (res < 0){
-		print_s("write: Cannot find a location pointer for this block\n");
-		return ERROR;
-	}
 
 
 	/*Current byte in the block that we are able to write to*/
@@ -422,26 +423,28 @@ int rd_write(int fd, char *address, int num_bytes){
 		pos_ptr++;
 		fs->inode[inode_num].size++;
 		//We are at the end of the last block so we need to allocate a new one
-		if (pos_ptr / 256 + 1 > blocks_alloc){
-			cur_block++;
-			res = allocate_block(cur_block,inode_num);
+		if (pos_ptr % 256 ==0){
+			if (pos_ptr / 256 + 1 > blocks_alloc){
+				cur_block++;
+				res = allocate_block(cur_block,inode_num);
 
-			if(res < 0){
-				print_s("write: No more available blocks to allocate\n");
-				return ERROR;
+				if(res < 0){
+					print_s("write: No more available blocks to allocate\n");
+					return ERROR;
+				}
+				res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
+				
+				init_block(block_ptr, fs->inode[inode_num].type);
+
+				blocks_alloc++;
+				cur_byte = (char*) block_ptr;
 			}
-			res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
-			
-			init_block(block_ptr, fs->inode[inode_num].type);
-
-			blocks_alloc++;
-			cur_byte = (char*) block_ptr;
-		}
-		// We have to go to the next block
-		else if (pos_ptr % 256 == 0){
-			cur_block++;
-			res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
-			cur_byte = (char*) block_ptr;
+			// Else just go to the next block
+			else{
+				cur_block++;
+				res = find_block(cur_block,&block_ptr,inode_num); //Find the current block;
+				cur_byte = (char*) block_ptr;
+			}
 		}
 	}
 
@@ -608,10 +611,10 @@ int find_block(int block_num, block_t** cur_block, int inode){
 		return ERROR;
 	}
 	
+	char temp[16] ;
 
 	if(block_num <= 7){
 		*cur_block = (block_t*) fs->inode[inode].location[block_num];
-		char temp[16] ;
 		itoa(temp, 'd',inode);
 		print_s("Inode ");
 		print_s(temp);
@@ -627,6 +630,13 @@ int find_block(int block_num, block_t** cur_block, int inode){
 		block_t *indirect[64];
 		*indirect = fs->inode[inode].location[8];
 		*cur_block = (block_t*) indirect[block_num - 8];
+		itoa(temp, 'd',inode);
+		print_s("Indirect 1 Inode ");
+		print_s(temp);
+		itoa(temp, 'd',*cur_block);
+		print_s("\nIn find_block address is ");
+		print_s(temp);
+		print_s("\n");
 		return 0;
 	}
 	//Second indirection
@@ -638,6 +648,12 @@ int find_block(int block_num, block_t** cur_block, int inode){
 		block_t *indirect_2[64];
 		*indirect_2 = indirect_1[ind_1];
 		*cur_block = (block_t*) indirect_2[ind_2];
+		print_s("Indirect 2 Inode ");
+		print_s(temp);
+		itoa(temp, 'd',*cur_block);
+		print_s("\nIn find_block address is ");
+		print_s(temp);
+		print_s("\n");
 		return 0;
 	}
 	

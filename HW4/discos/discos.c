@@ -60,7 +60,7 @@ int time= 0;
 
 static char pathname[80];
 
-static char data1[DIRECT*BLK_SZ]; /* Largest data directly accessible */
+static char data1[BLK_SZ*DIRECT + 257]; /* Largest data directly accessible */
 static char data2[PTRS_PB*BLK_SZ];     /* Single indirect data size */
 static char data3[PTRS_PB*PTRS_PB*BLK_SZ]; /* Double indirect data size */
 static char addr[PTRS_PB*PTRS_PB*BLK_SZ+1]; /* Scratchpad memory */
@@ -175,13 +175,15 @@ void kmain (multiboot_info_t* mbt, unsigned long magic) {
 	char tmp[]="123456789";
 	memset (data1, '1', sizeof (data1));
         fd = rd_open("/test/tmp/giannis", RW);
-
+	
+	print_s("Write time\n");
         rd_write(fd, data1, strlen(data1));
         
-	char temp[sizeof(data1)] = "";
-        memset(temp, '\0', strlen(data1));
+	char temp[sizeof(data1) + 1] = "";
+        memset(temp, '\0', strlen(data1)+1);
 	
 	rd_lseek(fd, 0);
+	print_s("Read time\n");
 	int size = rd_read(fd, temp, sizeof(data1));
         print_s("THE CONTENT IS: ");
         print_s(temp);
